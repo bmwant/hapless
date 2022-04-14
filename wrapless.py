@@ -38,4 +38,5 @@ async def run(cmd, hap_id: int):
 
 
 if __name__ == '__main__':
-    asyncio.run(run('python fast.py', 5))
+    # asyncio.run(run('python fast.py', 5))
+    asyncio.run(run('python long_running.py', 6))
