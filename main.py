@@ -1,6 +1,8 @@
 import asyncio
 import time
-from datetime import datetime
+import tempfile
+from pathlib import Path
+
 
 import psutil
 import humanize
@@ -8,20 +10,6 @@ from rich import box
 from rich.console import Console
 from rich.table import Table
 
-
-async def run(cmd):
-    proc = await asyncio.create_subprocess_shell(
-        cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE)
-
-    stdout, stderr = await proc.communicate()
-
-    print(f'[{cmd!r} exited with {proc.returncode}]')
-    if stdout:
-        print(f'[stdout]\n{stdout.decode()}')
-    if stderr:
-        print(f'[stderr]\n{stderr.decode()}')
 
 
 """
@@ -31,7 +19,8 @@ failed
 completed
 """
 
-def main():
+
+def console():
     console = Console()
 
     table = Table(show_header=True, header_style="bold magenta", box=box.HEAVY_EDGE)
@@ -43,7 +32,7 @@ def main():
 
     # todo: add rc
     pids = [
-        1603,
+        36800,
         7646,
         5044,
     ]
@@ -56,4 +45,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    console()
