@@ -51,15 +51,31 @@ class Hapless(object):
         table.add_column("Status")
         table.add_column("Runtime", justify="right")
 
-        for h in haps:
-            try:
-                p = psutil.Process(h.pid)
-                runtime = time.time() - p.create_time()
-                table.add_row(f'{h.hid}', f'{h.name}', f'{h.pid}', p.status(), humanize.naturaldelta(runtime))
-            except psutil.NoSuchProcess:
-                table.add_row(f'{h.hid}', f'{h.name}', f'{h.pid}', 'completed', '1 h')
+        for hap in haps:
+            table.add_row(Hapless._stat_hap(hap))
         
         console.print(table)
+
+    @staticmethod
+    def _stat_hap(hap):
+        try:
+            p = psutil.Process(hap.pid)
+            runtime = time.time() - p.create_time()
+            return (
+                f'{hap.hid}', 
+                f'{hap.name}', 
+                f'{hap.pid}',
+                p.status(), 
+                humanize.naturaldelta(runtime),
+            )
+        except psutil.NoSuchProcess:
+            return (
+                f'{hap.hid}',
+                f'{hap.name}',
+                f'{hap.pid}', 
+                'completed',
+                '1 h',
+            )
 
     def get_haps(self):
         tmp_dir = Path(tempfile.gettempdir())
