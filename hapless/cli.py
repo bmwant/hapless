@@ -1,5 +1,6 @@
 import shlex
 import click
+from typing import Optional
 
 from hapless.main import Hapless
 
@@ -13,15 +14,25 @@ def cli(ctx):
 
 
 @cli.command()
-def status():
-    # todo: show status for individual hap
-    _status()
+@click.argument('hap_alias', metavar='hap', required=False)
+def status(hap_alias):
+    _status(hap_alias)
 
 
-def _status():
+@cli.command()
+@click.argument('hap_alias', metavar='hap', required=False)
+def show(hap_alias):
+    _status(hap_alias)
+
+
+def _status(hap_alias: Optional[str] = None):
     h = Hapless()
-    haps = h.get_haps()
-    h.stats(haps)
+    if hap_alias is not None:
+        hap = h.get_hap(hap_alias)
+        h.show(hap)
+    else:
+        haps = h.get_haps()
+        h.stats(haps)
 
 
 

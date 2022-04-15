@@ -3,6 +3,7 @@ import asyncio
 import sys
 import tempfile
 from pathlib import Path
+from typing import List
 
 from rich import box
 from rich.console import Console
@@ -26,7 +27,7 @@ class Hapless(object):
             self._hapless_dir.mkdir(parents=True, exist_ok=True)
 
     @staticmethod
-    def stats(haps):
+    def stats(haps: List[Hap]):
         console = Console()
         table = Table(show_header=True, header_style="bold magenta", box=box.HEAVY_EDGE)
         table.add_column("#", style="dim", width=2)
@@ -48,6 +49,15 @@ class Hapless(object):
         
         console.print(table)
 
+    @staticmethod
+    def show(hap: Hap):
+        console = Console()
+        table = Table(show_header=True, header_style="bold magenta", box=box.HEAVY_EDGE)
+        table.add_column("#", style="dim", width=2)
+        table.add_column("Name")
+        table.add_column("PID")
+        console.print(table)
+
     @property
     def dir(self) -> Path:
         return self._hapless_dir
@@ -60,7 +70,10 @@ class Hapless(object):
         dirs = self._get_hap_dirs()
         return 1 if not dirs else int(dirs[-1]) + 1
 
-    def get_haps(self):
+    def get_hap(self, hap_alias) -> Hap:
+        pass
+
+    def get_haps(self) -> List[Hap]:
         haps = []
         if not self._hapless_dir.exists():
             return haps
