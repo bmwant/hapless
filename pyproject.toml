@@ -9,10 +9,21 @@ license = "MIT"
 python = "^3.7"
 rich = "^12.2.0"
 psutil = "^5.9.0"
-humanfriendly = "^10.0"
 humanize = "^4.0.0"
+click = "^8.1.2"
 
 [tool.poetry.dev-dependencies]
+black = "^22.3.0"
+pytest = "^7.1.1"
+
+[tool.poetry.scripts]
+hap = 'hapless.cli:cli'
+
+[tool.poetry.urls]
+"Blog post" = "https://bmwlog.pp.ua/"
+
+[tool.black]
+line-length = 88
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
