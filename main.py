@@ -81,8 +81,13 @@ class Hapless(object):
         tmp_dir = Path(tempfile.gettempdir())
         hapless_dir = tmp_dir / 'hapless'
         haps = []
-        for item in os.listdir(hapless_dir):
-            hap_path = hapless_dir / item
+        if not hapless_dir.exists():
+            return haps
+
+        # todo: sort by ascending
+        hap_dirs = filter(str.isdigit, os.listdir(hapless_dir))
+        for dir in hap_dirs:
+            hap_path = hapless_dir / dir
             haps.append(Hap(hap_path))
         return haps
 
