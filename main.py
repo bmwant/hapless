@@ -15,12 +15,12 @@ failed
 completed
 """
 
-
-
-
 class Hapless(object):
     def __init__(self):
-        pass
+        tmp_dir = Path(tempfile.gettempdir())
+        self._hapless_dir = tmp_dir / 'hapless'
+        if not self._hapless_dir.exists():
+            self._hapless_dir.mkdir(parents=True, exist_ok=True)
 
     @staticmethod
     def stats(haps):
@@ -43,23 +43,28 @@ class Hapless(object):
         
         console.print(table)
 
+    def _get_hap_dirs(self):  
+        hap_dirs = filter(str.isdigit, os.listdir(self._hapless_dir))
+        return sorted(hap_dirs)
+
+    def get_next_hap_id(self):
+        dirs = self._get_hap_dirs()
+        return 1 if not dirs else int(dirs[-1]) + 1
+
     def get_haps(self):
-        tmp_dir = Path(tempfile.gettempdir())
-        hapless_dir = tmp_dir / 'hapless'
         haps = []
-        if not hapless_dir.exists():
+        if not self._hapless_dir.exists():
             return haps
 
-        # todo: sort by ascending
-        hap_dirs = filter(str.isdigit, os.listdir(hapless_dir))
-        for dir in hap_dirs:
-            hap_path = hapless_dir / dir
+        for dir in self._get_hap_dirs():
+            hap_path = self._hapless_dir / dir
             haps.append(Hap(hap_path))
         return haps
 
 
 def main():
     h = Hapless()
+    print(h.get_next_hap_id())
     haps = h.get_haps()
     h.stats(haps)
 
