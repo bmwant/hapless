@@ -80,7 +80,7 @@ class Hapless(object):
         pid = os.fork()
         if pid == 0:
             coro = subprocess_wrapper(
-                'python ../long_running.py',
+                cmd,
                 stdout_path=stdout_path,
                 stderr_path=stderr_path,
                 pid_path=pid_path,
@@ -88,7 +88,7 @@ class Hapless(object):
             )   
             asyncio.run(coro)
         else:
-            sys.exit(19)
+            sys.exit(0)
 
 
 async def subprocess_wrapper(
@@ -110,7 +110,6 @@ async def subprocess_wrapper(
             stderr=stderr_pipe,
         )
         with open(pid_path, 'w') as pid_file:
-            print(f'And my pid is {proc.pid}')
             pid_file.write(f'{proc.pid}')
 
         _ = await proc.communicate()

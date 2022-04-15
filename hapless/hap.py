@@ -41,6 +41,7 @@ class Hap(object):
         proc = self.proc
         if proc is not None:
             runtime = time.time() - proc.create_time()
+        # todo: proper runtime for finished hap
         runtime = time.time() - os.path.getmtime(self._pid_file)
         return humanize.naturaldelta(runtime)
 

@@ -1,5 +1,4 @@
-import sys
-import shlex, subprocess
+import shlex
 import click
 
 from hapless.main import Hapless
@@ -15,6 +14,7 @@ def cli(ctx):
 
 @cli.command()
 def status():
+    # todo: show status for individual hap
     _status()
 
 
@@ -24,10 +24,19 @@ def _status():
     h.stats(haps)
 
 
+
 @cli.command()
-def run():
+def clean():
+    pass
+
+
+@cli.command()
+@click.argument('cmd', nargs=-1)
+def run(cmd):
     h = Hapless()
-    h.run('python long_running.py')
+    print(f'This is: {cmd}')
+    h.run(shlex.join(cmd))
+
 
 
 if __name__ == '__main__':
