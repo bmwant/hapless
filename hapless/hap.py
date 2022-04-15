@@ -10,8 +10,8 @@ class Hap(object):
     def __init__(self, hap_path: Path):
         self._name = 'hap-name'
         self._hid = os.path.basename(hap_path)
-        pid_file = hap_path / 'pid'
-        with open(pid_file) as f:
+        self._pid_file = hap_path / 'pid'
+        with open(self._pid_file) as f:
             pid = f.read()
         self._pid = int(pid)
         self._proc = None
@@ -31,9 +31,8 @@ class Hap(object):
     def runtime(self) -> str:
         if self._proc is not None:
             runtime = time.time() - self._proc.create_time()
-            return humanize.naturaldelta(runtime)
-        
-
+        runtime = time.time() - os.path.getmtime(self._pid_file)
+        return humanize.naturaldelta(runtime)
 
     @property
     def active(self) -> bool:
