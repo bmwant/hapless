@@ -1,16 +1,12 @@
 import os
-import time
 import tempfile
 from pathlib import Path
 
-
-import psutil
-import humanize
 from rich import box
 from rich.console import Console
 from rich.table import Table
 
-
+from hapless.hap import Hap
 
 """
 paused
@@ -19,22 +15,7 @@ failed
 completed
 """
 
-class Hap(object):
-    def __init__(self, hap_path: Path):
-        self.name = 'hap-name'
-        self._hid = os.path.basename(hap_path)
-        pid_file = hap_path / 'pid'
-        with open(pid_file) as f:
-            pid = f.read()
-        self._pid = int(pid)
 
-    @property
-    def hid(self):
-        return self._hid
-
-    @property
-    def pid(self):
-        return self._pid
 
 
 class Hapless(object):
@@ -52,30 +33,15 @@ class Hapless(object):
         table.add_column("Runtime", justify="right")
 
         for hap in haps:
-            table.add_row(Hapless._stat_hap(hap))
+            table.add_row(
+                f'{hap.hid}',
+                hap.name,
+                f'{hap.pid}',
+                hap.status,
+                hap.runtime,
+            )
         
         console.print(table)
-
-    @staticmethod
-    def _stat_hap(hap):
-        try:
-            p = psutil.Process(hap.pid)
-            runtime = time.time() - p.create_time()
-            return (
-                f'{hap.hid}', 
-                f'{hap.name}', 
-                f'{hap.pid}',
-                p.status(), 
-                humanize.naturaldelta(runtime),
-            )
-        except psutil.NoSuchProcess:
-            return (
-                f'{hap.hid}',
-                f'{hap.name}',
-                f'{hap.pid}', 
-                'completed',
-                '1 h',
-            )
 
     def get_haps(self):
         tmp_dir = Path(tempfile.gettempdir())
