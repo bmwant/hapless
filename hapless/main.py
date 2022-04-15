@@ -13,8 +13,9 @@ from hapless.hap import Hap
 """
 paused
 running
-failed
-completed
+finished
+* finished(failed) non-zero rc
+* finished(success) zero rc
 """
 
 class Hapless(object):
