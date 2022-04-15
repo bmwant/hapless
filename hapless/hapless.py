@@ -61,13 +61,5 @@ class Hapless(object):
             haps.append(Hap(hap_path))
         return haps
 
-
-def main():
-    h = Hapless()
-    print(h.get_next_hap_id())
-    haps = h.get_haps()
-    h.stats(haps)
-
-
-if __name__ == '__main__':
-    main()
+    def run(self, cmd):
+        pass
