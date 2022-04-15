@@ -9,34 +9,44 @@ import humanize
 class Hap(object):
     def __init__(self, hap_path: Path):
         self._name = 'hap-name'
+        self._hap_path = hap_path
         self._hid = os.path.basename(hap_path)
+
+        # todo: allow overrides
         self._pid_file = hap_path / 'pid'
-        with open(self._pid_file) as f:
-            pid = f.read()
-        self._pid = int(pid)
-        self._proc = None
-        # self._active = True
+        self._rc_file = hap_path / 'rc'
+
+    @property
+    def status(self) -> str:
+        proc = self.proc
+        if proc is not None:
+            return proc.status()
+        return 'completed'
+
+    @property
+    def proc(self):
         try:
-            self._proc = psutil.Process(self._pid)
+            return psutil.Process(self.pid)
         except psutil.NoSuchProcess:
             pass
 
     @property
-    def status(self) -> str:
-        if self._proc is not None:
-            return self._proc.status()
-        return 'completed'
+    def rc(self) -> int:
+        if self._rc_file.exists():
+            with open(self._rc_file) as f:
+                return int(f.read())
 
     @property
     def runtime(self) -> str:
-        if self._proc is not None:
-            runtime = time.time() - self._proc.create_time()
+        proc = self.proc
+        if proc is not None:
+            runtime = time.time() - proc.create_time()
         runtime = time.time() - os.path.getmtime(self._pid_file)
         return humanize.naturaldelta(runtime)
 
     @property
     def active(self) -> bool:
-        return self._proc is not None
+        return self.proc is not None
 
     @property
     def hid(self) -> int:
@@ -44,7 +54,9 @@ class Hap(object):
 
     @property
     def pid(self) -> int:
-        return self._pid
+        if self._pid_file.exists():
+            with open(self._pid_file) as f:
+                return int(f.read())
 
     @property
     def name(self) -> str:

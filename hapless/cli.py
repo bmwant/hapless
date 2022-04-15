@@ -1,6 +1,8 @@
+import sys
+import shlex, subprocess
 import click
 
-from hapless.hapless import Hapless
+from hapless.main import Hapless
 
 
 @click.group(invoke_without_command=True)
@@ -20,6 +22,12 @@ def _status():
     h = Hapless()
     haps = h.get_haps()
     h.stats(haps)
+
+
+@cli.command()
+def run():
+    h = Hapless()
+    h.run('python long_running.py')
 
 
 if __name__ == '__main__':

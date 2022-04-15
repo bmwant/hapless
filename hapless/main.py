@@ -1,4 +1,6 @@
 import os
+import asyncio
+import sys
 import tempfile
 from pathlib import Path
 
@@ -30,6 +32,7 @@ class Hapless(object):
         table.add_column("Name")
         table.add_column("PID")
         table.add_column("Status")
+        table.add_column("RC")
         table.add_column("Runtime", justify="right")
 
         for hap in haps:
@@ -38,10 +41,15 @@ class Hapless(object):
                 hap.name,
                 f'{hap.pid}',
                 hap.status,
+                f'{hap.rc}',
                 hap.runtime,
             )
         
         console.print(table)
+
+    @property
+    def dir(self) -> Path:
+        return self._hapless_dir
 
     def _get_hap_dirs(self):  
         hap_dirs = filter(str.isdigit, os.listdir(self._hapless_dir))
@@ -62,4 +70,49 @@ class Hapless(object):
         return haps
 
     def run(self, cmd):
-        pass
+        hid = self.get_next_hap_id()
+        hap_dir = self._hapless_dir / f'{hid}'
+        hap_dir.mkdir()
+        stdout_path = hap_dir / 'stdout.log'
+        stderr_path = hap_dir / 'stderr.log'
+        pid_path = hap_dir / 'pid'
+        rc_path = hap_dir / 'rc'
+        pid = os.fork()
+        if pid == 0:
+            coro = subprocess_wrapper(
+                'python ../long_running.py',
+                stdout_path=stdout_path,
+                stderr_path=stderr_path,
+                pid_path=pid_path,
+                rc_path=rc_path,
+            )   
+            asyncio.run(coro)
+        else:
+            sys.exit(19)
+
+
+async def subprocess_wrapper(
+    cmd,
+    *,
+    stdout_path: Path,
+    stderr_path: Path,
+    pid_path: Path,
+    rc_path: Path,
+):
+    with (
+        open(stdout_path, 'w') as stdout_pipe,
+        open(stderr_path, 'w') as stderr_pipe,
+        open(rc_path, 'w') as rc_file,
+    ):
+        proc = await asyncio.create_subprocess_shell(
+            cmd,
+            stdout=stdout_pipe,
+            stderr=stderr_pipe,
+        )
+        with open(pid_path, 'w') as pid_file:
+            print(f'And my pid is {proc.pid}')
+            pid_file.write(f'{proc.pid}')
+
+        _ = await proc.communicate()
+        rc = proc.returncode
+        rc_file.write(f'{rc}')
