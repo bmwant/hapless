@@ -35,7 +35,6 @@ def _status(hap_alias: Optional[str] = None):
         h.stats(haps)
 
 
-
 @cli.command()
 def clean():
     pass

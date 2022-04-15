@@ -8,6 +8,7 @@ from typing import List
 from rich import box
 from rich.console import Console
 from rich.table import Table
+from rich.panel import Panel
 
 from hapless.hap import Hap
 
@@ -52,11 +53,17 @@ class Hapless(object):
     @staticmethod
     def show(hap: Hap):
         console = Console()
-        table = Table(show_header=True, header_style="bold magenta", box=box.HEAVY_EDGE)
-        table.add_column("#", style="dim", width=2)
-        table.add_column("Name")
-        table.add_column("PID")
-        console.print(table)
+        table = Table(show_header=False, show_footer=False, box=box.SIMPLE)
+        table.add_row("PID", f"{hap.pid}")
+        table.add_row("Command", f"{hap.cmd}")
+        table.add_row("Runtime", f'{hap.runtime}')
+        panel = Panel(
+            table, 
+            expand=False, 
+            title=f'Hap #{hap.hid}', 
+            subtitle=f'{hap.status}',
+        )
+        console.print(panel)
 
     @property
     def dir(self) -> Path:
@@ -71,7 +78,8 @@ class Hapless(object):
         return 1 if not dirs else int(dirs[-1]) + 1
 
     def get_hap(self, hap_alias) -> Hap:
-        pass
+        # todo: actual search by alias
+        return Hap(self._hapless_dir / '6')
 
     def get_haps(self) -> List[Hap]:
         haps = []

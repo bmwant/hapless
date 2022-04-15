@@ -31,6 +31,13 @@ class Hap(object):
             pass
 
     @property
+    def cmd(self):
+        proc = self.proc
+        if proc is not None:
+            return proc.cmdline()
+        return 'python fallback_cmd.py --finished'
+
+    @property
     def rc(self) -> int:
         if self._rc_file.exists():
             with open(self._rc_file) as f:
