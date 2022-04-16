@@ -4,6 +4,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from importlib.metadata import version
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -43,7 +44,9 @@ class Hapless(object):
             )
             return
 
+        package_version = version(__package__)
         table = Table(
+            title=f"{config.ICON_HAP} {__package__}, {package_version}",
             show_header=True,
             header_style=f"{config.COLOR_MAIN} bold",
             box=box.HEAVY_EDGE,
