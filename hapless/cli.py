@@ -1,9 +1,26 @@
 import shlex
+import sys
 from typing import Optional
 
 import click
+from rich.console import Console
 
+from hapless import config
 from hapless.main import Hapless
+
+console = Console(highlight=False)
+hapless = Hapless()
+
+
+def get_or_exit(hap_alias: str):
+    hap = hapless.get_hap(hap_alias)
+    if hap is None:
+        console.print(
+            f"{config.ICON_INFO} No such hap: {hap_alias}",
+            style=f"{config.COLOR_ERROR} bold",
+        )
+        sys.exit(1)
+    return hap
 
 
 @click.group(invoke_without_command=True)
@@ -27,22 +44,20 @@ def show(hap_alias):
 
 
 def _status(hap_alias: Optional[str] = None):
-    h = Hapless()
     if hap_alias is not None:
-        hap = h.get_hap(hap_alias)
-        h.show(hap)
+        hap = get_or_exit(hap_alias)
+        hapless.show(hap)
     else:
-        haps = h.get_haps()
-        h.stats(haps)
+        haps = hapless.get_haps()
+        hapless.stats(haps)
 
 
 @cli.command()
 @click.argument("hap_alias", metavar="hap")
 @click.option("-f", "--follow", is_flag=True, default=False)
 def logs(hap_alias, follow):
-    h = Hapless()
-    hap = h.get_hap(hap_alias)
-    h.logs(hap, follow=follow)
+    hap = get_or_exit(hap_alias)
+    hapless.logs(hap, follow=follow)
 
 
 @cli.command()
@@ -53,8 +68,7 @@ def clean():
 @cli.command()
 @click.argument("cmd", nargs=-1)
 def run(cmd):
-    h = Hapless()
-    h.run(shlex.join(cmd))
+    hapless.run(shlex.join(cmd))
 
 
 if __name__ == "__main__":
