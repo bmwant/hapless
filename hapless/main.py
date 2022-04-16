@@ -3,7 +3,7 @@ import os
 import sys
 import tempfile
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from rich import box
 from rich.console import Console
@@ -20,6 +20,7 @@ running
 finished
 * finished(failed) non-zero rc
 * finished(success) zero rc
+💀
 """
 
 
@@ -68,8 +69,12 @@ class Hapless(object):
 
         table.add_row("Runtime:", f"{hap.runtime}")
 
-        title_text = Text(f"Hap ⚡️{hap.hid}", style="yellow bold")
-        panel = Panel(table, expand=False, title=title_text, subtitle=hap.name)
+        panel = Panel(
+            table,
+            expand=False,
+            title=f"Hap {config.ICON_HAP}{hap.hid}",
+            subtitle=hap.name,
+        )
         console.print(panel)
 
     @property
@@ -80,8 +85,15 @@ class Hapless(object):
         hap_dirs = filter(str.isdigit, os.listdir(self._hapless_dir))
         return sorted(hap_dirs)
 
-    def _get_hap_names(self) -> List[str]:
-        return []
+    def _get_hap_names_map(self) -> Dict[str, str]:
+        names = {}
+        for dir in self._get_hap_dirs():
+            filename = self._hapless_dir / dir / "name"
+            if filename.exists():
+                with open(filename) as f:
+                    name = f.read().strip()
+                    names[name] = dir
+        return names
 
     def get_next_hap_id(self):
         dirs = self._get_hap_dirs()
@@ -94,7 +106,9 @@ class Hapless(object):
             return Hap(self._hapless_dir / hap_alias)
 
         # Check by hap name
-        return Hap(self._hapless_dir / "6")
+        names_map = self._get_hap_names_map()
+        if hap_alias in names_map:
+            return Hap(self._hapless_dir / names_map[hap_alias])
 
     def get_haps(self) -> List[Hap]:
         haps = []
@@ -106,7 +120,13 @@ class Hapless(object):
             haps.append(Hap(hap_path))
         return haps
 
-    def run(self, cmd):
+    def create_hap(self):
+        pass
+
+    async def run_hap(self):
+        pass
+
+    def run(self, cmd: str):
         hid = self.get_next_hap_id()
         hap_dir = self._hapless_dir / f"{hid}"
         hap_dir.mkdir()
@@ -136,6 +156,7 @@ async def subprocess_wrapper(
     pid_path: Path,
     rc_path: Path,
 ):
+    console = Console()
     with (
         open(stdout_path, "w") as stdout_pipe,
         open(stderr_path, "w") as stderr_pipe,
@@ -145,6 +166,8 @@ async def subprocess_wrapper(
             stdout=stdout_pipe,
             stderr=stderr_pipe,
         )
+        # todo: update style
+        console.print(f"{config.ICON_HAP} Launched hap PID[{proc.pid}]")
         with open(pid_path, "w") as pid_file:
             pid_file.write(f"{proc.pid}")
 

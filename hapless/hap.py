@@ -21,7 +21,7 @@ def allow_missing(func):
 
 
 class Hap(object):
-    def __init__(self, hap_path: Path):
+    def __init__(self, hap_path: Path, *, name: Optional[str] = None):
         self._hap_path = hap_path
         self._hid = os.path.basename(hap_path)
 
@@ -31,6 +31,19 @@ class Hap(object):
         self._name_file = hap_path / "name"
         self._cmd_file = hap_path / "cmd"
         self._env_file = hap_path / "env"
+
+        self._set_name(name)
+
+    def _set_name(self, name: Optional[str]):
+        """
+        Sets name for the first time on hap creation.
+        """
+        if name is None:
+            name = "generated-random"
+
+        if self.name is None:
+            with open(self._name_file, "w") as f:
+                f.write(name)
 
     @property
     def status(self) -> str:
