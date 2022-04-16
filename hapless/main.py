@@ -22,6 +22,7 @@ finished
 * finished(success) zero rc
 💀
 """
+console = Console()
 
 
 class Hapless(object):
@@ -33,7 +34,10 @@ class Hapless(object):
 
     @staticmethod
     def stats(haps: List[Hap]):
-        console = Console()
+        if not haps:
+            console.print("🔴 No haps are currently running")
+            return
+
         table = Table(show_header=True, header_style="bold magenta", box=box.HEAVY_EDGE)
         table.add_column("#", style="dim", width=2)
         table.add_column("Name")
@@ -48,7 +52,7 @@ class Hapless(object):
                 hap.name,
                 f"{hap.pid}",
                 hap.status,
-                f"{hap.rc}" if hap.rc else "",
+                f"{hap.rc}" if hap.rc is not None else "",
                 hap.runtime,
             )
 
@@ -56,7 +60,6 @@ class Hapless(object):
 
     @staticmethod
     def show(hap: Hap):
-        console = Console()
         table = Table(show_header=False, show_footer=False, box=box.SIMPLE)
 
         status_text = Text()
@@ -156,7 +159,6 @@ async def subprocess_wrapper(
     pid_path: Path,
     rc_path: Path,
 ):
-    console = Console()
     with (
         open(stdout_path, "w") as stdout_pipe,
         open(stderr_path, "w") as stderr_pipe,

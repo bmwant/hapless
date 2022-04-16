@@ -1,5 +1,7 @@
 import os
+import random
 import shlex
+import string
 import time
 from functools import wraps
 from pathlib import Path
@@ -39,18 +41,28 @@ class Hap(object):
         Sets name for the first time on hap creation.
         """
         if name is None:
-            name = "generated-random"
+            suffix = self.get_random_name()
+            name = f"hap-{suffix}"
 
         if self.name is None:
             with open(self._name_file, "w") as f:
                 f.write(name)
+
+    @staticmethod
+    def get_random_name(length: int = 6):
+        return "".join(
+            random.sample(
+                string.ascii_lowercase + string.digits,
+                length,
+            )
+        )
 
     @property
     def status(self) -> str:
         proc = self.proc
         if proc is not None:
             return proc.status()
-        return "success"
+        return "🟢 success"
 
     @property
     def proc(self):

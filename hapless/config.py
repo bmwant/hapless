@@ -5,6 +5,9 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 COLOR_HEADER = ""
 COLOR_ACCENT = "#3aaed8"
+
 ICON_HAP = "⚡️"
-ICON_SUCCESS = ""
-ICON_FAILED = ""
+ICON_SUCCESS = "🟢"
+ICON_RUNNING = "🟠"
+ICON_PAUSED = "⚪️"
+ICON_FAILED = "🔴"

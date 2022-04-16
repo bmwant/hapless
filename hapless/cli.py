@@ -37,6 +37,14 @@ def _status(hap_alias: Optional[str] = None):
 
 
 @cli.command()
+@click.argument("hap_alias", metavar="hap")
+def logs(hap_alias):
+    h = Hapless()
+    hap = h.get_hap(hap_alias)
+    h.show(hap)
+
+
+@cli.command()
 def clean():
     pass
 
