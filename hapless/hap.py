@@ -10,6 +10,8 @@ from typing import Optional
 import humanize
 import psutil
 
+from hapless import config
+
 
 def allow_missing(func):
     @wraps(func)
@@ -57,12 +59,15 @@ class Hap(object):
             )
         )
 
+    # todo: add extended status to show panel proc.status()
     @property
     def status(self) -> str:
         proc = self.proc
+        # todo: running or paused
         if proc is not None:
-            return proc.status()
-        return "🟢 success"
+            return f"{config.ICON_RUNNING} running"
+
+        return f"{config.ICON_SUCCESS} success"
 
     @property
     def proc(self):

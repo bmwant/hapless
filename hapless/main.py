@@ -75,10 +75,12 @@ class Hapless(object):
 
         table = Table(show_header=False, show_footer=False, box=box.SIMPLE)
 
-        status_text = Text()
-        table.add_row("Status:", status_text)
+        table.add_row("Status:", hap.status)
 
         table.add_row("PID:", f"{hap.pid}")
+
+        if hap.rc is not None:
+            table.add_row("Return code:", f"{hap.rc}")
 
         cmd_text = Text(f"{hap.cmd}", style=f"{config.COLOR_ACCENT} bold")
         table.add_row("Command:", cmd_text)
