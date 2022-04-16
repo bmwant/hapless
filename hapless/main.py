@@ -1,5 +1,6 @@
 import asyncio
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -161,11 +162,21 @@ class Hapless(object):
             sys.exit(0)
 
     def logs(self, hap: Hap, follow: bool = False):
-        stdout_path = str(hap._hap_path / "stdout.log")
+        stdout_path = str(hap.path / "stdout.log")
         if follow:
             return subprocess.run(["tail", "-f", stdout_path])
         else:
             return subprocess.run(["cat", stdout_path])
+
+    def clean(self, skip_failed: bool = False):
+        def to_clean(hap):
+            if hap.rc is not None:
+                return hap.rc == 0 or not skip_failed
+            return False
+
+        haps = filter(to_clean, self.get_haps())
+        for hap in haps:
+            shutil.rmtree(hap.path)
 
 
 async def subprocess_wrapper(

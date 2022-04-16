@@ -61,8 +61,9 @@ def logs(hap_alias, follow):
 
 
 @cli.command()
-def clean():
-    pass
+@click.option("--skip-failed", is_flag=True, default=False)
+def clean(skip_failed):
+    hapless.clean(skip_failed)
 
 
 @cli.command()

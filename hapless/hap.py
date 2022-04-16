@@ -128,3 +128,10 @@ class Hap(object):
     def name(self) -> Optional[str]:
         with open(self._name_file) as f:
             return f.read().strip()
+
+    @property
+    def path(self):
+        return self._hap_path
+
+    def __str__(self):
+        return f"#{self.hid} ({self.name})"
