@@ -35,6 +35,13 @@ class Hapless(object):
 
     @staticmethod
     def stats(haps: List[Hap]):
+        if not haps:
+            console.print(
+                f"{config.ICON_INFO} No haps are currently running",
+                style=f"{config.COLOR_MAIN} bold",
+            )
+            return
+
         table = Table(
             show_header=True,
             header_style=f"{config.COLOR_MAIN} bold",
