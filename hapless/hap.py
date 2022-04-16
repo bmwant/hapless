@@ -1,6 +1,7 @@
 import os
 import time
 from pathlib import Path
+from typing import Optional
 
 import humanize
 import psutil
@@ -31,14 +32,14 @@ class Hap(object):
             pass
 
     @property
-    def cmd(self):
+    def cmd(self) -> str:
         proc = self.proc
         if proc is not None:
             return proc.cmdline()
         return "python fallback_cmd.py --finished"
 
     @property
-    def rc(self) -> int:
+    def rc(self) -> Optional[int]:
         if self._rc_file.exists():
             with open(self._rc_file) as f:
                 return int(f.read())
@@ -48,8 +49,11 @@ class Hap(object):
         proc = self.proc
         if proc is not None:
             runtime = time.time() - proc.create_time()
-        # todo: proper runtime for finished hap
-        runtime = time.time() - os.path.getmtime(self._pid_file)
+        else:
+            start_time = os.path.getmtime(self._pid_file)
+            finish_time = os.path.getmtime(self._rc_file)
+            runtime = finish_time - start_time
+
         return humanize.naturaldelta(runtime)
 
     @property
@@ -61,7 +65,7 @@ class Hap(object):
         return self._hid
 
     @property
-    def pid(self) -> int:
+    def pid(self) -> Optional[int]:
         if self._pid_file.exists():
             with open(self._pid_file) as f:
                 return int(f.read())

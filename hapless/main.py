@@ -3,7 +3,7 @@ import os
 import sys
 import tempfile
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from rich import box
 from rich.console import Console
@@ -70,16 +70,24 @@ class Hapless(object):
     def dir(self) -> Path:
         return self._hapless_dir
 
-    def _get_hap_dirs(self):
+    def _get_hap_dirs(self) -> List[str]:
         hap_dirs = filter(str.isdigit, os.listdir(self._hapless_dir))
         return sorted(hap_dirs)
+
+    def _get_hap_names(self) -> List[str]:
+        return []
 
     def get_next_hap_id(self):
         dirs = self._get_hap_dirs()
         return 1 if not dirs else int(dirs[-1]) + 1
 
-    def get_hap(self, hap_alias) -> Hap:
-        # todo: actual search by alias
+    def get_hap(self, hap_alias: str) -> Optional[Hap]:
+        dirs = self._get_hap_dirs()
+        # Check by hap id
+        if hap_alias in dirs:
+            return Hap(self._hapless_dir / hap_alias)
+
+        # Check by hap name
         return Hap(self._hapless_dir / "6")
 
     def get_haps(self) -> List[Hap]:
@@ -125,7 +133,6 @@ async def subprocess_wrapper(
     with (
         open(stdout_path, "w") as stdout_pipe,
         open(stderr_path, "w") as stderr_pipe,
-        open(rc_path, "w") as rc_file,
     ):
         proc = await asyncio.create_subprocess_shell(
             cmd,
@@ -136,5 +143,6 @@ async def subprocess_wrapper(
             pid_file.write(f"{proc.pid}")
 
         _ = await proc.communicate()
-        rc = proc.returncode
-        rc_file.write(f"{rc}")
+
+        with open(rc_path, "w") as rc_file:
+            rc_file.write(f"{proc.returncode}")
