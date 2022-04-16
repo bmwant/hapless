@@ -22,7 +22,7 @@ finished
 * finished(success) zero rc
 💀
 """
-console = Console()
+console = Console(highlight=False)
 
 
 class Hapless(object):
@@ -41,7 +41,11 @@ class Hapless(object):
             )
             return
 
-        table = Table(show_header=True, header_style="bold magenta", box=box.HEAVY_EDGE)
+        table = Table(
+            show_header=True,
+            header_style=f"{config.COLOR_MAIN} bold",
+            box=box.HEAVY_EDGE,
+        )
         table.add_column("#", style="dim", width=2)
         table.add_column("Name")
         table.add_column("PID")
@@ -177,8 +181,8 @@ async def subprocess_wrapper(
             stdout=stdout_pipe,
             stderr=stderr_pipe,
         )
-        # todo: update style
-        console.print(f"{config.ICON_HAP} Launched hap PID[{proc.pid}]")
+        pid_text = Text(f"{proc.pid}", style=f"{config.COLOR_MAIN} bold")
+        console.print(f"{config.ICON_HAP} Launched hap PID [", pid_text, "]", sep="")
         with open(pid_path, "w") as pid_file:
             pid_file.write(f"{proc.pid}")
 
