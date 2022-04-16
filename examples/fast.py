@@ -2,10 +2,10 @@ import time
 
 
 def main():
-    print('Starting', flush=True)
+    print("Starting", flush=True)
     time.sleep(5)
-    print('I am done', flush=True)
+    print("I am done", flush=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,5 +1,5 @@
-import os
 import asyncio
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -7,8 +7,8 @@ from typing import List
 
 from rich import box
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
+from rich.table import Table
 
 from hapless.hap import Hap
 
@@ -20,10 +20,11 @@ finished
 * finished(success) zero rc
 """
 
+
 class Hapless(object):
     def __init__(self):
         tmp_dir = Path(tempfile.gettempdir())
-        self._hapless_dir = tmp_dir / 'hapless'
+        self._hapless_dir = tmp_dir / "hapless"
         if not self._hapless_dir.exists():
             self._hapless_dir.mkdir(parents=True, exist_ok=True)
 
@@ -40,14 +41,14 @@ class Hapless(object):
 
         for hap in haps:
             table.add_row(
-                f'{hap.hid}',
+                f"{hap.hid}",
                 hap.name,
-                f'{hap.pid}',
+                f"{hap.pid}",
                 hap.status,
-                f'{hap.rc}',
+                f"{hap.rc}",
                 hap.runtime,
             )
-        
+
         console.print(table)
 
     @staticmethod
@@ -56,12 +57,12 @@ class Hapless(object):
         table = Table(show_header=False, show_footer=False, box=box.SIMPLE)
         table.add_row("PID", f"{hap.pid}")
         table.add_row("Command", f"{hap.cmd}")
-        table.add_row("Runtime", f'{hap.runtime}')
+        table.add_row("Runtime", f"{hap.runtime}")
         panel = Panel(
-            table, 
-            expand=False, 
-            title=f'Hap #{hap.hid}', 
-            subtitle=f'{hap.status}',
+            table,
+            expand=False,
+            title=f"Hap #{hap.hid}",
+            subtitle=f"{hap.status}",
         )
         console.print(panel)
 
@@ -69,7 +70,7 @@ class Hapless(object):
     def dir(self) -> Path:
         return self._hapless_dir
 
-    def _get_hap_dirs(self):  
+    def _get_hap_dirs(self):
         hap_dirs = filter(str.isdigit, os.listdir(self._hapless_dir))
         return sorted(hap_dirs)
 
@@ -79,7 +80,7 @@ class Hapless(object):
 
     def get_hap(self, hap_alias) -> Hap:
         # todo: actual search by alias
-        return Hap(self._hapless_dir / '6')
+        return Hap(self._hapless_dir / "6")
 
     def get_haps(self) -> List[Hap]:
         haps = []
@@ -93,12 +94,12 @@ class Hapless(object):
 
     def run(self, cmd):
         hid = self.get_next_hap_id()
-        hap_dir = self._hapless_dir / f'{hid}'
+        hap_dir = self._hapless_dir / f"{hid}"
         hap_dir.mkdir()
-        stdout_path = hap_dir / 'stdout.log'
-        stderr_path = hap_dir / 'stderr.log'
-        pid_path = hap_dir / 'pid'
-        rc_path = hap_dir / 'rc'
+        stdout_path = hap_dir / "stdout.log"
+        stderr_path = hap_dir / "stderr.log"
+        pid_path = hap_dir / "pid"
+        rc_path = hap_dir / "rc"
         pid = os.fork()
         if pid == 0:
             coro = subprocess_wrapper(
@@ -107,7 +108,7 @@ class Hapless(object):
                 stderr_path=stderr_path,
                 pid_path=pid_path,
                 rc_path=rc_path,
-            )   
+            )
             asyncio.run(coro)
         else:
             sys.exit(0)
@@ -122,18 +123,18 @@ async def subprocess_wrapper(
     rc_path: Path,
 ):
     with (
-        open(stdout_path, 'w') as stdout_pipe,
-        open(stderr_path, 'w') as stderr_pipe,
-        open(rc_path, 'w') as rc_file,
+        open(stdout_path, "w") as stdout_pipe,
+        open(stderr_path, "w") as stderr_pipe,
+        open(rc_path, "w") as rc_file,
     ):
         proc = await asyncio.create_subprocess_shell(
             cmd,
             stdout=stdout_pipe,
             stderr=stderr_pipe,
         )
-        with open(pid_path, 'w') as pid_file:
-            pid_file.write(f'{proc.pid}')
+        with open(pid_path, "w") as pid_file:
+            pid_file.write(f"{proc.pid}")
 
         _ = await proc.communicate()
         rc = proc.returncode
-        rc_file.write(f'{rc}')
+        rc_file.write(f"{rc}")

@@ -2,26 +2,26 @@ import os
 import time
 from pathlib import Path
 
-import psutil
 import humanize
+import psutil
 
 
 class Hap(object):
     def __init__(self, hap_path: Path):
-        self._name = 'hap-name'
+        self._name = "hap-name"
         self._hap_path = hap_path
         self._hid = os.path.basename(hap_path)
 
         # todo: allow overrides
-        self._pid_file = hap_path / 'pid'
-        self._rc_file = hap_path / 'rc'
+        self._pid_file = hap_path / "pid"
+        self._rc_file = hap_path / "rc"
 
     @property
     def status(self) -> str:
         proc = self.proc
         if proc is not None:
             return proc.status()
-        return 'completed'
+        return "completed"
 
     @property
     def proc(self):
@@ -35,7 +35,7 @@ class Hap(object):
         proc = self.proc
         if proc is not None:
             return proc.cmdline()
-        return 'python fallback_cmd.py --finished'
+        return "python fallback_cmd.py --finished"
 
     @property
     def rc(self) -> int:

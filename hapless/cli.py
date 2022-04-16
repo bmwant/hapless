@@ -1,6 +1,7 @@
 import shlex
-import click
 from typing import Optional
+
+import click
 
 from hapless.main import Hapless
 
@@ -14,13 +15,13 @@ def cli(ctx):
 
 
 @cli.command()
-@click.argument('hap_alias', metavar='hap', required=False)
+@click.argument("hap_alias", metavar="hap", required=False)
 def status(hap_alias):
     _status(hap_alias)
 
 
 @cli.command()
-@click.argument('hap_alias', metavar='hap', required=False)
+@click.argument("hap_alias", metavar="hap", required=False)
 def show(hap_alias):
     _status(hap_alias)
 
@@ -41,13 +42,12 @@ def clean():
 
 
 @cli.command()
-@click.argument('cmd', nargs=-1)
+@click.argument("cmd", nargs=-1)
 def run(cmd):
     h = Hapless()
-    print(f'This is: {cmd}')
+    print(f"This is: {cmd}")
     h.run(shlex.join(cmd))
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()
