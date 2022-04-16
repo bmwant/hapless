@@ -67,6 +67,9 @@ class Hap(object):
         if proc is not None:
             return f"{config.ICON_RUNNING} running"
 
+        if self.rc != 0:
+            return f"{config.ICON_FAILED} failed"
+
         return f"{config.ICON_SUCCESS} success"
 
     @property
