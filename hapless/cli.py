@@ -45,7 +45,6 @@ def clean():
 @click.argument("cmd", nargs=-1)
 def run(cmd):
     h = Hapless()
-    print(f"This is: {cmd}")
     h.run(shlex.join(cmd))
 
 

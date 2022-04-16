@@ -9,7 +9,9 @@ from rich import box
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
+from rich.text import Text
 
+from hapless import config
 from hapless.hap import Hap
 
 """
@@ -55,15 +57,19 @@ class Hapless(object):
     def show(hap: Hap):
         console = Console()
         table = Table(show_header=False, show_footer=False, box=box.SIMPLE)
-        table.add_row("PID", f"{hap.pid}")
-        table.add_row("Command", f"{hap.cmd}")
-        table.add_row("Runtime", f"{hap.runtime}")
-        panel = Panel(
-            table,
-            expand=False,
-            title=f"Hap #{hap.hid}",
-            subtitle=f"{hap.status}",
-        )
+
+        status_text = Text()
+        table.add_row("Status:", status_text)
+
+        table.add_row("PID:", f"{hap.pid}")
+
+        cmd_text = Text(f"{hap.cmd}", style=f"{config.COLOR_ACCENT} bold")
+        table.add_row("Command:", cmd_text)
+
+        table.add_row("Runtime:", f"{hap.runtime}")
+
+        title_text = Text(f"Hap ⚡️{hap.hid}", style="yellow bold")
+        panel = Panel(table, expand=False, title=title_text, subtitle=hap.name)
         console.print(panel)
 
     @property

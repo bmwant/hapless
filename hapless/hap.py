@@ -1,4 +1,5 @@
 import os
+import shlex
 import time
 from functools import wraps
 from pathlib import Path
@@ -49,7 +50,7 @@ class Hap(object):
     def cmd(self) -> str:
         proc = self.proc
         if proc is not None:
-            return proc.cmdline()
+            return shlex.join(proc.cmdline())
         return "python fallback_cmd.py --finished"
 
     @property
@@ -93,4 +94,4 @@ class Hap(object):
     @allow_missing
     def name(self) -> Optional[str]:
         with open(self._name_file) as f:
-            return f.read()
+            return f.read().strip()
