@@ -1,5 +1,6 @@
 import asyncio
 import os
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -164,6 +165,13 @@ class Hapless(object):
             asyncio.run(coro)
         else:
             sys.exit(0)
+
+    def logs(self, hap: Hap, follow: bool = False):
+        stdout_path = str(hap._hap_path / "stdout.log")
+        if follow:
+            return subprocess.run(["tail", "-f", stdout_path])
+        else:
+            return subprocess.run(["cat", stdout_path])
 
 
 async def subprocess_wrapper(
