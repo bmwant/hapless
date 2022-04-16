@@ -174,9 +174,20 @@ class Hapless(object):
                 return hap.rc == 0 or not skip_failed
             return False
 
-        haps = filter(to_clean, self.get_haps())
+        haps = list(filter(to_clean, self.get_haps()))
         for hap in haps:
             shutil.rmtree(hap.path)
+
+        if haps:
+            console.print(
+                f"{config.ICON_INFO} Deleted {len(haps)} finished haps",
+                style=f"{config.COLOR_MAIN} bold",
+            )
+        else:
+            console.print(
+                f"{config.ICON_INFO} Nothing to clean",
+                style=f"{config.COLOR_ERROR} bold",
+            )
 
 
 async def subprocess_wrapper(
