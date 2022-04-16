@@ -1,5 +1,6 @@
 import os
 import time
+from functools import wraps
 from pathlib import Path
 from typing import Optional
 
@@ -7,22 +8,35 @@ import humanize
 import psutil
 
 
+def allow_missing(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except FileNotFoundError:
+            pass
+
+    return wrapper
+
+
 class Hap(object):
     def __init__(self, hap_path: Path):
-        self._name = "hap-name"
         self._hap_path = hap_path
         self._hid = os.path.basename(hap_path)
 
-        # todo: allow overrides
+        # todo: allow overrides?
         self._pid_file = hap_path / "pid"
         self._rc_file = hap_path / "rc"
+        self._name_file = hap_path / "name"
+        self._cmd_file = hap_path / "cmd"
+        self._env_file = hap_path / "env"
 
     @property
     def status(self) -> str:
         proc = self.proc
         if proc is not None:
             return proc.status()
-        return "completed"
+        return "success"
 
     @property
     def proc(self):
@@ -39,10 +53,10 @@ class Hap(object):
         return "python fallback_cmd.py --finished"
 
     @property
+    @allow_missing
     def rc(self) -> Optional[int]:
-        if self._rc_file.exists():
-            with open(self._rc_file) as f:
-                return int(f.read())
+        with open(self._rc_file) as f:
+            return int(f.read())
 
     @property
     def runtime(self) -> str:
@@ -65,11 +79,18 @@ class Hap(object):
         return self._hid
 
     @property
+    @allow_missing
     def pid(self) -> Optional[int]:
-        if self._pid_file.exists():
-            with open(self._pid_file) as f:
-                return int(f.read())
+        with open(self._pid_file) as f:
+            return int(f.read())
 
     @property
-    def name(self) -> str:
-        return self._name
+    @allow_missing
+    def env(self):
+        pass
+
+    @property
+    @allow_missing
+    def name(self) -> Optional[str]:
+        with open(self._name_file) as f:
+            return f.read()

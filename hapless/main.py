@@ -45,7 +45,7 @@ class Hapless(object):
                 hap.name,
                 f"{hap.pid}",
                 hap.status,
-                f"{hap.rc}",
+                f"{hap.rc}" if hap.rc else "",
                 hap.runtime,
             )
 
