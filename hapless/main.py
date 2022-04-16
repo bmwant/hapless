@@ -35,7 +35,10 @@ class Hapless(object):
     @staticmethod
     def stats(haps: List[Hap]):
         if not haps:
-            console.print("🔴 No haps are currently running")
+            console.print(
+                f"{config.ICON_INFO} No haps are currently running",
+                style=f"{config.COLOR_ERROR} bold",
+            )
             return
 
         table = Table(show_header=True, header_style="bold magenta", box=box.HEAVY_EDGE)
@@ -60,6 +63,12 @@ class Hapless(object):
 
     @staticmethod
     def show(hap: Hap):
+        if not hap:
+            console.print(
+                f"{config.ICON_INFO} No such hap", style=f"{config.COLOR_ERROR} bold"
+            )
+            return
+
         table = Table(show_header=False, show_footer=False, box=box.SIMPLE)
 
         status_text = Text()
