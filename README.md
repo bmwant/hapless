@@ -19,6 +19,8 @@ $ hap run -- python long_running.py
 $ hap status
 ```
 
+See [USAGE.md](https://github.com/bmwant/hapless/blob/main/USAGE.md) for the complete list of commands and available parameters.
+
 ### Contribute
 
 See [DEVELOP.md](https://github.com/bmwant/hapless/blob/main/DEVELOP.md) to setup your local development environment and feel free to create a pull request with a new feature.
