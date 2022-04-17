@@ -1,12 +1,20 @@
 ## hapless
 
+![Checks](https://github.com/bmwant/hapless/actions/workflows/tests.yml/badge.svg)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ### Installation
 
 ```bash
 $ pip install hapless
-$ python -m pip install hapless
 
+# or to make sure proper pip is used for the given python executable
+$ python -m pip install hapless
+```
+
+Install into user-specific directory in case of any permissions-related issues.
+
+```bash
 $ pip install --user hapless
 $ python -m pip install --user hapless
 ```

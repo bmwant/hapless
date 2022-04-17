@@ -15,6 +15,15 @@ $ hap run python ./examples/fast.py
 
 ### Checking status
 
+* Show summary for all haps
+
+```bash
+$ hap
+# or
+$ hap status  # equivalent
+$ hap show  # same as above
+```
+
 * Check status of the specific hap
 
 ```bash
