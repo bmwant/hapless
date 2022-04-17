@@ -38,4 +38,5 @@ See [CHANGELOG.md](https://github.com/bmwant/hapless/blob/main/CHANGELOG.md) for
 🐶 `D7DA74qzZUyh9cctCxWovPTEovUSjGzL2S` this is [Dogecoin](https://dogecoin.com/) wallet to support the project.
 
 🇺🇦 All donations will go towards supporting Ukraine in the war.
-[Contact author](mailto:bmwant@gmail.com) directly in case you want to donate with some different payment option or check what has already been done.
+
+✉️ [Contact author](mailto:bmwant@gmail.com) directly in case you want to donate with some different payment option or check what has already been done.
