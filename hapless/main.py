@@ -4,7 +4,12 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from importlib.metadata import version
+
+try:
+    from importlib.metadata import version
+except ModuleNotFoundError:
+    # Fallback for Python 3.7
+    from importlib_metadata import version
 from pathlib import Path
 from typing import Dict, List, Optional
 
