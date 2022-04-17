@@ -161,7 +161,8 @@ class Hapless(object):
             pid_text = Text(f"{proc.pid}", style=f"{config.COLOR_MAIN} bold")
             name_text = Text(f"{hap.name}", style=f"{config.COLOR_MAIN} bold")
             console.print(
-                f"{config.ICON_INFO} Running hap {config.ICON_HAP}{hap.hid} (",
+                f"{config.ICON_INFO} Running hap {config.ICON_HAP}{hap.hid} ",
+                "(",
                 name_text,
                 ") with PID [",
                 pid_text,
@@ -175,7 +176,12 @@ class Hapless(object):
 
     def _check_fast_failure(self, hap: Hap):
         if wait_created(hap._rc_file) and hap.rc != 0:
-            console.print("Hap failed!", hap)
+            console.print(
+                f"{config.ICON_INFO} Hap exited too quickly. stderr message:",
+                style=f"{config.COLOR_ERROR} bold",
+            )
+            with open(hap.stderr_path) as f:
+                console.print(f.read())
             sys.exit(1)
 
     def run(self, cmd: str, check: bool = False):
