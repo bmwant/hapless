@@ -1,4 +1,16 @@
 import time
+from functools import wraps
+
+
+def allow_missing(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except FileNotFoundError:
+            pass
+
+    return wrapper
 
 
 class timed(object):

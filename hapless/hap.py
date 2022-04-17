@@ -2,7 +2,6 @@ import os
 import random
 import string
 import time
-from functools import wraps
 from pathlib import Path
 from typing import Optional
 
@@ -10,17 +9,7 @@ import humanize
 import psutil
 
 from hapless import config
-
-
-def allow_missing(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except FileNotFoundError:
-            pass
-
-    return wrapper
+from hapless.utils import allow_missing
 
 
 class Hap(object):
