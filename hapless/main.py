@@ -145,10 +145,9 @@ class Hapless(object):
         return Hap(hap_dir, cmd=cmd, name=name)
 
     async def run_hap(self, hap: Hap):
-        with (
-            open(hap.stdout_path, "w") as stdout_pipe,
-            open(hap.stderr_path, "w") as stderr_pipe,
-        ):
+        with open(hap.stdout_path, "w") as stdout_pipe, open(
+            hap.stderr_path, "w"
+        ) as stderr_pipe:
             # todo: run with exec
             proc = await asyncio.create_subprocess_shell(
                 hap.cmd,
