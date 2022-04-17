@@ -1,6 +1,5 @@
 import os
 import random
-import shlex
 import string
 import time
 from functools import wraps
@@ -25,11 +24,16 @@ def allow_missing(func):
 
 
 class Hap(object):
-    def __init__(self, hap_path: Path, *, name: Optional[str] = None):
+    def __init__(
+        self,
+        hap_path: Path,
+        *,
+        name: Optional[str] = None,
+        cmd: Optional[str] = None,
+    ):
         self._hap_path = hap_path
         self._hid = os.path.basename(hap_path)
 
-        # todo: allow overrides?
         self._pid_file = hap_path / "pid"
         self._rc_file = hap_path / "rc"
         self._name_file = hap_path / "name"
@@ -37,6 +41,8 @@ class Hap(object):
         self._env_file = hap_path / "env"
 
         self._set_name(name)
+        self._set_cmd(cmd)
+        self._set_env()
 
     def _set_name(self, name: Optional[str]):
         """
@@ -49,6 +55,19 @@ class Hap(object):
         if self.name is None:
             with open(self._name_file, "w") as f:
                 f.write(name)
+
+    def _set_cmd(self, cmd: Optional[str]):
+        """
+        Sets cmd for the first tiem on hap creation.
+        """
+        if self.cmd is None:
+            if cmd is None:
+                raise ValueError("Command to run is not provided")
+            with open(self._cmd_file, "w") as f:
+                f.write(cmd)
+
+    def _set_env(self):
+        pass
 
     @staticmethod
     def get_random_name(length: int = 6):
@@ -80,11 +99,12 @@ class Hap(object):
             pass
 
     @property
+    @allow_missing
     def cmd(self) -> str:
-        proc = self.proc
-        if proc is not None:
-            return shlex.join(proc.cmdline())
-        return "python fallback_cmd.py --finished"
+        # todo: might be better for the shell expansion
+        # shlex.join(proc.cmdline())
+        with open(self._cmd_file) as f:
+            return f.read()
 
     @property
     @allow_missing
@@ -132,6 +152,14 @@ class Hap(object):
     @property
     def path(self):
         return self._hap_path
+
+    @property
+    def stdout_path(self):
+        return self._hap_path / "stdout.log"
+
+    @property
+    def stderr_path(self):
+        return self._hap_path / "stderr.log"
 
     def __str__(self):
         return f"#{self.hid} ({self.name})"

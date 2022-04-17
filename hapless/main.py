@@ -137,39 +137,51 @@ class Hapless(object):
             haps.append(Hap(hap_path))
         return haps
 
-    def create_hap(self):
-        pass
-
-    async def run_hap(self):
-        pass
-
-    def run(self, cmd: str):
+    def create_hap(self, cmd: str, name: Optional[str] = None) -> Hap:
         hid = self.get_next_hap_id()
         hap_dir = self._hapless_dir / f"{hid}"
         hap_dir.mkdir()
-        stdout_path = hap_dir / "stdout.log"
-        stderr_path = hap_dir / "stderr.log"
-        pid_path = hap_dir / "pid"
-        rc_path = hap_dir / "rc"
+        return Hap(hap_dir, cmd=cmd, name=name)
+
+    async def run_hap(self, hap: Hap):
+        with (
+            open(hap.stdout_path, "w") as stdout_pipe,
+            open(hap.stderr_path, "w") as stderr_pipe,
+        ):
+            # todo: run with exec
+            proc = await asyncio.create_subprocess_shell(
+                hap.cmd,
+                stdout=stdout_pipe,
+                stderr=stderr_pipe,
+            )
+
+            pid_text = Text(f"{proc.pid}", style=f"{config.COLOR_MAIN} bold")
+            console.print(
+                f"{config.ICON_HAP} Launched hap PID [", pid_text, "]", sep=""
+            )
+
+            with open(hap._pid_file, "w") as pid_file:
+                pid_file.write(f"{proc.pid}")
+
+            _ = await proc.communicate()
+
+            with open(hap._rc_file, "w") as rc_file:
+                rc_file.write(f"{proc.returncode}")
+
+    def run(self, cmd: str):
+        hap = self.create_hap(cmd=cmd)
         pid = os.fork()
         if pid == 0:
-            coro = subprocess_wrapper(
-                cmd,
-                stdout_path=stdout_path,
-                stderr_path=stderr_path,
-                pid_path=pid_path,
-                rc_path=rc_path,
-            )
+            coro = self.run_hap(hap)
             asyncio.run(coro)
         else:
             sys.exit(0)
 
     def logs(self, hap: Hap, follow: bool = False):
-        stdout_path = str(hap.path / "stdout.log")
         if follow:
-            return subprocess.run(["tail", "-f", stdout_path])
+            return subprocess.run(["tail", "-f", hap.stdout_path])
         else:
-            return subprocess.run(["cat", stdout_path])
+            return subprocess.run(["cat", hap.stdout_path])
 
     def clean(self, skip_failed: bool = False):
         def to_clean(hap):
@@ -191,31 +203,3 @@ class Hapless(object):
                 f"{config.ICON_INFO} Nothing to clean",
                 style=f"{config.COLOR_ERROR} bold",
             )
-
-
-async def subprocess_wrapper(
-    cmd,
-    *,
-    stdout_path: Path,
-    stderr_path: Path,
-    pid_path: Path,
-    rc_path: Path,
-):
-    with (
-        open(stdout_path, "w") as stdout_pipe,
-        open(stderr_path, "w") as stderr_pipe,
-    ):
-        proc = await asyncio.create_subprocess_shell(
-            cmd,
-            stdout=stdout_pipe,
-            stderr=stderr_pipe,
-        )
-        pid_text = Text(f"{proc.pid}", style=f"{config.COLOR_MAIN} bold")
-        console.print(f"{config.ICON_HAP} Launched hap PID [", pid_text, "]", sep="")
-        with open(pid_path, "w") as pid_file:
-            pid_file.write(f"{proc.pid}")
-
-        _ = await proc.communicate()
-
-        with open(rc_path, "w") as rc_file:
-            rc_file.write(f"{proc.returncode}")
