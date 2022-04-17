@@ -16,6 +16,7 @@ from rich.text import Text
 
 from hapless import config
 from hapless.hap import Hap
+from hapless.utils import wait_created
 
 """
 paused
@@ -154,19 +155,23 @@ class Hapless(object):
                 stdout=stdout_pipe,
                 stderr=stderr_pipe,
             )
-
-            pid_text = Text(f"{proc.pid}", style=f"{config.COLOR_MAIN} bold")
-            console.print(
-                f"{config.ICON_HAP} Launched hap PID [", pid_text, "]", sep=""
-            )
-
             with open(hap._pid_file, "w") as pid_file:
                 pid_file.write(f"{proc.pid}")
 
+            # pid_text = Text(f"{proc.pid}", style=f"{config.COLOR_MAIN} bold")
+            # console.print(
+            #     f"{config.ICON_HAP} Running hap with PID [", pid_text, "]", sep=""
+            # )
+            console.print(f"Launching hap {config.ICON_HAP}{hap.hid}...")
             _ = await proc.communicate()
 
             with open(hap._rc_file, "w") as rc_file:
                 rc_file.write(f"{proc.returncode}")
+
+    def _report_fast_failure(self, hap: Hap):
+        if wait_created(hap._rc_file) and hap.rc != 0:
+            console.print("Hap failed!", hap)
+            sys.exit(1)
 
     def run(self, cmd: str):
         hap = self.create_hap(cmd=cmd)
@@ -175,6 +180,7 @@ class Hapless(object):
             coro = self.run_hap(hap)
             asyncio.run(coro)
         else:
+            self._report_fast_failure(hap)
             sys.exit(0)
 
     def logs(self, hap: Hap, follow: bool = False):
