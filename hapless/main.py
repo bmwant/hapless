@@ -101,7 +101,7 @@ class Hapless(object):
 
     def _get_hap_dirs(self) -> List[str]:
         hap_dirs = filter(str.isdigit, os.listdir(self._hapless_dir))
-        return sorted(hap_dirs)
+        return sorted(hap_dirs, key=int)
 
     def _get_hap_names_map(self) -> Dict[str, str]:
         names = {}
@@ -158,29 +158,35 @@ class Hapless(object):
             with open(hap._pid_file, "w") as pid_file:
                 pid_file.write(f"{proc.pid}")
 
-            # pid_text = Text(f"{proc.pid}", style=f"{config.COLOR_MAIN} bold")
-            # console.print(
-            #     f"{config.ICON_HAP} Running hap with PID [", pid_text, "]", sep=""
-            # )
-            console.print(f"Launching hap {config.ICON_HAP}{hap.hid}...")
+            pid_text = Text(f"{proc.pid}", style=f"{config.COLOR_MAIN} bold")
+            name_text = Text(f"{hap.name}", style=f"{config.COLOR_MAIN} bold")
+            console.print(
+                f"{config.ICON_INFO} Running hap {config.ICON_HAP}{hap.hid} (",
+                name_text,
+                ") with PID [",
+                pid_text,
+                "]",
+                sep="",
+            )
             _ = await proc.communicate()
 
             with open(hap._rc_file, "w") as rc_file:
                 rc_file.write(f"{proc.returncode}")
 
-    def _report_fast_failure(self, hap: Hap):
+    def _check_fast_failure(self, hap: Hap):
         if wait_created(hap._rc_file) and hap.rc != 0:
             console.print("Hap failed!", hap)
             sys.exit(1)
 
-    def run(self, cmd: str):
+    def run(self, cmd: str, check: bool = False):
         hap = self.create_hap(cmd=cmd)
         pid = os.fork()
         if pid == 0:
             coro = self.run_hap(hap)
             asyncio.run(coro)
         else:
-            self._report_fast_failure(hap)
+            if check:
+                self._check_fast_failure(hap)
             sys.exit(0)
 
     def logs(self, hap: Hap, follow: bool = False):
