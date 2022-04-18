@@ -1,6 +1,8 @@
 ## hapless
 
 ![Checks](https://github.com/bmwant/hapless/actions/workflows/tests.yml/badge.svg)
+[![PyPI](https://img.shields.io/pypi/v/hapless)](https://pypi.org/project/hapless/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/hapless)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 Simplest way of running and tracking processes in the background.
