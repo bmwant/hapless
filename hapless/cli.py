@@ -33,17 +33,19 @@ def cli(ctx):
 
 @cli.command()
 @click.argument("hap_alias", metavar="hap", required=False)
-def status(hap_alias):
+@click.option("-v", "--verbose", is_flag=True, default=False)
+def status(hap_alias, verbose):
     _status(hap_alias)
 
 
 @cli.command()
 @click.argument("hap_alias", metavar="hap", required=False)
-def show(hap_alias):
+@click.option("-v", "--verbose", is_flag=True, default=False)
+def show(hap_alias, verbose):
     _status(hap_alias)
 
 
-def _status(hap_alias: Optional[str] = None):
+def _status(hap_alias: Optional[str] = None, verbose: bool = False):
     if hap_alias is not None:
         hap = get_or_exit(hap_alias)
         hapless.show(hap)

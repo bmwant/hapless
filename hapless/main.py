@@ -172,6 +172,7 @@ class Hapless(object):
                 pid_text,
                 "]",
                 sep="",
+                style="blink",
             )
             _ = await proc.communicate()
 

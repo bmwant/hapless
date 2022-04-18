@@ -6,11 +6,25 @@
 
 ### Running scripts
 
-* Run simple script
+* Run a simple script
 
 ```bash
 $ hap run ./examples/script.sh
 $ hap run python ./examples/fast.py
+```
+
+* Run script accepting arguments
+
+```bash
+$ hap run -- python ./examples/show_details.py -v --name details --count=5
+```
+
+Use `--` delimiter in order to separate target script and its arguments. Otherwise arguments will be interpreted as a keys for `hap` executable.
+
+* Check script for early failures right after launch
+
+```bash
+$ hap run --check python ./examples/fail_fast.py
 ```
 
 ### Checking status
