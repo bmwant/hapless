@@ -35,7 +35,7 @@ def cli(ctx):
 @click.argument("hap_alias", metavar="hap", required=False)
 @click.option("-v", "--verbose", is_flag=True, default=False)
 def status(hap_alias, verbose):
-    _status(hap_alias)
+    _status(hap_alias, verbose)
 
 
 @cli.command()
