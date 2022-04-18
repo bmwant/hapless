@@ -162,18 +162,7 @@ class Hapless(object):
             with open(hap._pid_file, "w") as pid_file:
                 pid_file.write(f"{proc.pid}")
 
-            pid_text = Text(f"{proc.pid}", style=f"{config.COLOR_MAIN} bold")
-            name_text = Text(f"{hap.name}", style=f"{config.COLOR_MAIN} bold")
-            console.print(
-                f"{config.ICON_INFO} Running hap {config.ICON_HAP}{hap.hid} ",
-                "(",
-                name_text,
-                ") with PID [",
-                pid_text,
-                "]",
-                sep="",
-                style="blink",
-            )
+            console.print(f"{config.ICON_INFO} Running", hap)
             _ = await proc.communicate()
 
             with open(hap._rc_file, "w") as rc_file:

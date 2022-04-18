@@ -152,3 +152,13 @@ class Hap(object):
 
     def __str__(self):
         return f"#{self.hid} ({self.name})"
+
+    def __rich__(self) -> str:
+        pid_text = f"with PID [[{config.COLOR_MAIN} bold]{self.pid}[/]]"
+        rich_text = (
+            f"hap {config.ICON_HAP}{self.hid} "
+            f"([{config.COLOR_MAIN} bold]{self.name}[/])"
+        )
+        if self.pid:
+            return f"{rich_text} {pid_text}"
+        return rich_text
