@@ -56,26 +56,30 @@ class Hap(object):
                 f.write(cmd)
 
     def _set_pid(self, pid: int):
-        if not psutil.pid_exists(pid):
-            raise ValueError(f"Cannot attach, pid {pid} doesn't exist")
-
         with open(self._pid_file, "w") as pid_file:
             pid_file.write(f"{pid}")
+
+        if not psutil.pid_exists(pid):
+            raise RuntimeError(f"Process with pid {pid} is gone")
 
     def _set_env(self):
         proc = self.proc
         if proc is None:
             raise RuntimeError("Cannot get environment for the non-running process")
 
+        environ = proc.environ()
         with open(self._env_file, "w") as env_file:
-            env_file.write(json.dumps(proc.environ()))
+            env_file.write(json.dumps(environ))
 
     def attach(self, pid: int):
         """
         Associate hap object with existing process by pid
         """
-        self._set_pid(pid)
-        self._set_env()
+        try:
+            self._set_pid(pid)
+            self._set_env()
+        except RuntimeError:
+            pass
 
     @staticmethod
     def get_random_name(length: int = 6):
@@ -145,6 +149,7 @@ class Hap(object):
             return int(f.read())
 
     @property
+    @allow_missing
     def env(self) -> Dict[str, str]:
         proc = self.proc
         if proc is not None:

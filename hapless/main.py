@@ -100,11 +100,12 @@ class Hapless(object):
         )
         console.print(status_panel)
 
-        if verbose:
+        environ = hap.env
+        if verbose and environ is not None:
             env_table = Table(show_header=False, show_footer=False, box=None)
             env_table.add_column("", justify="right")
             env_table.add_column("", justify="left", style=config.COLOR_ACCENT)
-            environ = hap.env
+
             for key, value in environ.items():
                 env_table.add_row(key, Text(value, overflow="fold"))
 
