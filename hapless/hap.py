@@ -1,9 +1,10 @@
+import json
 import os
 import random
 import string
 import time
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Optional
 
 import humanize
 import psutil
@@ -31,7 +32,6 @@ class Hap(object):
 
         self._set_name(name)
         self._set_cmd(cmd)
-        self._set_env()
 
     def _set_name(self, name: Optional[str]):
         """
@@ -55,8 +55,27 @@ class Hap(object):
             with open(self._cmd_file, "w") as f:
                 f.write(cmd)
 
+    def _set_pid(self, pid: int):
+        if not psutil.pid_exists(pid):
+            raise ValueError(f"Cannot attach, pid {pid} doesn't exist")
+
+        with open(self._pid_file, "w") as pid_file:
+            pid_file.write(f"{pid}")
+
     def _set_env(self):
-        pass
+        proc = self.proc
+        if proc is None:
+            raise RuntimeError("Cannot get environment for the non-running process")
+
+        with open(self._env_file, "w") as env_file:
+            env_file.write(json.dumps(proc.environ()))
+
+    def attach(self, pid: int):
+        """
+        Associate hap object with existing process by pid
+        """
+        self._set_pid(pid)
+        self._set_env()
 
     @staticmethod
     def get_random_name(length: int = 6):
@@ -90,8 +109,6 @@ class Hap(object):
     @property
     @allow_missing
     def cmd(self) -> str:
-        # todo: might be better for the shell expansion
-        # shlex.join(proc.cmdline())
         with open(self._cmd_file) as f:
             return f.read()
 
@@ -128,9 +145,13 @@ class Hap(object):
             return int(f.read())
 
     @property
-    @allow_missing
-    def env(self):
-        pass
+    def env(self) -> Dict[str, str]:
+        proc = self.proc
+        if proc is not None:
+            return proc.environ()
+
+        with open(self._env_file) as env_file:
+            return json.loads(env_file.read())
 
     @property
     @allow_missing

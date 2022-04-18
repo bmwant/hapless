@@ -42,13 +42,13 @@ def status(hap_alias, verbose):
 @click.argument("hap_alias", metavar="hap", required=False)
 @click.option("-v", "--verbose", is_flag=True, default=False)
 def show(hap_alias, verbose):
-    _status(hap_alias)
+    _status(hap_alias, verbose)
 
 
 def _status(hap_alias: Optional[str] = None, verbose: bool = False):
     if hap_alias is not None:
         hap = get_or_exit(hap_alias)
-        hapless.show(hap)
+        hapless.show(hap, verbose=verbose)
     else:
         haps = hapless.get_haps()
         hapless.stats(haps)

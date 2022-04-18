@@ -77,28 +77,44 @@ class Hapless(object):
         console.print(table)
 
     @staticmethod
-    def show(hap: Hap):
-        table = Table(show_header=False, show_footer=False, box=box.SIMPLE)
+    def show(hap: Hap, verbose: bool = False):
+        status_table = Table(show_header=False, show_footer=False, box=box.SIMPLE)
 
-        table.add_row("Status:", hap.status)
+        status_table.add_row("Status:", hap.status)
 
-        table.add_row("PID:", f"{hap.pid}")
+        status_table.add_row("PID:", f"{hap.pid}")
 
         if hap.rc is not None:
-            table.add_row("Return code:", f"{hap.rc}")
+            status_table.add_row("Return code:", f"{hap.rc}")
 
         cmd_text = Text(f"{hap.cmd}", style=f"{config.COLOR_ACCENT} bold")
-        table.add_row("Command:", cmd_text)
+        status_table.add_row("Command:", cmd_text)
 
-        table.add_row("Runtime:", f"{hap.runtime}")
+        status_table.add_row("Runtime:", f"{hap.runtime}")
 
-        panel = Panel(
-            table,
-            expand=False,
+        status_panel = Panel(
+            status_table,
+            expand=verbose,
             title=f"Hap {config.ICON_HAP}{hap.hid}",
             subtitle=hap.name,
         )
-        console.print(panel)
+        console.print(status_panel)
+
+        if verbose:
+            env_table = Table(show_header=False, show_footer=False, box=None)
+            env_table.add_column("", justify="right")
+            env_table.add_column("", justify="left", style=config.COLOR_ACCENT)
+            environ = hap.env
+            for key, value in environ.items():
+                env_table.add_row(key, Text(value, overflow="fold"))
+
+            env_panel = Panel(
+                env_table,
+                title="Environment",
+                subtitle=f"{len(environ)} items",
+                border_style=config.COLOR_MAIN,
+            )
+            console.print(env_panel)
 
     @property
     def dir(self) -> Path:
@@ -159,8 +175,7 @@ class Hapless(object):
                 stdout=stdout_pipe,
                 stderr=stderr_pipe,
             )
-            with open(hap._pid_file, "w") as pid_file:
-                pid_file.write(f"{proc.pid}")
+            hap.attach(proc.pid)
 
             console.print(f"{config.ICON_INFO} Running", hap)
             _ = await proc.communicate()
