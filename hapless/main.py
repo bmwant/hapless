@@ -10,6 +10,7 @@ try:
 except ModuleNotFoundError:
     # Fallback for Python 3.7
     from importlib_metadata import version
+
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -23,14 +24,6 @@ from hapless import config
 from hapless.hap import Hap
 from hapless.utils import wait_created
 
-"""
-paused
-running
-finished
-* finished(failed) non-zero rc
-* finished(success) zero rc
-💀
-"""
 console = Console(highlight=False)
 
 

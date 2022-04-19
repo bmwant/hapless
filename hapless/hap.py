@@ -3,15 +3,24 @@ import os
 import random
 import string
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, Optional
-from datetime import datetime
 
 import humanize
 import psutil
 
 from hapless import config
 from hapless.utils import allow_missing
+
+"""
+paused
+running
+finished
+* finished(failed) non-zero rc
+* finished(success) zero rc
+💀
+"""
 
 
 class Hap(object):
@@ -138,13 +147,17 @@ class Hap(object):
     @property
     def start_time(self) -> Optional[str]:
         if self._pid_file.exists():
-            return datetime.fromtimestamp(os.path.getmtime(self._pid_file)).strftime(config.DATETIME_FORMAT)
+            return datetime.fromtimestamp(os.path.getmtime(self._pid_file)).strftime(
+                config.DATETIME_FORMAT
+            )
         # log "Hap has not started yet"
 
     @property
     def end_time(self) -> Optional[str]:
         if self._rc_file.exists():
-            return datetime.fromtimestamp(os.path.getmtime(self._rc_file)).strftime(config.DATETIME_FORMAT)
+            return datetime.fromtimestamp(os.path.getmtime(self._rc_file)).strftime(
+                config.DATETIME_FORMAT
+            )
         # log "Hap has not finished yet"
 
     @property
