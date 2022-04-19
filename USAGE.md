@@ -1,6 +1,6 @@
 ## Usage
 
-`Hap` is a tiny wrapper around the process allowing to track its status during execution and upon completion.
+`Hap` is a tiny wrapper around the process allowing to track its status during execution and upon completion. Unlike other managers it does not run any daemon process and does not require any configuration files to get started.
 
 `hap-alias` is either a hap id (integer identificator) or hap name (string identificator). Note that you need to replace this placeholder in commands below with an actual value.
 

@@ -92,6 +92,10 @@ class Hapless(object):
 
         status_table.add_row("Runtime:", f"{hap.runtime}")
 
+        if verbose:
+            status_table.add_row("Stdout file:", f"{hap.stdout_path}")
+            status_table.add_row("Stderr file:", f"{hap.stderr_path}")
+
         status_panel = Panel(
             status_table,
             expand=verbose,

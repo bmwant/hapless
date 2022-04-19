@@ -43,9 +43,9 @@ See [CHANGELOG.md](https://github.com/bmwant/hapless/blob/main/CHANGELOG.md) for
 
 ### See also
 
-* rich
-* supervisor
-* podmena
+* [Rich](https://rich.readthedocs.io/en/stable/introduction.html) console UI library.
+* [Supervisor](http://supervisord.org/) full-fledged process manager.
+* [podmena](https://github.com/bmwant/podmena) provides nice emoji icons to commit messages.
 
 ### Support project, support 🇺🇦 Ukraine!
 
