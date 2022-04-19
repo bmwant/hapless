@@ -5,6 +5,7 @@ import string
 import time
 from pathlib import Path
 from typing import Dict, Optional
+from datetime import datetime
 
 import humanize
 import psutil
@@ -133,6 +134,18 @@ class Hap(object):
             runtime = finish_time - start_time
 
         return humanize.naturaldelta(runtime)
+
+    @property
+    def start_time(self) -> Optional[str]:
+        if self._pid_file.exists():
+            return datetime.fromtimestamp(os.path.getmtime(self._pid_file)).strftime(config.DATETIME_FORMAT)
+        # log "Hap has not started yet"
+
+    @property
+    def end_time(self) -> Optional[str]:
+        if self._rc_file.exists():
+            return datetime.fromtimestamp(os.path.getmtime(self._rc_file)).strftime(config.DATETIME_FORMAT)
+        # log "Hap has not finished yet"
 
     @property
     def active(self) -> bool:

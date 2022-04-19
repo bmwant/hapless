@@ -15,3 +15,4 @@ ICON_PAUSED = "⚪️"
 ICON_FAILED = "🔴"
 
 FAILFAST_DELAY = 2
+DATETIME_FORMAT = "%H:%M:%S %Y/%m/%d"

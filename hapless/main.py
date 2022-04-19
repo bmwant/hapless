@@ -90,11 +90,19 @@ class Hapless(object):
         cmd_text = Text(f"{hap.cmd}", style=f"{config.COLOR_ACCENT} bold")
         status_table.add_row("Command:", cmd_text)
 
-        status_table.add_row("Runtime:", f"{hap.runtime}")
-
         if verbose:
             status_table.add_row("Stdout file:", f"{hap.stdout_path}")
             status_table.add_row("Stderr file:", f"{hap.stderr_path}")
+
+        status_table.add_row("Runtime:", f"{hap.runtime}")
+
+        start_time = hap.start_time
+        end_time = hap.end_time
+        if verbose and start_time:
+            status_table.add_row("Start time:", f"{start_time}")
+
+        if verbose and end_time:
+            status_table.add_row("End time:", f"{end_time}")
 
         status_panel = Panel(
             status_table,
