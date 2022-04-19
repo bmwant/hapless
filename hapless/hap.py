@@ -90,6 +90,9 @@ class Hap(object):
             self._set_env()
         except RuntimeError:
             pass
+        except psutil.AccessDenied:
+            # todo: likely early failure of the process
+            ...
 
     @staticmethod
     def get_random_name(length: int = 6):

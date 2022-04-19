@@ -1,5 +1,6 @@
 import time
 from functools import wraps
+from pathlib import Path
 
 from hapless import config
 
@@ -33,7 +34,9 @@ class timed(object):
         return self
 
 
-def wait_created(path, interval=0.1, timeout=config.DATETIME_FORMAT):
+def wait_created(
+    path: Path, interval: float = 0.1, timeout: float = config.FAILFAST_DELAY
+):
     start = time.time()
     while not path.exists() and time.time() - start < timeout:
         time.sleep(interval)
