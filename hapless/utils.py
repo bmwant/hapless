@@ -1,6 +1,8 @@
 import time
 from functools import wraps
 
+from hapless import config
+
 
 def allow_missing(func):
     @wraps(func)
@@ -31,7 +33,7 @@ class timed(object):
         return self
 
 
-def wait_created(path, interval=0.1, timeout=2):
+def wait_created(path, interval=0.1, timeout=config.DATETIME_FORMAT):
     start = time.time()
     while not path.exists() and time.time() - start < timeout:
         time.sleep(interval)
