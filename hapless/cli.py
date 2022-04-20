@@ -1,4 +1,3 @@
-import shlex
 import sys
 from typing import Optional
 
@@ -7,6 +6,12 @@ from rich.console import Console
 
 from hapless import config
 from hapless.main import Hapless
+
+try:
+    from shlex import join as shlex_join
+except ImportError:
+    # Fallback for Python 3.7
+    from hapless.utils import shlex_join_backport as shlex_join
 
 console = Console(highlight=False)
 hapless = Hapless()
@@ -72,7 +77,7 @@ def clean(skip_failed):
 @click.argument("cmd", nargs=-1)
 @click.option("--check", is_flag=True, default=False)
 def run(cmd, check):
-    hapless.run(shlex.join(cmd), check=check)
+    hapless.run(shlex_join(cmd), check=check)
 
 
 @cli.command()

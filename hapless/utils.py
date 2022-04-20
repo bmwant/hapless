@@ -1,3 +1,4 @@
+import shlex
 import time
 from functools import wraps
 from pathlib import Path
@@ -14,6 +15,11 @@ def allow_missing(func):
             pass
 
     return wrapper
+
+
+def shlex_join_backport(split_command):
+    """Return a shell-escaped string"""
+    return " ".join(shlex.quote(arg) for arg in split_command)
 
 
 class timed(object):
