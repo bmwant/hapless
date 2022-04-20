@@ -28,9 +28,9 @@ console = Console(highlight=False)
 
 
 class Hapless(object):
-    def __init__(self):
-        tmp_dir = Path(tempfile.gettempdir())
-        self._hapless_dir = tmp_dir / "hapless"
+    def __init__(self, hapless_dir: Path = None):
+        default_dir = Path(tempfile.gettempdir()) / "hapless"
+        self._hapless_dir = hapless_dir or default_dir
         if not self._hapless_dir.exists():
             self._hapless_dir.mkdir(parents=True, exist_ok=True)
 

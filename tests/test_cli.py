@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from hapless import cli
 
 
@@ -21,3 +23,27 @@ def test_help_invocation(runner):
 
     assert result.exit_code == 0
     assert "Show this message and exit" in result.output
+
+
+@patch("hapless.cli._status")
+def test_no_command_invokes_status(status_mock, runner):
+    result = runner.invoke(cli.cli)
+
+    assert result.exit_code == 0
+    assert status_mock.called_once_with(None, False)
+
+
+@patch("hapless.cli._status")
+def test_show_command_invokes_status(status_mock, runner):
+    result = runner.invoke(cli.cli, ["show", "hap-me"])
+
+    assert result.exit_code == 0
+    assert status_mock.called_once_with("hap-me", False)
+
+
+@patch("hapless.cli._status")
+def test_status_command_invokes_status(status_mock, runner):
+    result = runner.invoke(cli.cli, ["status", "hap-me"])
+
+    assert result.exit_code == 0
+    assert status_mock.called_once_with("hap-me", False)

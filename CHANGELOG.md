@@ -1,5 +1,8 @@
 ### 0.1.3 ⚙️ ongoing work
 
+* Add suspending/resuming functionality for running haps
+* Fix issue with checking for failures
+* Add unittests to cover basic invocations
 
 ## 0.1.2 📦 current package
 
