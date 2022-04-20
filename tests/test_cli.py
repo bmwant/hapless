@@ -30,7 +30,7 @@ def test_no_command_invokes_status(status_mock, runner):
     result = runner.invoke(cli.cli)
 
     assert result.exit_code == 0
-    assert status_mock.called_once_with(None, False)
+    status_mock.assert_called_once_with()
 
 
 @patch("hapless.cli._status")
@@ -38,7 +38,7 @@ def test_show_command_invokes_status(status_mock, runner):
     result = runner.invoke(cli.cli, ["show", "hap-me"])
 
     assert result.exit_code == 0
-    assert status_mock.called_once_with("hap-me", False)
+    status_mock.assert_called_once_with("hap-me", False)
 
 
 @patch("hapless.cli._status")
@@ -46,7 +46,7 @@ def test_status_command_invokes_status(status_mock, runner):
     result = runner.invoke(cli.cli, ["status", "hap-me"])
 
     assert result.exit_code == 0
-    assert status_mock.called_once_with("hap-me", False)
+    status_mock.assert_called_once_with("hap-me", False)
 
 
 def test_logs_invocation(runner):
@@ -58,4 +58,7 @@ def test_run_invocation(runner):
 
 
 def test_clean_invocation(runner):
-    pass
+    with patch.object(runner.hapless, "clean") as clean_mock:
+        result = runner.invoke(cli.cli, ["clean", "--skip-failed"])
+        assert result.exit_code == 0
+        clean_mock.assert_called_once_with(True)
