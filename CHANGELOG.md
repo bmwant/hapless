@@ -2,6 +2,7 @@
 
 * Add suspending/resuming functionality for running haps
 * Fix issue with checking for failures
+* Fix Python 3.7 compatibility
 * Add unittests to cover basic invocations
 
 ## 0.1.2 📦 current package

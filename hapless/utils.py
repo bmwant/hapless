@@ -1,9 +1,19 @@
+import logging
 import shlex
 import time
 from functools import wraps
 from pathlib import Path
 
 from hapless import config
+
+logging.disable(level=logging.CRITICAL)
+
+if config.DEBUG:
+    logging.disable(logging.NOTSET)
+    logging.basicConfig(level=logging.DEBUG)
+
+
+logger = logging.getLogger(__package__)
 
 
 def allow_missing(func):

@@ -11,7 +11,7 @@ import humanize
 import psutil
 
 from hapless import config
-from hapless.utils import allow_missing
+from hapless.utils import allow_missing, logger
 
 """
 paused
@@ -88,11 +88,8 @@ class Hap(object):
         try:
             self._set_pid(pid)
             self._set_env()
-        except RuntimeError:
-            pass
-        except psutil.AccessDenied:
-            # todo: likely early failure of the process
-            ...
+        except (RuntimeError, psutil.AccessDenied) as e:
+            logger.error(f"Cannot attached due to {e}")
 
     @staticmethod
     def get_random_name(length: int = 6):
@@ -121,8 +118,8 @@ class Hap(object):
     def proc(self):
         try:
             return psutil.Process(self.pid)
-        except psutil.NoSuchProcess:
-            pass
+        except psutil.NoSuchProcess as e:
+            logger.warning(f"Cannot find process: {e}")
 
     @property
     @allow_missing
@@ -154,7 +151,7 @@ class Hap(object):
             return datetime.fromtimestamp(os.path.getmtime(self._pid_file)).strftime(
                 config.DATETIME_FORMAT
             )
-        # log "Hap has not started yet"
+        logger.info("No start time as hap has not started yet")
 
     @property
     def end_time(self) -> Optional[str]:
@@ -162,7 +159,7 @@ class Hap(object):
             return datetime.fromtimestamp(os.path.getmtime(self._rc_file)).strftime(
                 config.DATETIME_FORMAT
             )
-        # log "Hap has not finished yet"
+        logger.info("No end time as hap has not finished yet")
 
     @property
     def active(self) -> bool:

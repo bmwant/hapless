@@ -23,7 +23,7 @@ from rich.text import Text
 
 from hapless import config
 from hapless.hap import Hap
-from hapless.utils import wait_created
+from hapless.utils import logger, wait_created
 
 console = Console(highlight=False)
 
@@ -32,6 +32,7 @@ class Hapless(object):
     def __init__(self, hapless_dir: Path = None):
         default_dir = Path(tempfile.gettempdir()) / "hapless"
         self._hapless_dir = hapless_dir or default_dir
+        logger.debug(f"Initialized within {self._hapless_dir} dir")
         if not self._hapless_dir.exists():
             self._hapless_dir.mkdir(parents=True, exist_ok=True)
 
@@ -249,6 +250,7 @@ class Hapless(object):
 
         haps = list(filter(to_clean, self.get_haps()))
         for hap in haps:
+            logger.debug(f"Removing {hap.path}")
             shutil.rmtree(hap.path)
 
         if haps:
