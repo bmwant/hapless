@@ -107,8 +107,9 @@ class Hap(object):
     @property
     def status(self) -> str:
         proc = self.proc
-        # todo: running or paused
         if proc is not None:
+            if proc.status() == psutil.STATUS_STOPPED:
+                return f"{config.ICON_PAUSED} paused"
             return f"{config.ICON_RUNNING} running"
 
         if self.rc != 0:

@@ -14,6 +14,7 @@ except ModuleNotFoundError:
 from pathlib import Path
 from typing import Dict, List, Optional
 
+import psutil
 from rich import box
 from rich.console import Console
 from rich.panel import Panel
@@ -197,6 +198,30 @@ class Hapless(object):
             )
             with open(hap.stderr_path) as f:
                 console.print(f.read())
+            sys.exit(1)
+
+    def pause_hap(self, hap: Hap):
+        proc = hap.proc
+        if proc is not None:
+            proc.suspend()
+            console.print(f"{config.ICON_INFO} Paused", hap)
+        else:
+            console.print(
+                f"{config.ICON_INFO} Cannot pause. Hap {hap} is not running",
+                style=f"{config.COLOR_ERROR} bold",
+            )
+            sys.exit(1)
+
+    def resume_hap(self, hap: Hap):
+        proc = hap.proc
+        if proc is not None and proc.status() == psutil.STATUS_STOPPED:
+            proc.resume()
+            console.print(f"{config.ICON_INFO} Resumed", hap)
+        else:
+            console.print(
+                f"{config.ICON_INFO} Cannot resume. Hap {hap} is not suspended",
+                style=f"{config.COLOR_ERROR} bold",
+            )
             sys.exit(1)
 
     def run(self, cmd: str, check: bool = False):

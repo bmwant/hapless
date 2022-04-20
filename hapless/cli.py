@@ -78,13 +78,15 @@ def run(cmd, check):
 @cli.command()
 @click.argument("hap_alias", metavar="hap")
 def pause(hap_alias):
-    pass
+    hap = get_or_exit(hap_alias)
+    hapless.pause_hap(hap)
 
 
 @cli.command()
 @click.argument("hap_alias", metavar="hap")
 def resume(hap_alias):
-    pass
+    hap = get_or_exit(hap_alias)
+    hapless.resume_hap(hap)
 
 
 if __name__ == "__main__":

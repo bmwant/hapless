@@ -4,7 +4,7 @@ import time
 def main():
     # this should be running for about 2 hours
     for i in range(1000):
-        print(".", end="", flush=True)
+        print(f"Iteration {i}...", flush=True)
         time.sleep(10)
 
 
