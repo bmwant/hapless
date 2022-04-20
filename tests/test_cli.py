@@ -47,3 +47,15 @@ def test_status_command_invokes_status(status_mock, runner):
 
     assert result.exit_code == 0
     assert status_mock.called_once_with("hap-me", False)
+
+
+def test_logs_invocation(runner):
+    pass
+
+
+def test_run_invocation(runner):
+    pass
+
+
+def test_clean_invocation(runner):
+    pass
