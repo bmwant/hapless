@@ -75,5 +75,17 @@ def run(cmd, check):
     hapless.run(shlex.join(cmd), check=check)
 
 
+@cli.command()
+@click.argument("hap_alias", metavar="hap")
+def pause(hap_alias):
+    pass
+
+
+@cli.command()
+@click.argument("hap_alias", metavar="hap")
+def resume(hap_alias):
+    pass
+
+
 if __name__ == "__main__":
     cli()
