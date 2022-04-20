@@ -1,11 +1,15 @@
-### 0.1.3 ⚙️ ongoing work
+### 0.1.4 ⚙️ ongoing work
+
+
+## 0.1.3 📦 current package
 
 * Add suspending/resuming functionality for running haps
 * Fix issue with checking for failures
 * Fix Python 3.7 compatibility
 * Add unittests to cover basic invocations
 
-## 0.1.2 📦 current package
+
+## 0.1.2
 
 * Display extra information for the verbose status command
 * Fix issue with attaching to short-living processes
