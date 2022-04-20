@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from hapless import cli
 
@@ -49,12 +49,31 @@ def test_status_command_invokes_status(status_mock, runner):
     status_mock.assert_called_once_with("hap-me", False)
 
 
-def test_logs_invocation(runner):
-    pass
+@patch("hapless.cli.get_or_exit")
+def test_logs_invocation(get_or_exit_mock, runner):
+    hap_mock = Mock()
+    get_or_exit_mock.return_value = hap_mock
+    with patch.object(runner.hapless, "logs") as logs_mock:
+        result = runner.invoke(cli.cli, ["logs", "hap-me", "--follow"])
+        assert result.exit_code == 0
+        get_or_exit_mock.assert_called_once_with("hap-me")
+        logs_mock.assert_called_once_with(hap_mock, follow=True)
 
 
 def test_run_invocation(runner):
-    pass
+    with patch.object(runner.hapless, "run") as run_mock:
+        result = runner.invoke(cli.cli, ["run", "script", "--check"])
+        assert result.exit_code == 0
+        run_mock.assert_called_once_with("script", check=True)
+
+
+def test_run_invocation_with_arguments(runner):
+    with patch.object(runner.hapless, "run") as run_mock:
+        result = runner.invoke(
+            cli.cli, ["run", "--check", "--", "script", "--script-param"]
+        )
+        assert result.exit_code == 0
+        run_mock.assert_called_once_with("script --script-param", check=True)
 
 
 def test_clean_invocation(runner):
