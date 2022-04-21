@@ -5,6 +5,8 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/hapless)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+> **hapless** (*adjective*) - (especially of a person) unfortunate. A developer who accidentally launched long-running process in the foreground.
+
 Simplest way of running and tracking processes in the background.
 
 ### Installation

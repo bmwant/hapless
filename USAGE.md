@@ -71,3 +71,19 @@ $ hap logs -f [hap-alias]
 # or
 $ hap logs --follow [hap-alias]
 ```
+
+### Other commands
+
+* Suspend (pause) a hap. Sends `SIGSTOP` signal to the process
+
+```bash
+$ hap pause [hap-alias]
+# or
+$ hap suspend [hap-alias]
+```
+
+* Resume paused hap. Sends `SIGCONT` signal to the suspended process
+
+```bash
+$ hap resume [hap-alias]
+```
