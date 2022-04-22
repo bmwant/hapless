@@ -231,8 +231,8 @@ class Hapless(object):
             )
             sys.exit(1)
 
-    def run(self, cmd: str, check: bool = False):
-        hap = self.create_hap(cmd=cmd)
+    def run(self, cmd: str, name: Optional[str] = None, check: bool = False):
+        hap = self.create_hap(cmd=cmd, name=name)
         pid = os.fork()
         if pid == 0:
             coro = self.run_hap(hap)

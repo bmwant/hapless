@@ -76,9 +76,10 @@ def clean(skip_failed):
 
 @cli.command()
 @click.argument("cmd", nargs=-1)
+@click.option("-n", "--name")
 @click.option("--check", is_flag=True, default=False)
-def run(cmd, check):
-    hapless.run(shlex_join(cmd), check=check)
+def run(cmd, name, check):
+    hapless.run(shlex_join(cmd), name=name, check=check)
 
 
 @cli.command()
