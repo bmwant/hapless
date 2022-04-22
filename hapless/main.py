@@ -244,6 +244,10 @@ class Hapless(object):
 
     def logs(self, hap: Hap, follow: bool = False):
         if follow:
+            console.print(
+                f"{config.ICON_INFO} Streaming {hap.stdout_path} file...",
+                style=f"{config.COLOR_MAIN} bold",
+            )
             return subprocess.run(["tail", "-f", hap.stdout_path])
         else:
             return subprocess.run(["cat", hap.stdout_path])

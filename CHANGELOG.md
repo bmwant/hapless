@@ -1,5 +1,8 @@
 ### 0.1.4 ⚙️ ongoing work
 
+* Add verbose mode for the main command
+* Allow specifying custom name for the hap
+
 
 ## 0.1.3 📦 current package
 
