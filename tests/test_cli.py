@@ -30,7 +30,7 @@ def test_no_command_invokes_status(status_mock, runner):
     result = runner.invoke(cli.cli)
 
     assert result.exit_code == 0
-    status_mock.assert_called_once_with()
+    status_mock.assert_called_once_with(None, verbose=False)
 
 
 @patch("hapless.cli._status")

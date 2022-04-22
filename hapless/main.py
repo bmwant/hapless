@@ -37,7 +37,7 @@ class Hapless(object):
             self._hapless_dir.mkdir(parents=True, exist_ok=True)
 
     @staticmethod
-    def stats(haps: List[Hap]):
+    def stats(haps: List[Hap], verbose: bool = False):
         if not haps:
             console.print(
                 f"{config.ICON_INFO} No haps are currently running",
@@ -47,10 +47,11 @@ class Hapless(object):
 
         package_version = version(__package__)
         table = Table(
-            title=f"{config.ICON_HAP} {__package__}, {package_version}",
             show_header=True,
             header_style=f"{config.COLOR_MAIN} bold",
             box=box.HEAVY_EDGE,
+            caption_style="dim",
+            caption_justify="right",
         )
         table.add_column("#", style="dim", width=2)
         table.add_column("Name")
@@ -59,7 +60,9 @@ class Hapless(object):
         table.add_column("RC")
         table.add_column("Runtime", justify="right")
 
+        active_haps = 0
         for hap in haps:
+            active_haps += 1 if hap.active else 0
             table.add_row(
                 f"{hap.hid}",
                 hap.name,
@@ -69,6 +72,9 @@ class Hapless(object):
                 hap.runtime,
             )
 
+        if verbose:
+            table.title = f"{config.ICON_HAP} {__package__}, {package_version}"
+            table.caption = f"{active_haps} active / {len(haps)} total"
         console.print(table)
 
     @staticmethod

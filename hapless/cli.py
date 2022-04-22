@@ -30,10 +30,11 @@ def get_or_exit(hap_alias: str):
 
 @click.group(invoke_without_command=True)
 @click.version_option(message="hapless, version %(version)s")
+@click.option("-v", "--verbose", is_flag=True, default=False)
 @click.pass_context
-def cli(ctx):
+def cli(ctx, verbose):
     if ctx.invoked_subcommand is None:
-        _status()
+        _status(None, verbose=verbose)
 
 
 @cli.command()
@@ -56,7 +57,7 @@ def _status(hap_alias: Optional[str] = None, verbose: bool = False):
         hapless.show(hap, verbose=verbose)
     else:
         haps = hapless.get_haps()
-        hapless.stats(haps)
+        hapless.stats(haps, verbose=verbose)
 
 
 @cli.command()

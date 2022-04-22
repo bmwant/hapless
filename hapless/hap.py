@@ -14,8 +14,9 @@ from hapless import config
 from hapless.utils import allow_missing, logger
 
 """
-paused
-running
+active
+* paused
+* running
 finished
 * finished(failed) non-zero rc
 * finished(success) zero rc
