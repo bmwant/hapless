@@ -27,6 +27,8 @@ $ python -m pip install --user hapless
 
 ### Usage
 
+<script id="asciicast-489924" data-speed="2" src="https://asciinema.org/a/489924.js" async></script>
+
 ```bash
 $ hap
 $ hap run -- python long_running.py
