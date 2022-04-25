@@ -27,7 +27,7 @@ $ python -m pip install --user hapless
 
 ### Usage
 
-<script id="asciicast-489924" data-speed="2" src="https://asciinema.org/a/489924.js" async></script>
+[![asciicast](https://asciinema.org/a/489924.svg)](https://asciinema.org/a/489924?speed=2)
 
 ```bash
 $ hap
