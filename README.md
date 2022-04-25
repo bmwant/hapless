@@ -9,6 +9,8 @@
 
 Simplest way of running and tracking processes in the background.
 
+[![asciicast](https://asciinema.org/a/489924.svg)](https://asciinema.org/a/489924?speed=2)
+
 ### Installation
 
 ```bash
@@ -27,12 +29,13 @@ $ python -m pip install --user hapless
 
 ### Usage
 
-[![asciicast](https://asciinema.org/a/489924.svg)](https://asciinema.org/a/489924?speed=2)
-
 ```bash
-$ hap
+# Run arbitrary script
 $ hap run -- python long_running.py
-$ hap status
+# Show summary table
+$ hap
+# Display status of the specific process
+$ hap status 1
 ```
 
 See [USAGE.md](https://github.com/bmwant/hapless/blob/main/USAGE.md) for the complete list of commands and available parameters.
