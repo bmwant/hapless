@@ -76,6 +76,17 @@ def test_run_invocation_with_arguments(runner):
         run_mock.assert_called_once_with("script --script-param", name=None, check=True)
 
 
+def test_run_invocation_name_provided(runner):
+    with patch.object(runner.hapless, "run") as run_mock:
+        result = runner.invoke(
+            cli.cli, ["run", "--name", "hap-name", "--", "script", "--script-param"]
+        )
+        assert result.exit_code == 0
+        run_mock.assert_called_once_with(
+            "script --script-param", name="hap-name", check=False
+        )
+
+
 def test_clean_invocation(runner):
     with patch.object(runner.hapless, "clean") as clean_mock:
         result = runner.invoke(cli.cli, ["clean", "--skip-failed"])
