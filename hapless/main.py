@@ -63,10 +63,11 @@ class Hapless(object):
         active_haps = 0
         for hap in haps:
             active_haps += 1 if hap.active else 0
+            pid_text = f"{hap.pid}" if hap.active else Text(f"{hap.pid}", style="dim")
             table.add_row(
                 f"{hap.hid}",
                 hap.name,
-                f"{hap.pid}",
+                pid_text,
                 hap.status,
                 f"{hap.rc}" if hap.rc is not None else "",
                 hap.runtime,
