@@ -11,6 +11,7 @@ except ModuleNotFoundError:
     # Fallback for Python 3.7
     from importlib_metadata import version
 
+from itertools import filterfalse
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -56,6 +57,8 @@ class Hapless(object):
         table.add_column("#", style="dim", width=2)
         table.add_column("Name")
         table.add_column("PID")
+        if verbose:
+            table.add_column("Command")
         table.add_column("Status")
         table.add_column("RC")
         table.add_column("Runtime", justify="right")
@@ -64,14 +67,20 @@ class Hapless(object):
         for hap in haps:
             active_haps += 1 if hap.active else 0
             pid_text = f"{hap.pid}" if hap.active else Text(f"{hap.pid}", style="dim")
-            table.add_row(
+            command_text = Text(
+                hap.cmd, overflow="ellipsis", style=f"{config.COLOR_ACCENT}"
+            )
+            command_text.truncate(config.TRUNCATE_LENGTH)
+            row = [
                 f"{hap.hid}",
                 hap.name,
                 pid_text,
+                command_text if verbose else None,
                 hap.status,
                 f"{hap.rc}" if hap.rc is not None else "",
                 hap.runtime,
-            )
+            ]
+            table.add_row(*filterfalse(lambda x: x is None, row))
 
         if verbose:
             table.title = f"{config.ICON_HAP} {__package__}, {package_version}"
