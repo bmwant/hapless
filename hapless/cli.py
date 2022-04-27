@@ -96,5 +96,25 @@ def resume(hap_alias):
     hapless.resume_hap(hap)
 
 
+@cli.command()
+@click.argument("hap_alias", metavar="hap", required=False)
+@click.option("-a", "--all", "killall", is_flag=True, default=False)
+def kill(hap_alias, killall):
+    if hap_alias is not None and killall:
+        raise click.BadOptionUsage(
+            "killall", "Cannot use --all flag while hap id provided"
+        )
+
+    if hap_alias is None and not killall:
+        raise click.BadArgumentUsage("Provide hap alias to kill")
+
+    if killall:
+        haps = hapless.get_haps()
+        hapless.kill(haps)
+    else:
+        hap = get_or_exit(hap_alias)
+        hapless.kill([hap])
+
+
 if __name__ == "__main__":
     cli()

@@ -20,7 +20,6 @@ active
 finished
 * finished(failed) non-zero rc
 * finished(success) zero rc
-💀
 """
 
 

@@ -289,3 +289,22 @@ class Hapless(object):
                 f"{config.ICON_INFO} Nothing to clean",
                 style=f"{config.COLOR_ERROR} bold",
             )
+
+    def kill(self, haps: List[Hap]):
+        killed_counter = 0
+        for hap in haps:
+            if hap.active:
+                logger.info(f"Killing {hap}...")
+                hap.proc.kill()
+                killed_counter += 1
+
+        if killed_counter:
+            console.print(
+                f"{config.ICON_KILLED} Killed {killed_counter} active haps",
+                style=f"{config.COLOR_MAIN} bold",
+            )
+        else:
+            console.print(
+                f"{config.ICON_INFO} No active haps to kill",
+                style=f"{config.COLOR_ERROR} bold",
+            )
