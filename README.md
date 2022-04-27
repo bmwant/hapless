@@ -32,8 +32,10 @@ $ python -m pip install --user hapless
 ```bash
 # Run arbitrary script
 $ hap run -- python long_running.py
+
 # Show summary table
 $ hap
+
 # Display status of the specific process
 $ hap status 1
 ```

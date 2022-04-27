@@ -101,11 +101,15 @@ class Hapless(object):
         cmd_text = Text(f"{hap.cmd}", style=f"{config.COLOR_ACCENT} bold")
         status_table.add_row("Command:", cmd_text)
 
+        proc = hap.proc
+        if verbose and proc is not None:
+            status_table.add_row("Working dir:", f"{proc.cwd()}")
+            status_table.add_row("Parent PID:", f"{proc.ppid()}")
+            status_table.add_row("User:", f"{proc.username()}")
+
         if verbose:
             status_table.add_row("Stdout file:", f"{hap.stdout_path}")
             status_table.add_row("Stderr file:", f"{hap.stderr_path}")
-
-        status_table.add_row("Runtime:", f"{hap.runtime}")
 
         start_time = hap.start_time
         end_time = hap.end_time
@@ -114,6 +118,8 @@ class Hapless(object):
 
         if verbose and end_time:
             status_table.add_row("End time:", f"{end_time}")
+
+        status_table.add_row("Runtime:", f"{hap.runtime}")
 
         status_panel = Panel(
             status_table,
