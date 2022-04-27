@@ -74,10 +74,18 @@ class Hap(object):
 
     def _set_env(self):
         proc = self.proc
-        if proc is None:
-            raise RuntimeError("Cannot get environment for the non-running process")
 
-        environ = proc.environ()
+        environ = {}
+        if proc is not None:
+            environ = proc.environ()
+
+        if not environ:
+            logger.warning(
+                "Cannot get environment from the process. "
+                "Fallback to current environment"
+            )
+            environ = dict(os.environ)
+
         with open(self._env_file, "w") as env_file:
             env_file.write(json.dumps(environ))
 

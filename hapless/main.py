@@ -60,7 +60,7 @@ class Hapless(object):
         if verbose:
             table.add_column("Command")
         table.add_column("Status")
-        table.add_column("RC")
+        table.add_column("RC", justify="right")
         table.add_column("Runtime", justify="right")
 
         active_haps = 0
