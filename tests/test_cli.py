@@ -92,3 +92,22 @@ def test_clean_invocation(runner):
         result = runner.invoke(cli.cli, ["clean", "--skip-failed"])
         assert result.exit_code == 0
         clean_mock.assert_called_once_with(True)
+
+
+@patch("hapless.cli.get_or_exit")
+def test_kill_invocation(get_or_exit_mock, runner):
+    hap_mock = Mock()
+    get_or_exit_mock.return_value = hap_mock
+    with patch.object(runner.hapless, "kill") as kill_mock:
+        result = runner.invoke(cli.cli, ["kill", "hap-name"])
+        assert result.exit_code == 0
+        get_or_exit_mock.assert_called_once_with("hap-name")
+        kill_mock.assert_called_once_with([hap_mock])
+
+
+def test_killall_invocation(runner):
+    pass
+
+
+def test_killall_improper_invocation(runner):
+    pass
