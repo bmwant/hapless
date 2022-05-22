@@ -6,6 +6,7 @@ from rich.console import Console
 
 from hapless import config
 from hapless.main import Hapless
+from hapless.utils import validate_signal
 
 try:
     from shlex import join as shlex_join
@@ -114,6 +115,14 @@ def kill(hap_alias, killall):
     else:
         hap = get_or_exit(hap_alias)
         hapless.kill([hap])
+
+
+@cli.command()
+@click.argument("hap_alias", metavar="hap")
+@click.argument("signal", callback=validate_signal, metavar="signal-code")
+def signal(hap_alias, signal):
+    hap = get_or_exit(hap_alias)
+    hapless.signal(hap, signal)
 
 
 if __name__ == "__main__":

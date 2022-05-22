@@ -1,6 +1,7 @@
 ### 0.1.5 ⚙️ ongoing work
 
 * Add command to kill specific hap / all active haps
+* Allow sending arbitrary signals to the hap
 
 
 ## 0.1.4 📦 current package

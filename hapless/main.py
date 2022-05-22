@@ -1,6 +1,7 @@
 import asyncio
 import os
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -306,5 +307,18 @@ class Hapless(object):
         else:
             console.print(
                 f"{config.ICON_INFO} No active haps to kill",
+                style=f"{config.COLOR_ERROR} bold",
+            )
+
+    def signal(self, hap: Hap, sig: signal.Signals):
+        if hap.active:
+            sig_text = (
+                f"[bold]{sig.name}[/] ([{config.COLOR_MAIN}]{signal.strsignal(sig)}[/])"
+            )
+            console.print(f"{config.ICON_INFO} Sending {sig_text} to hap {hap}")
+            hap.proc.send_signal(sig)
+        else:
+            console.print(
+                f"{config.ICON_INFO} Cannot send signal to the inactive hap",
                 style=f"{config.COLOR_ERROR} bold",
             )

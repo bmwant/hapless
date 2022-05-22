@@ -1,8 +1,11 @@
 import logging
 import shlex
+import signal
 import time
 from functools import wraps
 from pathlib import Path
+
+import click
 
 from hapless import config
 
@@ -57,3 +60,15 @@ def wait_created(
     while not path.exists() and time.time() - start < timeout:
         time.sleep(interval)
     return path.exists()
+
+
+def validate_signal(ctx, param, value):
+    try:
+        signal_code = int(value)
+    except ValueError:
+        raise click.BadParameter("Signal should be a valid integer value")
+
+    try:
+        return signal.Signals(signal_code)
+    except ValueError:
+        raise click.BadParameter(f"{signal_code} is not a valid signal code")
