@@ -1,10 +1,13 @@
-### 0.1.5 ⚙️ ongoing work
+### 0.1.6 ⚙️ ongoing work
+
+
+## 0.1.5 📦 current package
 
 * Add command to kill specific hap / all active haps
 * Allow sending arbitrary signals to the hap
 
 
-## 0.1.4 📦 current package
+## 0.1.4
 
 * Add verbose mode for the main command
 * Allow specifying custom name for the hap

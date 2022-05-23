@@ -4,16 +4,16 @@
 
 `hap-alias` is either a hap id (integer identificator) or hap name (string identificator). Note that you need to replace this placeholder in commands below with an actual value.
 
-### Running scripts
+### ✏️ Running scripts
 
-* Run a simple script
+➡️ Run a simple script
 
 ```bash
 $ hap run ./examples/script.sh
 $ hap run python ./examples/fast.py
 ```
 
-* Run script accepting arguments
+➡️ Run script accepting arguments
 
 ```bash
 $ hap run -- python ./examples/show_details.py -v --name details --count=5
@@ -21,15 +21,15 @@ $ hap run -- python ./examples/show_details.py -v --name details --count=5
 
 Use `--` delimiter in order to separate target script and its arguments. Otherwise arguments will be interpreted as a keys for `hap` executable.
 
-* Check script for early failures right after launch
+➡️ Check script for early failures right after launch
 
 ```bash
 $ hap run --check python ./examples/fail_fast.py
 ```
 
-### Checking status
+### ✏️ Checking status
 
-* Show summary for all haps
+➡️ Show summary for all haps
 
 ```bash
 $ hap
@@ -38,7 +38,7 @@ $ hap status  # equivalent
 $ hap show  # same as above
 ```
 
-* Check status of the specific hap
+➡️ Check status of the specific hap
 
 ```bash
 $ hap show [hap-alias]
@@ -46,7 +46,7 @@ $ hap show [hap-alias]
 $ hap status [hap-alias]
 ```
 
-* Show detailed status for the hap (including environment variables)
+➡️ Show detailed status for the hap (including environment variables)
 
 ```bash
 $ hap show -v [hap-alias]
@@ -56,15 +56,15 @@ $ hap status -v [hap-alias]
 $ hap status --verbose [hap-alias]  # same as above
 ```
 
-### Checking logs
+### ✏️ Checking logs
 
-* Print process logs to the console
+➡️ Print process logs to the console
 
 ```bash
 $ hap logs [hap-alias]
 ```
 
-* Stream logs continuously to the console
+➡️ Stream logs continuously to the console
 
 ```bash
 $ hap logs -f [hap-alias]
@@ -72,9 +72,9 @@ $ hap logs -f [hap-alias]
 $ hap logs --follow [hap-alias]
 ```
 
-### Other commands
+### ✏️ Other commands
 
-* Suspend (pause) a hap. Sends `SIGSTOP` signal to the process
+➡️ Suspend (pause) a hap. Sends `SIGSTOP` signal to the process
 
 ```bash
 $ hap pause [hap-alias]
@@ -82,8 +82,15 @@ $ hap pause [hap-alias]
 $ hap suspend [hap-alias]
 ```
 
-* Resume paused hap. Sends `SIGCONT` signal to the suspended process
+➡️ Resume paused hap. Sends `SIGCONT` signal to the suspended process
 
 ```bash
 $ hap resume [hap-alias]
+```
+
+➡️ Send specific signal to the process by its code
+
+```bash
+$ hap signal [hap-alias] 9  # sends SIGKILL
+$ hap signal [hap-alias] 15  # sends SIGTERM
 ```
