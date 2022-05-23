@@ -39,3 +39,26 @@ def test_killall_improper_invocation(runner):
         assert result.exit_code == 2
         assert "Cannot use --all flag while hap id provided" in result.stdout
         kill_mock.assert_not_called()
+
+
+@patch("hapless.cli.get_or_exit")
+def test_signal_invocation(get_or_exit_mock, runner):
+    hap_mock = Mock()
+    get_or_exit_mock.return_value = hap_mock
+    with patch.object(runner.hapless, "signal") as signal_mock:
+        result = runner.invoke(cli.cli, ["signal", "hap-name", "9"])
+        assert result.exit_code == 0
+        get_or_exit_mock.assert_called_once_with("hap-name")
+        signal_mock.assert_called_once_with(hap_mock, 9)
+
+
+def test_signal_invalid_hap():
+    pass
+
+
+def test_signal_wrong_code():
+    pass
+
+
+def test_signal_inactive_hap():
+    pass
