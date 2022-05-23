@@ -1,3 +1,4 @@
+import signal
 from pathlib import Path
 from unittest.mock import Mock
 
@@ -33,4 +34,10 @@ def test_validate_signal_wrong_code():
 
 
 def test_validate_signal_out_of_bounds():
-    pass
+    ctx = click.get_current_context(silent=True)
+    param = Mock()
+    code = signal.NSIG
+    with pytest.raises(click.BadParameter) as excinfo:
+        validate_signal(ctx, param, code)
+
+    assert str(excinfo.value) == f"{code} is not a valid signal code"
