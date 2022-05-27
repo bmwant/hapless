@@ -57,7 +57,18 @@ def test_logs_invocation(get_or_exit_mock, runner):
         result = runner.invoke(cli.cli, ["logs", "hap-me", "--follow"])
         assert result.exit_code == 0
         get_or_exit_mock.assert_called_once_with("hap-me")
-        logs_mock.assert_called_once_with(hap_mock, follow=True)
+        logs_mock.assert_called_once_with(hap_mock, stderr=False, follow=True)
+
+
+@patch("hapless.cli.get_or_exit")
+def test_logs_stderr_invocation(get_or_exit_mock, runner):
+    hap_mock = Mock()
+    get_or_exit_mock.return_value = hap_mock
+    with patch.object(runner.hapless, "logs") as logs_mock:
+        result = runner.invoke(cli.cli, ["logs", "hap-me", "--stderr"])
+        assert result.exit_code == 0
+        get_or_exit_mock.assert_called_once_with("hap-me")
+        logs_mock.assert_called_once_with(hap_mock, stderr=True, follow=False)
 
 
 def test_run_invocation(runner):

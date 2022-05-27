@@ -259,15 +259,16 @@ class Hapless(object):
                 self._check_fast_failure(hap)
             sys.exit(0)
 
-    def logs(self, hap: Hap, follow: bool = False):
+    def logs(self, hap: Hap, stderr: bool = False, follow: bool = False):
+        filepath = hap.stderr_path if stderr else hap.stdout_path
         if follow:
             console.print(
-                f"{config.ICON_INFO} Streaming {hap.stdout_path} file...",
+                f"{config.ICON_INFO} Streaming {filepath} file...",
                 style=f"{config.COLOR_MAIN} bold",
             )
-            return subprocess.run(["tail", "-f", hap.stdout_path])
+            return subprocess.run(["tail", "-f", filepath])
         else:
-            return subprocess.run(["cat", hap.stdout_path])
+            return subprocess.run(["cat", filepath])
 
     def clean(self, skip_failed: bool = False):
         def to_clean(hap):

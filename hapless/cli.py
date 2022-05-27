@@ -64,9 +64,10 @@ def _status(hap_alias: Optional[str] = None, verbose: bool = False):
 @cli.command()
 @click.argument("hap_alias", metavar="hap")
 @click.option("-f", "--follow", is_flag=True, default=False)
-def logs(hap_alias, follow):
+@click.option("-e", "--stderr", is_flag=True, default=False)
+def logs(hap_alias, follow, stderr):
     hap = get_or_exit(hap_alias)
-    hapless.logs(hap, follow=follow)
+    hapless.logs(hap, stderr=stderr, follow=follow)
 
 
 @cli.command()
