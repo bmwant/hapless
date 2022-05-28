@@ -28,6 +28,12 @@ Enable extra logging
 $ export HAPLESS_DEBUG=1
 ```
 
+Check coverage
+
+```bash
+$ poetry run pytest --cov=hapless --cov-report=html tests/
+```
+
 ### Releasing
 
 Bump a version with features you want to include and build a package

@@ -7,3 +7,8 @@ build:
 .PHONY: tests
 tests:
 	@poetry run pytest -sv tests
+
+
+.PHONY: coverage
+coverage:
+	@poetry run pytest --cov=hapless tests
