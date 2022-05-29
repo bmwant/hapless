@@ -103,3 +103,25 @@ def test_clean_invocation(runner):
         result = runner.invoke(cli.cli, ["clean", "--skip-failed"])
         assert result.exit_code == 0
         clean_mock.assert_called_once_with(True)
+
+
+@patch("hapless.cli.get_or_exit")
+def test_pause_invocation(get_or_exit_mock, runner):
+    hap_mock = Mock()
+    get_or_exit_mock.return_value = hap_mock
+    with patch.object(runner.hapless, "pause_hap") as pause_mock:
+        result = runner.invoke(cli.cli, ["pause", "hap-me"])
+        assert result.exit_code == 0
+        get_or_exit_mock.assert_called_once_with("hap-me")
+        pause_mock.assert_called_once_with(hap_mock)
+
+
+@patch("hapless.cli.get_or_exit")
+def test_resume_invocation(get_or_exit_mock, runner):
+    hap_mock = Mock()
+    get_or_exit_mock.return_value = hap_mock
+    with patch.object(runner.hapless, "resume_hap") as resume_mock:
+        result = runner.invoke(cli.cli, ["resume", "hap-me"])
+        assert result.exit_code == 0
+        get_or_exit_mock.assert_called_once_with("hap-me")
+        resume_mock.assert_called_once_with(hap_mock)

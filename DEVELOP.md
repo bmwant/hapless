@@ -32,6 +32,8 @@ Check coverage
 
 ```bash
 $ poetry run pytest --cov=hapless --cov-report=html tests/
+# or
+$ make coverage-report
 ```
 
 ### Releasing
