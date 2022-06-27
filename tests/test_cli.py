@@ -98,6 +98,26 @@ def test_run_invocation_name_provided(runner):
         )
 
 
+def test_run_invocation_same_name_provided(runner):
+    name = "hap-name"
+    cmd = "script"
+    with patch.object(runner.hapless, "run") as run_mock:
+        result_pass = runner.invoke(cli.cli, ["run", "--name", name, cmd])
+        assert result_pass.exit_code == 0
+        run_mock.assert_called_once_with(
+            cmd,
+            name=name,
+            check=False,
+        )
+        # make sure record for the hap has been actually created
+        runner.hapless.create_hap(cmd=cmd, name=name)
+
+        # call again with the same name
+        result_fail = runner.invoke(cli.cli, ["run", "--name", name, cmd])
+        assert result_fail.exit_code == 1
+        assert run_mock.call_count == 1
+
+
 def test_clean_invocation(runner):
     with patch.object(runner.hapless, "clean") as clean_mock:
         result = runner.invoke(cli.cli, ["clean", "--skip-failed"])

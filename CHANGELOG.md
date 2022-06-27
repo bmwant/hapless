@@ -1,5 +1,7 @@
 ### 0.1.6 ⚙️ ongoing work
 
+* Do not allow creating haps with same alias
+
 
 ## 0.1.5 📦 current package
 

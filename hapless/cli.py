@@ -81,6 +81,14 @@ def clean(skip_failed):
 @click.option("-n", "--name")
 @click.option("--check", is_flag=True, default=False)
 def run(cmd, name, check):
+    hap = hapless.get_hap(name)
+    print("Getting hap", hap)
+    if hap is not None:
+        console.print(
+            f"{config.ICON_INFO} Hap with such name already exists: {hap}",
+            style=f"{config.COLOR_ERROR} bold",
+        )
+        sys.exit(1)
     hapless.run(shlex_join(cmd), name=name, check=check)
 
 
