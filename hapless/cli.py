@@ -88,6 +88,7 @@ def run(cmd, name, check):
             style=f"{config.COLOR_ERROR} bold",
         )
         sys.exit(1)
+
     # NOTE: click doesn't like `required` property for `cmd` argument
     # https://click.palletsprojects.com/en/latest/arguments/#variadic-arguments
     cmd_escaped = shlex_join(cmd).strip()
