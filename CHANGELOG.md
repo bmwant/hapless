@@ -1,6 +1,7 @@
 ### 0.1.6 ⚙️ ongoing work
 
 * Do not allow creating haps with same alias
+* Warm when empty command is provided
 
 
 ## 0.1.5 📦 current package
