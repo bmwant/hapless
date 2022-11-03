@@ -82,14 +82,22 @@ def clean(skip_failed):
 @click.option("--check", is_flag=True, default=False)
 def run(cmd, name, check):
     hap = hapless.get_hap(name)
-    print("Getting hap", hap)
     if hap is not None:
         console.print(
             f"{config.ICON_INFO} Hap with such name already exists: {hap}",
             style=f"{config.COLOR_ERROR} bold",
         )
         sys.exit(1)
-    hapless.run(shlex_join(cmd), name=name, check=check)
+    # NOTE: click doesn't like `required` property for `cmd` argument
+    # https://click.palletsprojects.com/en/latest/arguments/#variadic-arguments
+    cmd_escaped = shlex_join(cmd).strip()
+    if not cmd_escaped:
+        console.print(
+            f"{config.ICON_INFO} You have to provide a command to run",
+            style=f"{config.COLOR_ERROR} bold",
+        )
+        sys.exit(1)
+    hapless.run(cmd_escaped, name=name, check=check)
 
 
 @cli.command(short_help="Pause a specific hap")
