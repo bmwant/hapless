@@ -4,6 +4,8 @@
 [![PyPI](https://img.shields.io/pypi/v/hapless)](https://pypi.org/project/hapless/)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/hapless)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![EditorConfig](https://img.shields.io/badge/-EditorConfig-grey?logo=editorconfig)](https://editorconfig.org/)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 > **hapless** (*adjective*) - (especially of a person) unfortunate. A developer who accidentally launched long-running process in the foreground.
 
