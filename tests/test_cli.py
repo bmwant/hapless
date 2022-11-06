@@ -120,9 +120,7 @@ def test_run_invocation_same_name_provided(runner):
 
 def test_run_empty_invocation(runner):
     with patch.object(runner.hapless, "run") as run_mock:
-        result = runner.invoke(
-            cli.cli, "run  "
-        )
+        result = runner.invoke(cli.cli, "run  ")
         assert result.exit_code == 1
         assert "provide a command to run" in result.output
         assert not run_mock.called

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - release
   pull_request:
     branches:
       - main
@@ -14,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
 
     steps:
       - name: Checkout code
@@ -24,6 +25,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+          cache: "poetry"
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -31,6 +33,13 @@ jobs:
       - name: Install dependencies
         run: |
           poetry install
+
+      - name: Check codestyle / formatting
+        run: |
+          echo "Checking imports order"
+          poetry run isort . --check-only
+          echo "Checking black codestyle"
+          poetry run black . --check
 
       - name: Run unittests
         run: |

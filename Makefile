@@ -17,3 +17,11 @@ coverage:
 .PHONY: coverage-report
 coverage-report:
 	@poetry run pytest --cov=hapless --cov-report=html tests
+
+.PHONY: isort
+isort:
+	@poetry run isort .
+
+.PHONY: black
+black:
+	@poetry run black .
