@@ -1,0 +1,49 @@
+name: "# Draft New Release #"
+
+on:
+  worflow_dispatch:
+    inputs:
+      version:
+        description: "The version you want to release (format: vX.X.X)"
+        required: true
+
+env:
+  POETRY_VERSION: "1.2.1"
+
+jobs:
+  name: "Draft a new release"
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Create release candidate branch
+      run: |
+        git checkout -b rc/${{ github.event.inputs.version }}
+
+    # Bump and populate the changelog according to https://keepachangelog.com/en/1.0.0/
+    # TODO: update action used
+    - name: Update changelog
+      uses: keep-a-changelog-new-release@1.1.0
+      with:
+        version: ${{ github.event.inputs.version }}
+
+    # In order to make a commit, we need to initialize a user
+    - name: Initialize mandatory git config
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email noreply@github.com
+
+    # Install Poetry package manager
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      # NOTE: pin to a specific Poetry version if needed
+      # with:
+      #   version: ${{ env.POETRY_VERSION }}
+
+    # Bump package version with Poetry
+    - name: Bump version
+      run: |
+        SEMVER="$(echo ${{ github.event.inputs.version }} | sed 's/^v//')"
+        poetry version ${SEMVER}
+        echo "Bumped the version to ${SEMVER}!"
