@@ -47,3 +47,33 @@ jobs:
         SEMVER="$(echo ${{ github.event.inputs.version }} | sed 's/^v//')"
         poetry version ${SEMVER}
         echo "Bumped the version to ${SEMVER}!"
+
+    # Commit changes made
+    - name: Commit changes
+      id: make-commit
+      # TODO: `set-output` is deprecated
+      run: |
+        git add CHANGELOG.md pyproject.toml
+        git commit --message "Prepare release ${{ github.event.inputs.version }} changes"
+        echo "::set-output name=commit::$(git rev-parse HEAD)"
+
+    - name: Push new branch
+      run: |
+        git push origin rc/${{ github.event.inputs.version }}
+
+    - name: Create pull request
+      # TODO: update action used
+      uses: create-pull-request@1.0.0
+      # NOTE: override Github token if needed
+      # env:
+      #   GITHUB_TOKEN: ""
+      with:
+        head: rc/${{ github.event.inputs.version }}
+        base: release
+        title: Release ${{ github.event.inputs.version }}
+        # By default, request a review from the person who triggered the workflow
+        reviewers: ${{ github.actor }}
+        body: |
+          This release was manually triggered by @${{ github.actor }} from this workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}.
+          Github Actions automatically bumped the version and updated changelog with this commit: ${{ steps.make-commit.outputs.commit }}.
+          Merging this PR will create a GitHub release and tag from the updated release branch.
