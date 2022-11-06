@@ -24,7 +24,7 @@ jobs:
 
       # Bump and populate the changelog according to https://keepachangelog.com/en/1.0.0/
       - name: Update changelog
-        uses: misha-brt/keep-a-changelog-new-release@latest
+        uses: misha-brt/keep-a-changelog-new-release@v0.0.1
         with:
           version: ${{ github.event.inputs.version }}
 
@@ -62,7 +62,7 @@ jobs:
           git push origin rc/${{ github.event.inputs.version }}
 
       - name: Create pull request
-        uses: misha-brt/create-pull-request@latest
+        uses: misha-brt/create-pull-request@v0.0.1
         # NOTE: override Github token if needed
         # env:
         #   GITHUB_TOKEN: ""
