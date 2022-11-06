@@ -63,9 +63,9 @@ jobs:
 
       - name: Create pull request
         uses: misha-brt/create-pull-request@v0.0.1
-        # NOTE: override Github token if needed
-        # env:
-        #   GITHUB_TOKEN: ""
+        # NOTE: default token automatically provided by Github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           head: rc/${{ github.event.inputs.version }}
           base: release
