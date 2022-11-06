@@ -1,7 +1,7 @@
 name: "# Draft New Release #"
 
 on:
-  worflow_dispatch:
+  workflow_dispatch:
     inputs:
       version:
         description: "The version you want to release (format: vX.X.X)"
