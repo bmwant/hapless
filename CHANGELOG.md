@@ -1,10 +1,12 @@
-### 0.1.6 ⚙️ ongoing work
+### Unreleased ⚙️ ongoing work
+
+### 0.1.6 📦 current package
 
 * Do not allow creating haps with same alias
 * Warn when empty command is provided
 
 
-## 0.1.5 📦 current package
+## 0.1.5
 
 * Add command to kill specific hap / all active haps
 * Allow sending arbitrary signals to the hap
