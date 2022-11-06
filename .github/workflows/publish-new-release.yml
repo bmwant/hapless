@@ -41,11 +41,10 @@ jobs:
 
       # Create Github release with notes and tag
       - name: Create release
-        # TODO: update action used
-        uses: create-release@1.0.0
-        # NOTE: override Github token if needed
-        # env:
-        #   GITHUB_TOKEN: ""
+        uses: misha-brt/create-release@v0.0.1
+        # NOTE: override default Github token if needed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           target_commitish: ${{ github.event.pull_request.merge_commit_sha }}
           tag_name: ${{ env.RELEASE_VERSION }}
@@ -60,5 +59,5 @@ jobs:
           type: now
           from_branch: release
           target_branch: develop
-          # NOTE: override Github token if needed
-          # github_token: ""
+          # NOTE: override default Github token if needed
+          github_token: ${{ secrets.GITHUB_TOKEN }}
