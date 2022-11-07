@@ -16,6 +16,10 @@ Available sections are:
 
 ## [Unreleased]
 
+### Changed
+
+- Use same dot icon for the status with different colors styling. This fixes table alignment on iTerm2 (MacOS).
+
 ## [v0.1.7] - 2022-11-06
 
 ### Changed
