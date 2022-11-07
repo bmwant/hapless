@@ -53,11 +53,12 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Merge release back to develop
+      # TODO: replace action with native js one
+      - name: Merge release back into main branch
         uses: devmasx/merge-branch@v1.3.1
         with:
           type: now
           from_branch: release
-          target_branch: develop
+          target_branch: main
           # NOTE: override default Github token if needed
           github_token: ${{ secrets.GITHUB_TOKEN }}
