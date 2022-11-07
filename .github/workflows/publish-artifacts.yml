@@ -23,9 +23,9 @@ jobs:
 
       - name: Build package
         run: |
-          make dist
+          make build
 
-      - name: Publish package artifacts
+      - name: Attach artifact to release assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -36,4 +36,9 @@ jobs:
             --tag_name "${GITHUB_REF_NAME}" \
             --artifact_file_path "${ARTIFACT_FILE_PATH}"
 
-      # TODO: add automatic Poetry upload to PyPI
+      - name: Publish package to PyPI
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          poetry config pypi-token.pypi ${PYPI_TOKEN}
+          poetry publish
