@@ -108,19 +108,20 @@ class Hap(object):
             )
         )
 
-    # todo: add extended status to show panel proc.status()
+    # TODO: add extended status to show panel proc.status()
+    # TODO: return enum entries instead
     @property
     def status(self) -> str:
         proc = self.proc
         if proc is not None:
             if proc.status() == psutil.STATUS_STOPPED:
-                return f"{config.ICON_PAUSED} paused"
-            return f"{config.ICON_RUNNING} running"
+                return "paused"
+            return "running"
 
         if self.rc != 0:
-            return f"{config.ICON_FAILED} failed"
+            return "failed"
 
-        return f"{config.ICON_SUCCESS} success"
+        return "success"
 
     @property
     def proc(self):
