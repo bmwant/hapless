@@ -16,9 +16,11 @@ Available sections are:
 
 ## [Unreleased]
 
+## [v0.1.8] - 2022-11-07
+
 ### Changed
 
-- Use same dot icon for the status with different colors styling. This fixes table alignment on iTerm2 (MacOS).
+-   Use same dot icon for the status with different colors styling. This fixes table alignment on iTerm2 (MacOS).
 
 ## [v0.1.7] - 2022-11-06
 
@@ -82,6 +84,8 @@ Available sections are:
 
 -   Initial release
 
-[Unreleased]: https://github.com/bmwant/hapless/compare/v0.1.7...HEAD
+[Unreleased]: https://github.com/bmwant/hapless/compare/v0.1.8...HEAD
+
+[v0.1.8]: https://github.com/bmwant/hapless/compare/v0.1.7...v0.1.8
 
 [v0.1.7]: https://github.com/bmwant/hapless/compare/11fdb87894b497730bd1a3e04ce9d0c03e0015e1...v0.1.7
