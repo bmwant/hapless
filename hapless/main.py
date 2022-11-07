@@ -71,13 +71,14 @@ class Hapless(object):
             command_text = Text(
                 hap.cmd, overflow="ellipsis", style=f"{config.COLOR_ACCENT}"
             )
+            status_text = Hapless._get_status_text(hap.status)
             command_text.truncate(config.TRUNCATE_LENGTH)
             row = [
                 f"{hap.hid}",
                 hap.name,
                 pid_text,
                 command_text if verbose else None,
-                hap.status,
+                status_text,
                 f"{hap.rc}" if hap.rc is not None else "",
                 hap.runtime,
             ]
@@ -87,6 +88,14 @@ class Hapless(object):
             table.title = f"{config.ICON_HAP} {__package__}, {package_version}"
             table.caption = f"{active_haps} active / {len(haps)} total"
         console.print(table)
+
+    @staticmethod
+    def _get_status_text(status) -> Text:
+        color = config.STATUS_COLORS.get(status)
+        status_text = Text()
+        status_text.append(config.ICON_STATUS, style=color)
+        status_text.append(f" {status}")
+        return status_text
 
     @staticmethod
     def show(hap: Hap, verbose: bool = False):
