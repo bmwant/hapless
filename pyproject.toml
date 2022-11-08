@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hapless"
-version = "0.1.8"
+version = "0.1.9"
 description = "Run and track processes in background"
 authors = ["Misha Behersky <bmwant@gmail.com>"]
 license = "MIT"
@@ -33,11 +33,17 @@ humanize = "^4.0.0"
 click = "^8.1.2"
 importlib-metadata = { version = "^4.11.3", python = "<3.8" }
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "^22.3.0"
 pytest = "^7.1.1"
 isort = "^5.10.1"
 pytest-cov = "^3.0.0"
+
+[tool.poetry.group.ci]
+optional = true
+
+[tool.poetry.group.ci.dependencies]
+github3-py = "^3.2.0"
 
 [tool.poetry.scripts]
 hap = 'hapless.cli:cli'

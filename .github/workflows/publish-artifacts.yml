@@ -1,0 +1,44 @@
+name: Artifacts
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
+on:
+  release:
+    types: [created]
+
+env:
+  POETRY_VERSION: "1.2.2"
+
+jobs:
+  build:
+    name: Build and upload artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        # with:
+        #   version: ${{ env.POETRY_VERSION }}
+
+      - name: Build package
+        run: |
+          make build
+
+      - name: Attach artifact to release assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          poetry install --only ci
+          ARTIFACT_FILE_PATH=$(ls -d -1 ./dist/*.whl)
+          poetry run python tools/upload_artifacts.py \
+            --github_token "${GITHUB_TOKEN}" \
+            --tag_name "${GITHUB_REF_NAME}" \
+            --artifact_file_path "${ARTIFACT_FILE_PATH}"
+
+      - name: Publish package to PyPI
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          poetry config pypi-token.pypi ${PYPI_TOKEN}
+          poetry publish
