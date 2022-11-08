@@ -90,14 +90,22 @@ Available sections are:
 
 -   Initial release
 
-<<<<<<< HEAD
 [Unreleased]: https://github.com/bmwant/hapless/compare/v0.1.9...HEAD
 
-[v0.1.9]: https://github.com/bmwant/hapless/compare/v0.1.7...v0.1.9
-=======
-[Unreleased]: https://github.com/bmwant/hapless/compare/v0.1.8...HEAD
+[v0.1.9]: https://github.com/bmwant/hapless/compare/v0.1.8...v0.1.9
 
 [v0.1.8]: https://github.com/bmwant/hapless/compare/v0.1.7...v0.1.8
->>>>>>> release
 
-[v0.1.7]: https://github.com/bmwant/hapless/compare/11fdb87894b497730bd1a3e04ce9d0c03e0015e1...v0.1.7
+[v0.1.7]: https://github.com/bmwant/hapless/compare/v0.1.6...v0.1.7
+
+[v0.1.6]: https://github.com/bmwant/hapless/compare/v0.1.5...v0.1.6
+
+[v0.1.5]: https://github.com/bmwant/hapless/compare/v0.1.4...v0.1.5
+
+[v0.1.4]: https://github.com/bmwant/hapless/compare/v0.1.3...v0.1.4
+
+[v0.1.3]: https://github.com/bmwant/hapless/compare/v0.1.2...v0.1.3
+
+[v0.1.2]: https://github.com/bmwant/hapless/compare/v0.1.1...v0.1.2
+
+[v0.1.1]: https://github.com/bmwant/hapless/compare/v0.1.0...v0.1.1
