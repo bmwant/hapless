@@ -16,6 +16,12 @@ Available sections are:
 
 ## [Unreleased]
 
+## [v0.1.10] - 2022-11-09
+
+### Added
+
+-   Attach `.whl` and `.tar.gz` package build artifacts on each Github release.
+
 ## [v0.1.9] - 2022-11-08
 
 ### Added
@@ -34,63 +40,65 @@ Available sections are:
 
 -   Use [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) for changelog tracking.
 
-## [0.1.6]
+## [v0.1.6] - 2022-11-05
 
 ### Changed
 
--   Do not allow creating haps with same alias
--   Warn when empty command is provided
+-   Do not allow creating haps with same alias.
+-   Warn when empty command is provided.
 
-## [0.1.5]
-
-### Added
-
--   Add command to kill specific hap / all active haps
--   Allow sending arbitrary signals to the hap
-
-## [0.1.4]
+## [v0.1.5] - 2022-05-23
 
 ### Added
 
--   Add verbose mode for the main command
--   Allow specifying custom name for the hap
+-   Add command to kill specific hap / all active haps.
+-   Allow sending arbitrary signals to the hap.
 
-## [0.1.3]
+## [v0.1.4] - 2022-04-26
 
 ### Added
 
--   Add suspending/resuming functionality for running haps
--   Add unittests to cover basic invocations
+-   Add verbose mode for the main command.
+-   Allow specifying custom name for the hap.
+
+## [v0.1.3] - 2022-04-20
+
+### Added
+
+-   Add suspending/resuming functionality for running haps.
+-   Add unittests to cover basic invocations.
 
 ### Fixed
 
--   Fix issue with checking for failures
--   Fix Python 3.7 compatibility
+-   Fix issue with checking for failures.
+-   Fix Python 3.7 compatibility.
 
-## [0.1.2]
+## [v0.1.2] - 2022-04-19
 
 ### Added
 
--   Display extra information for the verbose status command
+-   Display extra information for the verbose status command.
 
 ### Fixed
 
--   Fix issue with attaching to short-living processes
+-   Fix issue with attaching to short-living processes.
 
-## [0.1.1]
+## [v0.1.1] - 2022-04-18
 
 ### Added
 
--   Save environment for the hap
--   Show environment in the verbose status mode
+-   Save environment for the hap.
+-   Show environment in the verbose status mode.
 
-## [0.1.0]
+## [v0.1.0] - 2022-04-17
 
 ### Changed
 
--   Initial release
+-   Initial release.
 
-[Unreleased]: https://github.com/bmwant/hapless/compare/v0.1.9...HEAD
+[Unreleased]: https://github.com/bmwant/hapless/compare/v0.1.10...HEAD
+
+[v0.1.10]: https://github.com/bmwant/hapless/compare/v0.1.9...v0.1.10
 
 [v0.1.9]: https://github.com/bmwant/hapless/compare/v0.1.8...v0.1.9
 
@@ -109,3 +117,5 @@ Available sections are:
 [v0.1.2]: https://github.com/bmwant/hapless/compare/v0.1.1...v0.1.2
 
 [v0.1.1]: https://github.com/bmwant/hapless/compare/v0.1.0...v0.1.1
+
+[v0.1.0]: https://github.com/bmwant/hapless/compare/6a73ff26ed15485a5c28a6d6ffb1032b187f06e7...v0.1.0
