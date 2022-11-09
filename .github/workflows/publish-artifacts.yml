@@ -1,9 +1,9 @@
 name: Artifacts
 
-# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#release
 on:
   release:
-    types: [created]
+    types: [published]
 
 env:
   POETRY_VERSION: "1.2.2"
