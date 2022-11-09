@@ -38,28 +38,28 @@ Available sections are:
 
 -   Use [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) for changelog tracking.
 
-## [0.1.6]
+## [v0.1.6] - 2022-11-05
 
 ### Changed
 
 -   Do not allow creating haps with same alias.
 -   Warn when empty command is provided.
 
-## [0.1.5]
+## [v0.1.5] - 2022-05-23
 
 ### Added
 
 -   Add command to kill specific hap / all active haps.
 -   Allow sending arbitrary signals to the hap.
 
-## [0.1.4]
+## [v0.1.4] - 2022-04-26
 
 ### Added
 
 -   Add verbose mode for the main command.
 -   Allow specifying custom name for the hap.
 
-## [0.1.3]
+## [v0.1.3] - 2022-04-20
 
 ### Added
 
@@ -71,7 +71,7 @@ Available sections are:
 -   Fix issue with checking for failures.
 -   Fix Python 3.7 compatibility.
 
-## [0.1.2]
+## [v0.1.2] - 2022-04-19
 
 ### Added
 
@@ -81,14 +81,14 @@ Available sections are:
 
 -   Fix issue with attaching to short-living processes.
 
-## [0.1.1]
+## [v0.1.1] - 2022-04-18
 
 ### Added
 
 -   Save environment for the hap.
 -   Show environment in the verbose status mode.
 
-## [0.1.0]
+## [v0.1.0] - 2022-04-17
 
 ### Changed
 
