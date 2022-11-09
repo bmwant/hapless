@@ -113,3 +113,5 @@ Available sections are:
 [v0.1.2]: https://github.com/bmwant/hapless/compare/v0.1.1...v0.1.2
 
 [v0.1.1]: https://github.com/bmwant/hapless/compare/v0.1.0...v0.1.1
+
+[v0.1.0]: https://github.com/bmwant/hapless/compare/6a73ff26ed15485a5c28a6d6ffb1032b187f06e7...v0.1.0
