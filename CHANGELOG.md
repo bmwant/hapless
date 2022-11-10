@@ -16,6 +16,8 @@ Available sections are:
 
 ## [Unreleased]
 
+## [v0.1.10] - 2022-11-10
+
 ### Added
 
 -   Attach `.whl` and `.tar.gz` package build artifacts on each Github release.
@@ -94,7 +96,9 @@ Available sections are:
 
 -   Initial release.
 
-[Unreleased]: https://github.com/bmwant/hapless/compare/v0.1.9...HEAD
+[Unreleased]: https://github.com/bmwant/hapless/compare/v0.1.10...HEAD
+
+[v0.1.10]: https://github.com/bmwant/hapless/compare/v0.1.9...v0.1.10
 
 [v0.1.9]: https://github.com/bmwant/hapless/compare/v0.1.8...v0.1.9
 
