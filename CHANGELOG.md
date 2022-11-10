@@ -16,7 +16,7 @@ Available sections are:
 
 ## [Unreleased]
 
-## [v0.1.10] - 2022-11-09
+## [v0.1.10] - 2022-11-10
 
 ### Added
 
