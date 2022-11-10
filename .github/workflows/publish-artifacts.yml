@@ -1,9 +1,10 @@
-name: Artifacts
+name: "Publish artifacts"
 
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#release
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 env:
   POETRY_VERSION: "1.2.2"
@@ -32,9 +33,9 @@ jobs:
           poetry install --only ci
           ARTIFACT_FILE_PATH=$(ls -d -1 ./dist/*.whl)
           poetry run python tools/upload_artifacts.py \
-            --github_token "${GITHUB_TOKEN}" \
-            --tag_name "${GITHUB_REF_NAME}" \
-            --artifact_file_path "${ARTIFACT_FILE_PATH}"
+            --github-token "${GITHUB_TOKEN}" \
+            --tag "${GITHUB_REF_NAME}" \
+            --artifact "${ARTIFACT_FILE_PATH}"
 
       - name: Publish package to PyPI
         env:
