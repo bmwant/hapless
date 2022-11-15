@@ -16,6 +16,10 @@ Available sections are:
 
 ## [Unreleased]
 
+### Fixed
+
+-   Status icon is showed for the hap details
+
 ## [v0.1.10] - 2022-11-10
 
 ### Added

@@ -101,7 +101,8 @@ class Hapless(object):
     def show(hap: Hap, verbose: bool = False):
         status_table = Table(show_header=False, show_footer=False, box=box.SIMPLE)
 
-        status_table.add_row("Status:", hap.status)
+        status_text = Hapless._get_status_text(hap.status)
+        status_table.add_row("Status:", status_text)
 
         status_table.add_row("PID:", f"{hap.pid}")
 
