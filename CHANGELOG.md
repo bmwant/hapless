@@ -16,6 +16,10 @@ Available sections are:
 
 ## [Unreleased]
 
+### Fixed
+
+-   Resolving merge conflicts between release and main branches
+
 ## [v0.2.0] - 2022-11-16
 
 ### Fixed
