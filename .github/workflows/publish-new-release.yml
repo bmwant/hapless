@@ -53,12 +53,15 @@ jobs:
           draft: false
           prerelease: false
 
-      # TODO: replace action with native js one
       - name: Merge release back into main branch
-        uses: devmasx/merge-branch@v1.3.1
-        with:
-          type: now
-          from_branch: release
-          target_branch: main
+        run: |
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            /repos/bmwant/hapless/merges \
+            -f base='main' \
+            -f head='release' \
+            -f commit_message='Merge release into main'
+        env:
           # NOTE: override default Github token if needed
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
