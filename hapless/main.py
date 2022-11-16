@@ -1,4 +1,3 @@
-import asyncio
 import os
 import shutil
 import signal
@@ -25,7 +24,7 @@ from rich.text import Text
 
 from hapless import config
 from hapless.hap import Hap
-from hapless.utils import logger, wait_created, kill_proc_tree
+from hapless.utils import kill_proc_tree, logger, wait_created
 
 console = Console(highlight=False)
 
@@ -206,25 +205,6 @@ class Hapless(object):
         hap_dir.mkdir()
         return Hap(hap_dir, cmd=cmd, name=name)
 
-    async def run_hap_async(self, hap: Hap):
-        with open(hap.stdout_path, "w") as stdout_pipe, open(
-            hap.stderr_path, "w"
-        ) as stderr_pipe:
-            # todo: run with exec
-            proc = await asyncio.create_subprocess_shell(
-                hap.cmd,
-                stdout=stdout_pipe,
-                stderr=stderr_pipe,
-            )
-            logger.debug(f"And this is pid of the subshell {proc.pid}")
-            hap.attach(proc.pid)
-
-            console.print(f"{config.ICON_INFO} Running", hap)
-            _ = await proc.communicate()
-
-            with open(hap._rc_file, "w") as rc_file:
-                rc_file.write(f"{proc.returncode}")
-
     def run_hap(self, hap: Hap):
         # pid = os.getpid()
         # logger.debug(f"Attaching hap {hap} to pid {pid}")
@@ -245,10 +225,9 @@ class Hapless(object):
             hap.attach(pid)
 
             retcode = proc.wait()
-            
+
             with open(hap._rc_file, "w") as rc_file:
                 rc_file.write(f"{retcode}")
-
 
     def _check_fast_failure(self, hap: Hap):
         if wait_created(hap._rc_file) and hap.rc != 0:
