@@ -1,4 +1,3 @@
-import asyncio
 import os
 import shutil
 import signal
@@ -25,7 +24,7 @@ from rich.text import Text
 
 from hapless import config
 from hapless.hap import Hap
-from hapless.utils import logger, wait_created
+from hapless.utils import kill_proc_tree, logger, wait_created
 
 console = Console(highlight=False)
 
@@ -101,7 +100,8 @@ class Hapless(object):
     def show(hap: Hap, verbose: bool = False):
         status_table = Table(show_header=False, show_footer=False, box=box.SIMPLE)
 
-        status_table.add_row("Status:", hap.status)
+        status_text = Hapless._get_status_text(hap.status)
+        status_table.add_row("Status:", status_text)
 
         status_table.add_row("PID:", f"{hap.pid}")
 
@@ -205,23 +205,26 @@ class Hapless(object):
         hap_dir.mkdir()
         return Hap(hap_dir, cmd=cmd, name=name)
 
-    async def run_hap(self, hap: Hap):
+    def run_hap(self, hap: Hap):
         with open(hap.stdout_path, "w") as stdout_pipe, open(
             hap.stderr_path, "w"
         ) as stderr_pipe:
-            # todo: run with exec
-            proc = await asyncio.create_subprocess_shell(
+            console.print(f"{config.ICON_INFO} Launching", hap)
+            proc = subprocess.Popen(
                 hap.cmd,
+                shell=True,
                 stdout=stdout_pipe,
                 stderr=stderr_pipe,
             )
-            hap.attach(proc.pid)
 
-            console.print(f"{config.ICON_INFO} Running", hap)
-            _ = await proc.communicate()
+            pid = proc.pid
+            logger.debug(f"Attaching hap {hap} to pid {pid}")
+            hap.attach(pid)
+
+            retcode = proc.wait()
 
             with open(hap._rc_file, "w") as rc_file:
-                rc_file.write(f"{proc.returncode}")
+                rc_file.write(f"{retcode}")
 
     def _check_fast_failure(self, hap: Hap):
         if wait_created(hap._rc_file) and hap.rc != 0:
@@ -261,8 +264,7 @@ class Hapless(object):
         hap = self.create_hap(cmd=cmd, name=name)
         pid = os.fork()
         if pid == 0:
-            coro = self.run_hap(hap)
-            asyncio.run(coro)
+            self.run_hap(hap)
         else:
             if check:
                 self._check_fast_failure(hap)
@@ -306,7 +308,7 @@ class Hapless(object):
         for hap in haps:
             if hap.active:
                 logger.info(f"Killing {hap}...")
-                hap.proc.kill()
+                kill_proc_tree(hap.pid)
                 killed_counter += 1
 
         if killed_counter:

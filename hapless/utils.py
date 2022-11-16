@@ -1,4 +1,5 @@
 import logging
+import os
 import shlex
 import signal
 import time
@@ -6,6 +7,7 @@ from functools import wraps
 from pathlib import Path
 
 import click
+import psutil
 
 from hapless import config
 
@@ -72,3 +74,19 @@ def validate_signal(ctx, param, value):
         return signal.Signals(signal_code)
     except ValueError:
         raise click.BadParameter(f"{signal_code} is not a valid signal code")
+
+
+def kill_proc_tree(pid, sig=signal.SIGKILL, include_parent=True):
+    if pid == os.getpid():
+        raise ValueError("Would not kill myself")
+
+    parent = psutil.Process(pid)
+    children = parent.children(recursive=True)
+    if include_parent:
+        children.append(parent)
+    for p in children:
+        try:
+            p.send_signal(sig)
+            logger.debug(f"Sent {sig} to {p.pid} process")
+        except psutil.NoSuchProcess:
+            pass
