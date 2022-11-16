@@ -25,7 +25,7 @@ from rich.text import Text
 
 from hapless import config
 from hapless.hap import Hap
-from hapless.utils import logger, wait_created
+from hapless.utils import logger, wait_created, kill_proc_tree
 
 console = Console(highlight=False)
 
@@ -206,7 +206,7 @@ class Hapless(object):
         hap_dir.mkdir()
         return Hap(hap_dir, cmd=cmd, name=name)
 
-    async def run_hap(self, hap: Hap):
+    async def run_hap_async(self, hap: Hap):
         with open(hap.stdout_path, "w") as stdout_pipe, open(
             hap.stderr_path, "w"
         ) as stderr_pipe:
@@ -216,6 +216,7 @@ class Hapless(object):
                 stdout=stdout_pipe,
                 stderr=stderr_pipe,
             )
+            logger.debug(f"And this is pid of the subshell {proc.pid}")
             hap.attach(proc.pid)
 
             console.print(f"{config.ICON_INFO} Running", hap)
@@ -223,6 +224,31 @@ class Hapless(object):
 
             with open(hap._rc_file, "w") as rc_file:
                 rc_file.write(f"{proc.returncode}")
+
+    def run_hap(self, hap: Hap):
+        # pid = os.getpid()
+        # logger.debug(f"Attaching hap {hap} to pid {pid}")
+        # hap.attach(pid)
+        with open(hap.stdout_path, "w") as stdout_pipe, open(
+            hap.stderr_path, "w"
+        ) as stderr_pipe:
+            console.print(f"{config.ICON_INFO} Launching", hap)
+            proc = subprocess.Popen(
+                hap.cmd,
+                shell=True,
+                stdout=stdout_pipe,
+                stderr=stderr_pipe,
+            )
+
+            pid = proc.pid
+            logger.debug(f"Attaching hap {hap} to pid {pid}")
+            hap.attach(pid)
+
+            retcode = proc.wait()
+            
+            with open(hap._rc_file, "w") as rc_file:
+                rc_file.write(f"{retcode}")
+
 
     def _check_fast_failure(self, hap: Hap):
         if wait_created(hap._rc_file) and hap.rc != 0:
@@ -261,12 +287,14 @@ class Hapless(object):
     def run(self, cmd: str, name: Optional[str] = None, check: bool = False):
         hap = self.create_hap(cmd=cmd, name=name)
         pid = os.fork()
+        logger.debug(f"Fork return pid is {pid}")
         if pid == 0:
-            coro = self.run_hap(hap)
-            asyncio.run(coro)
+            logger.debug(f"Child should be {os.getpid()}")
+            self.run_hap(hap)
         else:
             if check:
                 self._check_fast_failure(hap)
+            logger.debug(f"Parent should be {os.getpid()}")
             sys.exit(0)
 
     def logs(self, hap: Hap, stderr: bool = False, follow: bool = False):
@@ -307,7 +335,7 @@ class Hapless(object):
         for hap in haps:
             if hap.active:
                 logger.info(f"Killing {hap}...")
-                hap.proc.kill()
+                kill_proc_tree(hap.pid)
                 killed_counter += 1
 
         if killed_counter:
