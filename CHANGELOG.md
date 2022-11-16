@@ -19,6 +19,7 @@ Available sections are:
 ### Fixed
 
 -   Status icon is showed for the hap details
+-   Properly kill hap and its underlying processes
 
 ## [v0.1.10] - 2022-11-10
 

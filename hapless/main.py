@@ -206,9 +206,6 @@ class Hapless(object):
         return Hap(hap_dir, cmd=cmd, name=name)
 
     def run_hap(self, hap: Hap):
-        # pid = os.getpid()
-        # logger.debug(f"Attaching hap {hap} to pid {pid}")
-        # hap.attach(pid)
         with open(hap.stdout_path, "w") as stdout_pipe, open(
             hap.stderr_path, "w"
         ) as stderr_pipe:
@@ -266,14 +263,11 @@ class Hapless(object):
     def run(self, cmd: str, name: Optional[str] = None, check: bool = False):
         hap = self.create_hap(cmd=cmd, name=name)
         pid = os.fork()
-        logger.debug(f"Fork return pid is {pid}")
         if pid == 0:
-            logger.debug(f"Child should be {os.getpid()}")
             self.run_hap(hap)
         else:
             if check:
                 self._check_fast_failure(hap)
-            logger.debug(f"Parent should be {os.getpid()}")
             sys.exit(0)
 
     def logs(self, hap: Hap, stderr: bool = False, follow: bool = False):
