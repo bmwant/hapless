@@ -16,6 +16,12 @@ Available sections are:
 
 ## [Unreleased]
 
+## [v0.2.1] - 2022-11-16
+
+### Fixed
+
+-   Resolving merge conflicts between release and main branches
+
 ## [v0.2.0] - 2022-11-16
 
 ### Fixed
@@ -103,7 +109,9 @@ Available sections are:
 
 -   Initial release.
 
-[Unreleased]: https://github.com/bmwant/hapless/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/bmwant/hapless/compare/v0.2.1...HEAD
+
+[v0.2.1]: https://github.com/bmwant/hapless/compare/v0.2.0...v0.2.1
 
 [v0.2.0]: https://github.com/bmwant/hapless/compare/v0.1.10...v0.2.0
 
