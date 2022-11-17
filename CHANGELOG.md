@@ -16,6 +16,8 @@ Available sections are:
 
 ## [Unreleased]
 
+## [v0.2.0] - 2022-11-17
+
 ### Fixed
 
 -   Status icon is showed for the hap details
@@ -101,7 +103,9 @@ Available sections are:
 
 -   Initial release.
 
-[Unreleased]: https://github.com/bmwant/hapless/compare/v0.1.10...HEAD
+[Unreleased]: https://github.com/bmwant/hapless/compare/v0.2.0...HEAD
+
+[v0.2.0]: https://github.com/bmwant/hapless/compare/v0.1.10...v0.2.0
 
 [v0.1.10]: https://github.com/bmwant/hapless/compare/v0.1.9...v0.1.10
 
