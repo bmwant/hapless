@@ -1,3 +1,4 @@
+import os
 import signal
 from pathlib import Path
 from unittest.mock import Mock
@@ -5,7 +6,7 @@ from unittest.mock import Mock
 import click
 import pytest
 
-from hapless.utils import allow_missing, validate_signal
+from hapless.utils import allow_missing, kill_proc_tree, validate_signal
 
 
 def read_file(path):
@@ -20,8 +21,12 @@ def test_allow_missing_no_file():
     assert result is None
 
 
-def test_allow_missing_file_exists():
-    pass
+def test_allow_missing_file_exists(tmp_path):
+    path = tmp_path / "file.txt"
+    path.write_text("content")
+    decorated = allow_missing(read_file)
+    result = decorated(path)
+    assert result == "content"
 
 
 def test_validate_signal_wrong_code():
@@ -41,3 +46,11 @@ def test_validate_signal_out_of_bounds():
         validate_signal(ctx, param, code)
 
     assert str(excinfo.value) == f"{code} is not a valid signal code"
+
+
+def test_kill_proc_tree_fails_with_current_pid():
+    pid = os.getpid()
+    with pytest.raises(ValueError) as excinfo:
+        kill_proc_tree(pid)
+
+    assert str(excinfo.value) == "Would not kill myself"
