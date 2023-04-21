@@ -58,10 +58,6 @@ See [CHANGELOG.md](https://github.com/bmwant/hapless/blob/main/CHANGELOG.md) for
 * [Supervisor](http://supervisord.org/) full-fledged process manager.
 * [podmena](https://github.com/bmwant/podmena) provides nice emoji icons to commit messages.
 
-### Support project, support 🇺🇦 Ukraine!
+### Support 🇺🇦 Ukraine in the war!
 
-🐶 `D7DA74qzZUyh9cctCxWovPTEovUSjGzL2S` this is [Dogecoin](https://dogecoin.com/) wallet to support the project.
-
-🇺🇦 All donations will go towards supporting Ukraine in the war.
-
-✉️ [Contact author](mailto:bmwant@gmail.com) directly in case you want to donate with some different payment option or check what has already been done.
+🇺🇦 Donate to [this foundation](https://prytulafoundation.org/en) in case you want to help. Every donation matter!
