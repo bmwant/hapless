@@ -35,12 +35,17 @@ jobs:
         run: |
           poetry install
 
-      - name: Check codestyle / formatting
+      - name: Check imports with isort
         run: |
-          echo "Checking imports order"
           poetry run isort . --check-only
-          echo "Checking black codestyle"
+
+      - name: Check codestyle with black
+        run: |
           poetry run black . --check
+
+      - name: Lint code with ruff
+        run: |
+          poetry run ruff check .
 
       - name: Run unittests
         run: |
