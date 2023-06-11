@@ -10,9 +10,11 @@ on:
       - main
       - release
 
+env:
+  POETRY_VERSION: "1.5.1"
+
 jobs:
   test:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,6 +26,8 @@ jobs:
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -35,12 +39,20 @@ jobs:
         run: |
           poetry install
 
-      - name: Check codestyle / formatting
+      - name: Check imports with isort
+        if: ${{ always() }}
         run: |
-          echo "Checking imports order"
           poetry run isort . --check-only
-          echo "Checking black codestyle"
+
+      - name: Check codestyle with black
+        if: ${{ always() }}
+        run: |
           poetry run black . --check
+
+      - name: Lint code with ruff
+        if: ${{ always() }}
+        run: |
+          poetry run ruff check .
 
       - name: Run unittests
         run: |

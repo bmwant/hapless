@@ -3,7 +3,10 @@
 ![Checks](https://github.com/bmwant/hapless/actions/workflows/tests.yml/badge.svg)
 [![PyPI](https://img.shields.io/pypi/v/hapless)](https://pypi.org/project/hapless/)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/hapless)
+
+
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![EditorConfig](https://img.shields.io/badge/-EditorConfig-grey?logo=editorconfig)](https://editorconfig.org/)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
@@ -58,10 +61,6 @@ See [CHANGELOG.md](https://github.com/bmwant/hapless/blob/main/CHANGELOG.md) for
 * [Supervisor](http://supervisord.org/) full-fledged process manager.
 * [podmena](https://github.com/bmwant/podmena) provides nice emoji icons to commit messages.
 
-### Support project, support 🇺🇦 Ukraine!
+### Support 🇺🇦 Ukraine in the war!
 
-🐶 `D7DA74qzZUyh9cctCxWovPTEovUSjGzL2S` this is [Dogecoin](https://dogecoin.com/) wallet to support the project.
-
-🇺🇦 All donations will go towards supporting Ukraine in the war.
-
-✉️ [Contact author](mailto:bmwant@gmail.com) directly in case you want to donate with some different payment option or check what has already been done.
+🇺🇦 Donate to [this foundation](https://prytulafoundation.org/en) in case you want to help. Every donation matter!
