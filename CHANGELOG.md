@@ -16,6 +16,10 @@ Available sections are:
 
 ## [Unreleased]
 
+### Changed
+
+-   Replace [flake8](https://flake8.pycqa.org/en/latest/) linter with [ruff](https://beta.ruff.rs/docs/)
+
 ## [v0.2.0] - 2022-11-17
 
 ### Fixed
