@@ -210,9 +210,13 @@ class Hapless(object):
             hap.stderr_path, "w"
         ) as stderr_pipe:
             console.print(f"{config.ICON_INFO} Launching", hap)
+            shell_exec = os.getenv("SHELL")
+            if shell_exec is not None:
+                logger.debug(f"Using {shell_exec} to run hap")
             proc = subprocess.Popen(
                 hap.cmd,
                 shell=True,
+                executable=shell_exec,
                 stdout=stdout_pipe,
                 stderr=stderr_pipe,
             )
