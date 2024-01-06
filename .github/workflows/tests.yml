@@ -44,10 +44,10 @@ jobs:
         run: |
           poetry run isort . --check-only
 
-      - name: Check codestyle with black
+      - name: Check codestyle with ruff
         if: ${{ always() }}
         run: |
-          poetry run black . --check
+          poetry run ruff format --check .
 
       - name: Lint code with ruff
         if: ${{ always() }}
