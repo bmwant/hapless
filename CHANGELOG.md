@@ -14,7 +14,17 @@ Available sections are:
 -   `Fixed` for any bug fixes.
 -   `Security` in case of vulnerabilities.
 
+
 ## [Unreleased]
+
+
+## [v0.2.2]
+
+### Changed
+
+-   Upgrade [rich](https://rich.readthedocs.io/en/latest/) library
+
+## [v0.2.1]
 
 ### Changed
 
