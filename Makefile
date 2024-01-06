@@ -25,9 +25,9 @@ isort:
 	@poetry run isort .
 
 
-.PHONY: black
-black:
-	@poetry run black .
+.PHONY: format
+format:
+	@poetry run ruff format .
 
 
 .PHONY: lint
