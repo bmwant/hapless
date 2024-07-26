@@ -1,6 +1,7 @@
 """
 Script to upload release artifacts to Github Releases assets.
 """
+
 import argparse
 import logging
 import os

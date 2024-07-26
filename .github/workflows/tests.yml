@@ -39,11 +39,6 @@ jobs:
         run: |
           poetry install
 
-      - name: Check imports with isort
-        if: ${{ always() }}
-        run: |
-          poetry run isort . --check-only
-
       - name: Check codestyle with ruff
         if: ${{ always() }}
         run: |
