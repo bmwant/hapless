@@ -7,11 +7,17 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, Optional
 
+try:
+    from functools import cached_property
+except ImportError:
+    # Fallback for Python 3.7
+    from backports.cached_property import cached_property
+
 import humanize
 import psutil
 
 from hapless import config
-from hapless.utils import allow_missing, logger
+from hapless.utils import allow_missing, get_mtime, logger
 
 """
 active
@@ -123,8 +129,9 @@ class Hap(object):
 
         return "success"
 
-    @property
+    @cached_property
     def proc(self):
+        # NOTE: this is cached for the instance lifetime, fits our use case
         try:
             return psutil.Process(self.pid)
         except psutil.NoSuchProcess as e:
@@ -147,9 +154,9 @@ class Hap(object):
         proc = self.proc
         if proc is not None:
             runtime = time.time() - proc.create_time()
-        else:
-            start_time = os.path.getmtime(self._pid_file)
-            finish_time = os.path.getmtime(self._rc_file)
+        elif self._pid_file.exists():
+            start_time = get_mtime(self._pid_file)
+            finish_time = get_mtime(self._rc_file) or get_mtime(self.stderr_path)
             runtime = finish_time - start_time
 
         return humanize.naturaldelta(runtime)

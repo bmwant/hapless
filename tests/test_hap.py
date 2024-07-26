@@ -15,3 +15,7 @@ def test_random_name_generation():
         names.append(new_name)
 
     assert not all_equal(names)
+
+
+def test_runtime_():
+    pass
