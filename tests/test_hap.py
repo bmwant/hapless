@@ -17,5 +17,18 @@ def test_random_name_generation():
     assert not all_equal(names)
 
 
-def test_runtime_():
-    pass
+def test_unattached_hap(hap: Hap):
+    assert hap.pid is None
+    assert hap.proc is None
+    assert hap.rc is None
+    assert hap.cmd == "false"
+    assert hap.status == "failed"
+    assert hap.env is None
+    assert not hap.active
+
+    assert not hap.stdout_path.exists()
+    assert not hap.stderr_path.exists()
+    assert hap.start_time is None
+    assert hap.end_time is None
+
+    assert hap.runtime == "a moment"

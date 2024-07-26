@@ -132,6 +132,9 @@ class Hap(object):
     @cached_property
     def proc(self):
         # NOTE: this is cached for the instance lifetime, fits our use case
+        if self.pid is None:
+            return
+
         try:
             return psutil.Process(self.pid)
         except psutil.NoSuchProcess as e:
@@ -152,6 +155,7 @@ class Hap(object):
     @property
     def runtime(self) -> str:
         proc = self.proc
+        runtime = 0
         if proc is not None:
             runtime = time.time() - proc.create_time()
         elif self._pid_file.exists():
