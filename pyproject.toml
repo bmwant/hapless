@@ -39,7 +39,7 @@ black = "^22.3.0"
 pytest = "^7.1.1"
 isort = "^5.10.1"
 pytest-cov = "^3.0.0"
-ruff = "^0.1.11"
+ruff = "^0.5.5"
 
 [tool.poetry.group.ci]
 optional = true
@@ -51,7 +51,7 @@ github3-py = "^3.2.0"
 hap = 'hapless.cli:cli'
 
 [tool.poetry.urls]
-"Blog post" = "https://bmwlog.pp.ua/hapless-easily-run-and-manage-background-processes/"
+"Blog post" = "https://bmwant.link/hapless-easily-run-and-manage-background-processes/"
 
 [tool.black]
 line-length = 88
