@@ -63,6 +63,13 @@ profile = "black"
 # Same as Black.
 line-length = 88
 
+# ruff check
+[tool.ruff.lint]
+extend-select = [
+  # isort
+  "I",
+]
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
