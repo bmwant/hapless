@@ -3,7 +3,7 @@ name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 on: push
 
 env:
-  POETRY_VERSION: "1.8.3"
+  POETRY_VERSION: "1.5.1"
 
 jobs:
   build:
