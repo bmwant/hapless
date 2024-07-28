@@ -30,6 +30,14 @@ jobs:
       with:
         version: ${{ env.POETRY_VERSION }}
 
+    - name: Generate temp version for the current commit
+      if: github.event_name == 'pull_request'
+      run: |
+        CURRENT_VERSION=$(poetry version --short)
+        NEW_VERSION="${CURRENT_VERSION}-${{ github.sha }}"
+        echo "New version: ${NEW_VERSION}"
+        poetry version ${NEW_VERSION}
+
     - name: Build package
       run: poetry build
 
