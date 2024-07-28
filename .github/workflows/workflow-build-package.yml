@@ -35,7 +35,7 @@ jobs:
         version: ${{ inputs.poetry_version }}
 
     - name: Generate temp version for the current commit
-      if: ${{ inputs.generate_temp_version == 'true' }}
+      if: ${{ inputs.generate_temp_version }}
       run: |
         CURRENT_VERSION=$(poetry version --short)
         NEW_VERSION="${CURRENT_VERSION}.dev${{ github.run_number }}${{ github.run_attempt }}"
