@@ -5,42 +5,20 @@ on:
     branches:
       - main
 
-env:
-  POETRY_VERSION: "1.5.1"
-
 jobs:
-  build:
-    name: Build distribution 📦
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.x"
-
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        version: ${{ env.POETRY_VERSION }}
-
-    - name: Build package
-      run: poetry build
-
-    - name: Store the distribution packages
-      uses: actions/upload-artifact@v3
-      with:
-        name: python-package-distributions
-        path: dist/
+  build-package:
+    uses: ./.github/workflows/workflow-build-package.yml
+    with:
+      python_version: "3.x"
+      poetry_version: "1.5.1"
+      generate_temp_version: ${{ github.event_name == 'pull_request' && true || false }}
 
   publish-to-pypi:
     name: Publish Python 🐍 distribution 📦 to PyPI
-    if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
+    # only publish to PyPI on tag pushes
+    if: startsWith(github.ref, 'refs/tags/')
     needs:
-    - build
+    - build-package
     runs-on: ubuntu-latest
 
     environment:

@@ -8,15 +8,12 @@ on:
     branches:
       - main
 
-env:
-  POETRY_VERSION: "1.5.1"
-
 jobs:
   build-package:
     uses: ./.github/workflows/workflow-build-package.yml
     with:
       python_version: "3.x"
-      poetry_version: ${{ vars.POETRY_VERSION }}
+      poetry_version: "1.5.1"
       generate_temp_version: ${{ github.event_name == 'pull_request' && true || false }}
 
   publish-to-testpypi:
