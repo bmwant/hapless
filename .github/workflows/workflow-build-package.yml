@@ -1,0 +1,54 @@
+name: Reusable workflow for building Python package 📦
+
+on:
+  workflow_call:
+    inputs:
+      python_version:
+        default: "3.x"
+        required: false
+        type: string
+      poetry_version:
+        required: true
+        type: string
+      generate_temp_version:
+        default: false
+        required: false
+        type: boolean
+
+jobs:
+  build:
+    name: Build distribution 📦
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python_version }}
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: ${{ inputs.poetry_version }}
+
+    - name: Generate temp version for the current commit
+      if: ${{ inputs.generate_temp_version == 'true' }}
+      run: |
+        CURRENT_VERSION=$(poetry version --short)
+        NEW_VERSION="${CURRENT_VERSION}.dev${{ github.run_number }}${{ github.run_attempt }}"
+        echo "Run number: ${{ github.run_number }}"
+        echo "Run attempt: ${{ github.run_attempt }}"
+        echo "New version: ${NEW_VERSION}"
+        poetry version ${NEW_VERSION}
+
+    - name: Build package
+      run: poetry build
+
+    - name: Store the distribution packages
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-package-distributions
+        path: dist/

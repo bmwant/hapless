@@ -12,47 +12,17 @@ env:
   POETRY_VERSION: "1.5.1"
 
 jobs:
-  build:
-    name: Build distribution 📦
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.x"
-
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        version: ${{ env.POETRY_VERSION }}
-
-    - name: Generate temp version for the current commit
-      if: github.event_name == 'pull_request'
-      run: |
-        CURRENT_VERSION=$(poetry version --short)
-        NEW_VERSION="${CURRENT_VERSION}.dev${{ github.run_number }}${{ github.run_attempt }}"
-        echo "Run number: ${{ github.run_number }}"
-        echo "Run attempt: ${{ github.run_attempt }}"
-        echo "New version: ${NEW_VERSION}"
-        poetry version ${NEW_VERSION}
-
-    - name: Build package
-      run: poetry build
-
-    - name: Store the distribution packages
-      uses: actions/upload-artifact@v3
-      with:
-        name: python-package-distributions
-        path: dist/
+  build-package:
+    uses: ./.github/workflows/workflow-build-package.yml
+    with:
+      python_version: "3.x"
+      poetry_version: "${{ env.POETRY_VERSION }}"
+      generate_temp_version: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
 
   publish-to-testpypi:
     name: Publish Python 🐍 distribution 📦 to TestPyPI
     needs:
-    - build
+    - build-package
     runs-on: ubuntu-latest
 
     environment:
