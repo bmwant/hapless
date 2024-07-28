@@ -1,7 +1,10 @@
-name: "[PyPI] 📦 Publish Python 🐍 distribution"
+name: "[TestPyPI] 📦 Publish Python 🐍 distribution"
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
@@ -36,16 +39,15 @@ jobs:
         name: python-package-distributions
         path: dist/
 
-  publish-to-pypi:
-    name: Publish Python 🐍 distribution 📦 to PyPI
-    if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
+  publish-to-testpypi:
+    name: Publish Python 🐍 distribution 📦 to TestPyPI
     needs:
     - build
     runs-on: ubuntu-latest
 
     environment:
-      name: pypi
-      url: https://pypi.org/p/hapless
+      name: testpypi
+      url: https://test.pypi.org/p/hapless
 
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
@@ -57,5 +59,7 @@ jobs:
         name: python-package-distributions
         path: dist/
 
-    - name: Publish distribution 📦 to PyPI
+    - name: Publish distribution 📦 to TestPyPI
       uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
