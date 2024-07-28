@@ -11,9 +11,9 @@ on:
         required: true
         type: string
       generate_temp_version:
-        default: false
+        default: "false"
         required: false
-        type: boolean
+        type: string
 
 jobs:
   build:

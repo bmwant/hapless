@@ -18,7 +18,7 @@ jobs:
       python_version: "3.x"
       # poetry_version: "${{ env.POETRY_VERSION }}"
       poetry_version: "1.5.1"
-      generate_temp_version: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+      generate_temp_version: "${{ github.event_name == 'pull_request' && 'true' || 'false' }}"
 
   publish-to-testpypi:
     name: Publish Python 🐍 distribution 📦 to TestPyPI
