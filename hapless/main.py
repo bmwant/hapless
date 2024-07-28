@@ -66,7 +66,9 @@ class Hapless(object):
         active_haps = 0
         for hap in haps:
             active_haps += 1 if hap.active else 0
-            pid_text = f"{hap.pid}" if hap.active else Text(f"{hap.pid}", style="dim")
+            pid_text = (
+                f"{hap.pid}" if hap.active else Text(f"{hap.pid or '-'}", style="dim")
+            )
             command_text = Text(
                 hap.cmd, overflow="ellipsis", style=f"{config.COLOR_ACCENT}"
             )
@@ -103,7 +105,7 @@ class Hapless(object):
         status_text = Hapless._get_status_text(hap.status)
         status_table.add_row("Status:", status_text)
 
-        status_table.add_row("PID:", f"{hap.pid}")
+        status_table.add_row("PID:", f"{hap.pid or '-'}")
 
         if hap.rc is not None:
             status_table.add_row("Return code:", f"{hap.rc}")

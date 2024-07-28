@@ -5,6 +5,7 @@ import signal
 import time
 from functools import wraps
 from pathlib import Path
+from typing import Optional
 
 import click
 import psutil
@@ -90,3 +91,8 @@ def kill_proc_tree(pid, sig=signal.SIGKILL, include_parent=True):
             logger.debug(f"Sent {sig} to {p.pid} process")
         except psutil.NoSuchProcess:
             pass
+
+
+def get_mtime(path: Path) -> Optional[float]:
+    if path.exists():
+        return os.path.getmtime(path)

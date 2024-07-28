@@ -54,3 +54,20 @@ def test_kill_proc_tree_fails_with_current_pid():
         kill_proc_tree(pid)
 
     assert str(excinfo.value) == "Would not kill myself"
+
+
+def test_allow_missing_as_property():
+    class Dummy:
+        @allow_missing
+        def stat(self):
+            return Path("does-not-exist").stat()
+
+        @property
+        @allow_missing
+        def stat_prop(self):
+            return Path("does-not-exist").stat()
+
+    dummy = Dummy()
+    res = dummy.stat()
+    assert res is None
+    assert dummy.stat_prop is None

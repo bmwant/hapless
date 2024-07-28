@@ -15,3 +15,9 @@ def runner():
         with patch("hapless.cli.hapless", hapless_test) as hapless_mock:
             cli_runner.hapless = hapless_mock
             yield cli_runner
+
+
+@pytest.fixture
+def hap(tmpdir):
+    hapless = Hapless(hapless_dir=tmpdir)
+    yield hapless.create_hap("false")

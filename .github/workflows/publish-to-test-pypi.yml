@@ -1,0 +1,45 @@
+name: "[TestPyPI] 📦 Publish Python 🐍 distribution"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  POETRY_VERSION: "1.5.1"
+
+jobs:
+  build-package:
+    uses: ./.github/workflows/workflow-build-package.yml
+    with:
+      python_version: "3.x"
+      poetry_version: "${{ env.POETRY_VERSION }}"
+      generate_temp_version: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+
+  publish-to-testpypi:
+    name: Publish Python 🐍 distribution 📦 to TestPyPI
+    needs:
+    - build-package
+    runs-on: ubuntu-latest
+
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/hapless
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v3
+      with:
+        name: python-package-distributions
+        path: dist/
+
+    - name: Publish distribution 📦 to TestPyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
