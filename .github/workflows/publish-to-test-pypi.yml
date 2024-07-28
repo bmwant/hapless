@@ -34,7 +34,7 @@ jobs:
       if: github.event_name == 'pull_request'
       run: |
         CURRENT_VERSION=$(poetry version --short)
-        NEW_VERSION="${CURRENT_VERSION}-${{ github.sha }}"
+        NEW_VERSION="${CURRENT_VERSION}+${{ github.sha }}"
         echo "New version: ${NEW_VERSION}"
         poetry version ${NEW_VERSION}
 
