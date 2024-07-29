@@ -17,10 +17,6 @@ Available sections are:
 
 ## [Unreleased]
 
-### Added
-
--   Allow to use current active shell to run commands instead of the default one.
-
 
 ## [v0.4.0]
 
