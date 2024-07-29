@@ -21,3 +21,8 @@ def runner():
 def hap(tmpdir):
     hapless = Hapless(hapless_dir=tmpdir)
     yield hapless.create_hap("false")
+
+
+@pytest.fixture
+def hapless(tmpdir):
+    yield Hapless(hapless_dir=tmpdir)

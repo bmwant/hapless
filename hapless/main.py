@@ -91,11 +91,11 @@ class Hapless(object):
         console.print(table)
 
     @staticmethod
-    def _get_status_text(status) -> Text:
+    def _get_status_text(status: Status) -> Text:
         color = config.STATUS_COLORS.get(status)
         status_text = Text()
         status_text.append(config.ICON_STATUS, style=color)
-        status_text.append(f" {status}")
+        status_text.append(f" {status.value}")
         return status_text
 
     @staticmethod
