@@ -128,9 +128,16 @@ def test_run_empty_invocation(runner):
 
 def test_clean_invocation(runner):
     with patch.object(runner.hapless, "clean") as clean_mock:
-        result = runner.invoke(cli.cli, ["clean", "--skip-failed"])
+        result = runner.invoke(cli.cli, ["clean", "--all"])
         assert result.exit_code == 0
-        clean_mock.assert_called_once_with(True)
+        clean_mock.assert_called_once_with(clean_all=True)
+
+
+def test_cleanall_invocation(runner):
+    with patch.object(runner.hapless, "clean") as clean_mock:
+        result = runner.invoke(cli.cli, ["cleanall"])
+        assert result.exit_code == 0
+        clean_mock.assert_called_once_with(clean_all=True)
 
 
 @patch("hapless.cli.get_or_exit")

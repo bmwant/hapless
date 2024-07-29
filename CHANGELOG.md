@@ -17,9 +17,24 @@ Available sections are:
 
 ## [Unreleased]
 
+
+## [v0.4.0]
+
 ### Added
 
--   Allow to use current active shell to run commands instead of the default one.
+-   New command `hap cleanall` to delete all finished haps (both successful and failed)
+
+
+### Changed
+
+-   Command `hap clean` now accepts `--all` parameter to cleanup both successful and failed haps from the list
+
+
+## [v0.3.0]
+
+### Fixed
+
+-   Fix [issue](https://github.com/bmwant/hapless/issues/30) when displaying runtime for the corrupted hap
 
 
 ## [v0.2.2]
@@ -121,7 +136,11 @@ Available sections are:
 
 -   Initial release.
 
-[Unreleased]: https://github.com/bmwant/hapless/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/bmwant/hapless/compare/v0.4.0...HEAD
+
+[v0.4.0]: https://github.com/bmwant/hapless/compare/v0.3.0...v0.4.0
+
+[v0.3.0]: https://github.com/bmwant/hapless/compare/v0.2.0...v0.3.0
 
 [v0.2.0]: https://github.com/bmwant/hapless/compare/v0.1.10...v0.2.0
 

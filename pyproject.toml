@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hapless"
-version = "0.3.0"
+version = "0.4.0"
 description = "Run and track processes in background"
 authors = ["Misha Behersky <bmwant@gmail.com>"]
 license = "MIT"
@@ -36,7 +36,6 @@ importlib-metadata = { version = "^4.11.3", python = "<3.8" }
 "backports.cached-property" = { version = "^1.0.2", python = "<3.8" }
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.3.0"
 pytest = "^7.1.1"
 isort = "^5.10.1"
 pytest-cov = "^3.0.0"

@@ -23,7 +23,7 @@ from rich.table import Table
 from rich.text import Text
 
 from hapless import config
-from hapless.hap import Hap
+from hapless.hap import Hap, Status
 from hapless.utils import kill_proc_tree, logger, wait_created
 
 console = Console(highlight=False)
@@ -225,7 +225,7 @@ class Hapless(object):
 
             pid = proc.pid
             logger.debug(f"Attaching hap {hap} to pid {pid}")
-            hap.attach(pid)
+            hap.bind(pid)
 
             retcode = proc.wait()
 
@@ -287,11 +287,11 @@ class Hapless(object):
         else:
             return subprocess.run(["cat", filepath])
 
-    def clean(self, skip_failed: bool = False):
-        def to_clean(hap):
-            if hap.rc is not None:
-                return hap.rc == 0 or not skip_failed
-            return False
+    def clean(self, clean_all: bool = False):
+        def to_clean(hap: Hap) -> bool:
+            return hap.status == Status.SUCCESS or (
+                hap.status == Status.FAILED and clean_all
+            )
 
         haps = list(filter(to_clean, self.get_haps()))
         for hap in haps:
