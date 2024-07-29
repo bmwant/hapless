@@ -38,14 +38,14 @@ def cli(ctx, verbose):
         _status(None, verbose=verbose)
 
 
-@cli.command(short_help="Display information about haps")
+@cli.command(short_help="Display information about haps.")
 @click.argument("hap_alias", metavar="hap", required=False)
 @click.option("-v", "--verbose", is_flag=True, default=False)
 def status(hap_alias, verbose):
     _status(hap_alias, verbose)
 
 
-@cli.command(short_help="Same as a status")
+@cli.command(short_help="Same as a status.")
 @click.argument("hap_alias", metavar="hap", required=False)
 @click.option("-v", "--verbose", is_flag=True, default=False)
 def show(hap_alias, verbose):
@@ -61,7 +61,7 @@ def _status(hap_alias: Optional[str] = None, verbose: bool = False):
         hapless.stats(haps, verbose=verbose)
 
 
-@cli.command(short_help="Output logs for a hap")
+@cli.command(short_help="Output logs for a hap.")
 @click.argument("hap_alias", metavar="hap")
 @click.option("-f", "--follow", is_flag=True, default=False)
 @click.option("-e", "--stderr", is_flag=True, default=False)
@@ -70,26 +70,40 @@ def logs(hap_alias, follow, stderr):
     hapless.logs(hap, stderr=stderr, follow=follow)
 
 
-@cli.command(short_help="Remove successfully completed haps")
-@click.option("--all", "clean_all", is_flag=True, default=False)
+@cli.command(short_help="Remove successfully completed haps.")
+@click.option(
+    "-a",
+    "--all",
+    "clean_all",
+    is_flag=True,
+    default=False,
+    help="Include failed haps for the removal.",
+)
 def clean(clean_all):
     hapless.clean(clean_all)
 
 
-@cli.command(short_help="Remove all finished haps, including failed ones")
+@cli.command(short_help="Remove all finished haps, including failed ones.")
 def cleanall():
     hapless.clean(clean_all=True)
 
 
 @cli.command(
-    short_help="Execute background command as a hap",
+    short_help="Execute background command as a hap.",
     context_settings=dict(
         ignore_unknown_options=True,
     ),
 )
 @click.argument("cmd", nargs=-1)
-@click.option("-n", "--name")
-@click.option("--check", is_flag=True, default=False)
+@click.option(
+    "-n", "--name", help="Provide your own alias for the hap instead of a default one."
+)
+@click.option(
+    "--check",
+    is_flag=True,
+    default=False,
+    help="Verify command launched does not fail immediately.",
+)
 def run(cmd, name, check):
     hap = hapless.get_hap(name)
     if hap is not None:
@@ -111,21 +125,21 @@ def run(cmd, name, check):
     hapless.run(cmd_escaped, name=name, check=check)
 
 
-@cli.command(short_help="Pause a specific hap")
+@cli.command(short_help="Pause a specific hap.")
 @click.argument("hap_alias", metavar="hap")
 def pause(hap_alias):
     hap = get_or_exit(hap_alias)
     hapless.pause_hap(hap)
 
 
-@cli.command(short_help="Resume execution of a paused hap")
+@cli.command(short_help="Resume execution of a paused hap.")
 @click.argument("hap_alias", metavar="hap")
 def resume(hap_alias):
     hap = get_or_exit(hap_alias)
     hapless.resume_hap(hap)
 
 
-@cli.command(short_help="Terminate a specific hap / all haps")
+@cli.command(short_help="Terminate a specific hap / all haps.")
 @click.argument("hap_alias", metavar="hap", required=False)
 @click.option("-a", "--all", "killall", is_flag=True, default=False)
 def kill(hap_alias, killall):
@@ -145,7 +159,7 @@ def kill(hap_alias, killall):
         hapless.kill([hap])
 
 
-@cli.command(short_help="Send an arbitrary signal to a hap")
+@cli.command(short_help="Send an arbitrary signal to a hap.")
 @click.argument("hap_alias", metavar="hap")
 @click.argument("signal", callback=validate_signal, metavar="signal-code")
 def signal(hap_alias, signal):
