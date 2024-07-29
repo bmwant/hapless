@@ -80,7 +80,7 @@ def logs(hap_alias, follow, stderr):
     help="Include failed haps for the removal.",
 )
 def clean(clean_all):
-    hapless.clean(clean_all)
+    hapless.clean(clean_all=clean_all)
 
 
 @cli.command(short_help="Remove all finished haps, including failed ones.")

@@ -225,7 +225,7 @@ class Hapless(object):
 
             pid = proc.pid
             logger.debug(f"Attaching hap {hap} to pid {pid}")
-            hap.attach(pid)
+            hap.bind(pid)
 
             retcode = proc.wait()
 

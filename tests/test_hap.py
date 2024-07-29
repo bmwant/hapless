@@ -17,7 +17,7 @@ def test_random_name_generation():
     assert not all_equal(names)
 
 
-def test_unattached_hap(hap: Hap):
+def test_unbound_hap(hap: Hap):
     assert hap.pid is None
     assert hap.proc is None
     assert hap.rc is None

@@ -21,6 +21,7 @@ from hapless import config
 from hapless.utils import allow_missing, get_mtime, logger
 
 
+# TODO: add unbound status for the hap without associated pid
 class Status(str, Enum):
     # Active statuses
     PAUSED = "paused"
@@ -96,7 +97,7 @@ class Hap(object):
         with open(self._env_file, "w") as env_file:
             env_file.write(json.dumps(environ))
 
-    def attach(self, pid: int):
+    def bind(self, pid: int):
         """
         Associate hap object with existing process by pid
         """
@@ -104,7 +105,7 @@ class Hap(object):
             self._set_pid(pid)
             self._set_env()
         except (RuntimeError, psutil.AccessDenied) as e:
-            logger.error(f"Cannot attached due to {e}")
+            logger.error(f"Cannot bind due to {e}")
 
     @staticmethod
     def get_random_name(length: int = 6):
