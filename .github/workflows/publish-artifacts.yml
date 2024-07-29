@@ -2,8 +2,6 @@ name: "Publish artifacts"
 
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#release
 on:
-  release:
-    types: [published]
   workflow_dispatch:
 
 env:
