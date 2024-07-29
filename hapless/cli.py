@@ -76,7 +76,12 @@ def clean(skip_failed):
     hapless.clean(skip_failed)
 
 
-@cli.command(short_help="Execute background command as a hap")
+@cli.command(
+    short_help="Execute background command as a hap",
+    context_settings=dict(
+        ignore_unknown_options=True,
+    ),
+)
 @click.argument("cmd", nargs=-1)
 @click.option("-n", "--name")
 @click.option("--check", is_flag=True, default=False)
