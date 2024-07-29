@@ -288,7 +288,7 @@ class Hapless(object):
             return subprocess.run(["cat", filepath])
 
     def clean(self, skip_failed: bool = False):
-        def to_clean(hap):
+        def to_clean(hap: Hap) -> bool:
             if hap.rc is not None:
                 return hap.rc == 0 or not skip_failed
             return False

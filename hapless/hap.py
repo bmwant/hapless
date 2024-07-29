@@ -4,6 +4,7 @@ import random
 import string
 import time
 from datetime import datetime
+from enum import Enum
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -19,14 +20,14 @@ import psutil
 from hapless import config
 from hapless.utils import allow_missing, get_mtime, logger
 
-"""
-active
-* paused
-* running
-finished
-* finished(failed) non-zero rc
-* finished(success) zero rc
-"""
+
+class Status(str, Enum):
+    # Active statuses
+    PAUSED = "paused"
+    RUNNING = "running"
+    # Finished statuses
+    FAILED = "failed"
+    SUCCESS = "success"
 
 
 class Hap(object):
@@ -115,19 +116,18 @@ class Hap(object):
         )
 
     # TODO: add extended status to show panel proc.status()
-    # TODO: return enum entries instead
     @property
-    def status(self) -> str:
+    def status(self) -> Status:
         proc = self.proc
         if proc is not None:
             if proc.status() == psutil.STATUS_STOPPED:
-                return "paused"
-            return "running"
+                return Status.PAUSED
+            return Status.RUNNING
 
         if self.rc != 0:
-            return "failed"
+            return Status.FAILED
 
-        return "success"
+        return Status.SUCCESS
 
     @cached_property
     def proc(self):
