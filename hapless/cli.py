@@ -70,10 +70,15 @@ def logs(hap_alias, follow, stderr):
     hapless.logs(hap, stderr=stderr, follow=follow)
 
 
-@cli.command(short_help="Remove finished haps")
-@click.option("--skip-failed", is_flag=True, default=False)
-def clean(skip_failed):
-    hapless.clean(skip_failed)
+@cli.command(short_help="Remove successfully completed haps")
+@click.option("--all", "clean_all", is_flag=True, default=False)
+def clean(clean_all):
+    hapless.clean(clean_all)
+
+
+@cli.command(short_help="Remove all finished haps, including failed ones")
+def cleanall():
+    hapless.clean(clean_all=True)
 
 
 @cli.command(
