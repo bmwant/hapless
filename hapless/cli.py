@@ -116,6 +116,7 @@ def run(cmd, name, check):
     # NOTE: click doesn't like `required` property for `cmd` argument
     # https://click.palletsprojects.com/en/latest/arguments/#variadic-arguments
     cmd_escaped = shlex_join(cmd).strip()
+    print(cmd_escaped)
     if not cmd_escaped:
         console.print(
             f"{config.ICON_INFO} You have to provide a command to run",
@@ -165,6 +166,13 @@ def kill(hap_alias, killall):
 def signal(hap_alias, signal):
     hap = get_or_exit(hap_alias)
     hapless.signal(hap, signal)
+
+
+@cli.command(short_help="Kills the hap and starts it again.")
+@click.argument("hap_alias", metavar="hap", required=True)
+def restart(hap_alias):
+    hap = get_or_exit(hap_alias)
+    hapless.restart(hap)
 
 
 if __name__ == "__main__":

@@ -309,7 +309,24 @@ class Hapless(object):
                 style=f"{config.COLOR_ERROR} bold",
             )
 
-    def kill(self, haps: List[Hap]):
+    def clean_one(self, hap: Hap, verbose: bool = False):
+        hid = hap.hid
+
+        def to_clean(hap_arg: Hap) -> bool:
+            return hap_arg.hid == hid
+
+        haps = list(filter(to_clean, self.get_haps()))
+        for hap in haps:
+            logger.debug(f"Removing {hap.path}")
+            shutil.rmtree(hap.path)
+
+        if verbose:
+            console.print(
+                f"{config.ICON_INFO} Deleted hap {hid}",
+                style=f"{config.COLOR_MAIN} bold",
+            )
+
+    def kill(self, haps: List[Hap], verbose: bool = True):
         killed_counter = 0
         for hap in haps:
             if hap.active:
@@ -317,12 +334,12 @@ class Hapless(object):
                 kill_proc_tree(hap.pid)
                 killed_counter += 1
 
-        if killed_counter:
+        if killed_counter and verbose:
             console.print(
                 f"{config.ICON_KILLED} Killed {killed_counter} active haps",
                 style=f"{config.COLOR_MAIN} bold",
             )
-        else:
+        elif verbose:
             console.print(
                 f"{config.ICON_INFO} No active haps to kill",
                 style=f"{config.COLOR_ERROR} bold",
@@ -340,3 +357,17 @@ class Hapless(object):
                 f"{config.ICON_INFO} Cannot send signal to the inactive hap",
                 style=f"{config.COLOR_ERROR} bold",
             )
+
+    def restart(self, hap: Hap):
+        hid, name, cmd = hap.hid, hap.name, hap.cmd
+
+        if hap.active:
+            self.kill([hap], verbose=False)
+
+        hap_killed = self.get_hap(str(hid))
+        while hap_killed.active:
+            hap_killed = self.get_hap(str(hid))
+
+        self.clean_one(hap_killed, verbose=False)
+
+        self.run(cmd=cmd, name=name)
