@@ -364,9 +364,9 @@ class Hapless(object):
         if hap.active:
             self.kill([hap], verbose=False)
 
-        hap_killed = self.get_hap(str(hid))
+        hap_killed = self.get_hap(hid)
         while hap_killed.active:
-            hap_killed = self.get_hap(str(hid))
+            hap_killed = self.get_hap(hid)
 
         self.clean_one(hap_killed, verbose=False)
 

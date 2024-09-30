@@ -116,7 +116,6 @@ def run(cmd, name, check):
     # NOTE: click doesn't like `required` property for `cmd` argument
     # https://click.palletsprojects.com/en/latest/arguments/#variadic-arguments
     cmd_escaped = shlex_join(cmd).strip()
-    print(cmd_escaped)
     if not cmd_escaped:
         console.print(
             f"{config.ICON_INFO} You have to provide a command to run",

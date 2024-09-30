@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Optional
+from typing import AnyStr, Dict, Optional
 
 try:
     from functools import cached_property
@@ -187,7 +187,7 @@ class Hap(object):
         return self.proc is not None
 
     @property
-    def hid(self) -> int:
+    def hid(self) -> AnyStr:
         return self._hid
 
     @property
