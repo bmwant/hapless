@@ -160,3 +160,14 @@ def test_resume_invocation(get_or_exit_mock, runner):
         assert result.exit_code == 0
         get_or_exit_mock.assert_called_once_with("hap-me")
         resume_mock.assert_called_once_with(hap_mock)
+
+
+@patch("hapless.cli.get_or_exit")
+def test_restart_invocation(get_or_exit_mock, runner):
+    hap_mock = Mock()
+    get_or_exit_mock.return_value = hap_mock
+    with patch.object(runner.hapless, "restart") as restart_mock:
+        result = runner.invoke(cli.cli, ["restart", "hap-me"])
+        assert result.exit_code == 0
+        get_or_exit_mock.assert_called_once_with("hap-me")
+        restart_mock.assert_called_once_with(hap_mock)
