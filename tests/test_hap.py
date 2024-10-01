@@ -1,3 +1,7 @@
+from pathlib import Path
+
+import pytest
+
 from hapless.hap import Hap
 
 
@@ -32,3 +36,13 @@ def test_unbound_hap(hap: Hap):
     assert hap.end_time is None
 
     assert hap.runtime == "a moment"
+
+
+def test_hap_path_should_be_a_directory(tmp_path):
+    hap_path = Path(tmp_path) / "hap-path"
+    hap_path.touch()
+
+    with pytest.raises(ValueError) as e:
+        Hap(hap_path)
+
+    assert f"Path {hap_path} is not a directory" == str(e.value)

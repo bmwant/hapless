@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import AnyStr, Dict, Optional
+from typing import Dict, Optional
 
 try:
     from functools import cached_property
@@ -39,8 +39,11 @@ class Hap(object):
         name: Optional[str] = None,
         cmd: Optional[str] = None,
     ):
+        if not hap_path.is_dir():
+            raise ValueError(f"Path {hap_path} is not a directory")
+
         self._hap_path = hap_path
-        self._hid = os.path.basename(hap_path)
+        self._hid: str = hap_path.name
 
         self._pid_file = hap_path / "pid"
         self._rc_file = hap_path / "rc"
@@ -187,7 +190,7 @@ class Hap(object):
         return self.proc is not None
 
     @property
-    def hid(self) -> AnyStr:
+    def hid(self) -> str:
         return self._hid
 
     @property

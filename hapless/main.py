@@ -30,7 +30,7 @@ console = Console(highlight=False)
 
 
 class Hapless(object):
-    def __init__(self, hapless_dir: Path = None):
+    def __init__(self, hapless_dir: Optional[Path] = None):
         default_dir = Path(tempfile.gettempdir()) / "hapless"
         self._hapless_dir = hapless_dir or default_dir
         logger.debug(f"Initialized within {self._hapless_dir} dir")

@@ -19,10 +19,10 @@ def runner():
 
 @pytest.fixture
 def hap(tmpdir):
-    hapless = Hapless(hapless_dir=tmpdir)
+    hapless = Hapless(hapless_dir=Path(tmpdir))
     yield hapless.create_hap("false")
 
 
 @pytest.fixture
 def hapless(tmpdir):
-    yield Hapless(hapless_dir=tmpdir)
+    yield Hapless(hapless_dir=Path(tmpdir))
