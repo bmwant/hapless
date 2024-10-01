@@ -36,16 +36,9 @@ importlib-metadata = { version = "^4.11.3", python = "<3.8" }
 "backports.cached-property" = { version = "^1.0.2", python = "<3.8" }
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.1.1"
-isort = "^5.10.1"
+pytest = "^7.4.4"
 pytest-cov = "^3.0.0"
-ruff = "^0.5.5"
-
-[tool.poetry.group.ci]
-optional = true
-
-[tool.poetry.group.ci.dependencies]
-github3-py = "^3.2.0"
+ruff = "^0.6.5"
 
 [tool.poetry.scripts]
 hap = 'hapless.cli:cli'
