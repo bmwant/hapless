@@ -167,5 +167,12 @@ def signal(hap_alias, signal):
     hapless.signal(hap, signal)
 
 
+@cli.command(short_help="Kills the hap and starts it again.")
+@click.argument("hap_alias", metavar="hap", required=True)
+def restart(hap_alias):
+    hap = get_or_exit(hap_alias)
+    hapless.restart(hap)
+
+
 if __name__ == "__main__":
     cli()

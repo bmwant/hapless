@@ -105,7 +105,9 @@ hap signal [hap-alias] 9  # sends SIGKILL
 hap signal [hap-alias] 15  # sends SIGTERM
 ```
 
-- Remove haps from the list. Without any parameters removes only successfully finished haps (with `0` return code). Provide `--all` flag to remove failed haps as well. Used to make list more concise in case you have a lot of things running at once and you are not interested in results/error logs of completed ones.
+➡️ Remove haps from the list.
+
+- Without any parameters removes only successfully finished haps (with `0` return code). Provide `--all` flag to remove failed haps as well. Used to make list more concise in case you have a lot of things running at once and you are not interested in results/error logs of completed ones.
 
 ```bash
 hap clean
@@ -114,4 +116,11 @@ hap clean
 hap clean --all
 # Same as above
 hap cleanall
+```
+➡️ Restart a hap.
+
+- When restart command is called, hap will stop the process and start it again. The command is rerun from the current working directory.
+
+```bash
+hap restart [hap-alias]
 ```
