@@ -15,7 +15,11 @@ Available sections are:
 -   `Security` in case of vulnerabilities.
 
 
-## [Unreleased]
+## [v0.5.0] - 2024-10-01
+
+### Added
+
+-   New command `hap restart` to kill hap and start same process again
 
 
 ## [v0.4.0]
@@ -136,7 +140,7 @@ Available sections are:
 
 -   Initial release.
 
-[Unreleased]: https://github.com/bmwant/hapless/compare/v0.4.0...HEAD
+[v0.5.0]: https://github.com/bmwant/hapless/compare/v0.4.0...v0.5.0
 
 [v0.4.0]: https://github.com/bmwant/hapless/compare/v0.3.0...v0.4.0
 
