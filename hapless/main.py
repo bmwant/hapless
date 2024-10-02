@@ -4,26 +4,15 @@ import signal
 import subprocess
 import sys
 import tempfile
-
-try:
-    from importlib.metadata import version
-except ModuleNotFoundError:
-    # Fallback for Python 3.7
-    from importlib_metadata import version
-
-from itertools import filterfalse
 from pathlib import Path
 from typing import Dict, List, Optional
 
 import psutil
-from rich import box
 from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.text import Text
 
 from hapless import config
 from hapless.hap import Hap, Status
+from hapless.ui import ConsoleUI
 from hapless.utils import kill_proc_tree, logger, wait_created
 
 console = Console(highlight=False)
@@ -36,127 +25,13 @@ class Hapless(object):
         logger.debug(f"Initialized within {self._hapless_dir} dir")
         if not self._hapless_dir.exists():
             self._hapless_dir.mkdir(parents=True, exist_ok=True)
+        self.ui = ConsoleUI()
 
-    @staticmethod
-    def stats(haps: List[Hap], verbose: bool = False):
-        if not haps:
-            console.print(
-                f"{config.ICON_INFO} No haps are currently running",
-                style=f"{config.COLOR_MAIN} bold",
-            )
-            return
+    def stats(self, haps: List[Hap], verbose: bool = False):
+        self.ui.stats(haps, verbose=verbose)
 
-        package_version = version(__package__)
-        table = Table(
-            show_header=True,
-            header_style=f"{config.COLOR_MAIN} bold",
-            box=box.HEAVY_EDGE,
-            caption_style="dim",
-            caption_justify="right",
-        )
-        table.add_column("#", style="dim", width=2)
-        table.add_column("Name")
-        table.add_column("PID")
-        if verbose:
-            table.add_column("Command")
-        table.add_column("Status")
-        table.add_column("RC", justify="right")
-        table.add_column("Runtime", justify="right")
-
-        active_haps = 0
-        for hap in haps:
-            active_haps += 1 if hap.active else 0
-            pid_text = (
-                f"{hap.pid}" if hap.active else Text(f"{hap.pid or '-'}", style="dim")
-            )
-            command_text = Text(
-                hap.cmd, overflow="ellipsis", style=f"{config.COLOR_ACCENT}"
-            )
-            status_text = Hapless._get_status_text(hap.status)
-            command_text.truncate(config.TRUNCATE_LENGTH)
-            row = [
-                f"{hap.hid}",
-                hap.name,
-                pid_text,
-                command_text if verbose else None,
-                status_text,
-                f"{hap.rc}" if hap.rc is not None else "",
-                hap.runtime,
-            ]
-            table.add_row(*filterfalse(lambda x: x is None, row))
-
-        if verbose:
-            table.title = f"{config.ICON_HAP} {__package__}, {package_version}"
-            table.caption = f"{active_haps} active / {len(haps)} total"
-        console.print(table)
-
-    @staticmethod
-    def _get_status_text(status: Status) -> Text:
-        color = config.STATUS_COLORS.get(status)
-        status_text = Text()
-        status_text.append(config.ICON_STATUS, style=color)
-        status_text.append(f" {status.value}")
-        return status_text
-
-    @staticmethod
-    def show(hap: Hap, verbose: bool = False):
-        status_table = Table(show_header=False, show_footer=False, box=box.SIMPLE)
-
-        status_text = Hapless._get_status_text(hap.status)
-        status_table.add_row("Status:", status_text)
-
-        status_table.add_row("PID:", f"{hap.pid or '-'}")
-
-        if hap.rc is not None:
-            status_table.add_row("Return code:", f"{hap.rc}")
-
-        cmd_text = Text(f"{hap.cmd}", style=f"{config.COLOR_ACCENT} bold")
-        status_table.add_row("Command:", cmd_text)
-
-        proc = hap.proc
-        if verbose and proc is not None:
-            status_table.add_row("Working dir:", f"{proc.cwd()}")
-            status_table.add_row("Parent PID:", f"{proc.ppid()}")
-            status_table.add_row("User:", f"{proc.username()}")
-
-        if verbose:
-            status_table.add_row("Stdout file:", f"{hap.stdout_path}")
-            status_table.add_row("Stderr file:", f"{hap.stderr_path}")
-
-        start_time = hap.start_time
-        end_time = hap.end_time
-        if verbose and start_time:
-            status_table.add_row("Start time:", f"{start_time}")
-
-        if verbose and end_time:
-            status_table.add_row("End time:", f"{end_time}")
-
-        status_table.add_row("Runtime:", f"{hap.runtime}")
-
-        status_panel = Panel(
-            status_table,
-            expand=verbose,
-            title=f"Hap {config.ICON_HAP}{hap.hid}",
-            subtitle=hap.name,
-        )
-        console.print(status_panel)
-
-        environ = hap.env
-        if verbose and environ is not None:
-            env_table = Table(show_header=False, show_footer=False, box=None)
-            env_table.add_column("", justify="right")
-            env_table.add_column("", justify="left", style=config.COLOR_ACCENT)
-
-            for key, value in environ.items():
-                env_table.add_row(key, Text(value, overflow="fold"))
-
-            env_panel = Panel(
-                env_table,
-                title="Environment",
-                subtitle=f"{len(environ)} items",
-                border_style=config.COLOR_MAIN,
-            )
-            console.print(env_panel)
+    def show(self, hap: Hap, verbose: bool = False):
+        self.ui.show_one(hap, verbose=verbose)
 
     @property
     def dir(self) -> Path:
@@ -176,7 +51,7 @@ class Hapless(object):
                     names[name] = dir
         return names
 
-    def get_next_hap_id(self):
+    def _get_next_hap_id(self) -> int:
         dirs = self._get_hap_dirs()
         return 1 if not dirs else int(dirs[-1]) + 1
 
@@ -202,7 +77,7 @@ class Hapless(object):
         return haps
 
     def create_hap(self, cmd: str, name: Optional[str] = None) -> Hap:
-        hid = self.get_next_hap_id()
+        hid = self._get_next_hap_id()
         hap_dir = self._hapless_dir / f"{hid}"
         hap_dir.mkdir()
         return Hap(hap_dir, cmd=cmd, name=name)
@@ -287,43 +162,37 @@ class Hapless(object):
         else:
             return subprocess.run(["cat", filepath])
 
+    def _clean_haps(self, filter_haps) -> int:
+        haps = list(filter(filter_haps, self.get_haps()))
+        for hap in haps:
+            logger.debug(f"Removing {hap.path}")
+            shutil.rmtree(hap.path)
+        return len(haps)
+
+    def _clean_one(self, hap: Hap):
+        def to_clean(hap_arg: Hap) -> bool:
+            return hap_arg.hid == hap.hid
+
+        haps_count = self._clean_haps(filter_haps=to_clean)
+        logger.debug(f"Deleted {haps_count} haps")
+
     def clean(self, clean_all: bool = False):
         def to_clean(hap: Hap) -> bool:
             return hap.status == Status.SUCCESS or (
                 hap.status == Status.FAILED and clean_all
             )
 
-        haps = list(filter(to_clean, self.get_haps()))
-        for hap in haps:
-            logger.debug(f"Removing {hap.path}")
-            shutil.rmtree(hap.path)
+        haps_count = self._clean_haps(filter_haps=to_clean)
 
-        if haps:
+        if haps_count:
             console.print(
-                f"{config.ICON_INFO} Deleted {len(haps)} finished haps",
+                f"{config.ICON_INFO} Deleted {haps_count} finished haps",
                 style=f"{config.COLOR_MAIN} bold",
             )
         else:
             console.print(
                 f"{config.ICON_INFO} Nothing to clean",
                 style=f"{config.COLOR_ERROR} bold",
-            )
-
-    def clean_one(self, hap: Hap, verbose: bool = False):
-        hid = hap.hid
-
-        def to_clean(hap_arg: Hap) -> bool:
-            return hap_arg.hid == hid
-
-        haps = list(filter(to_clean, self.get_haps()))
-        for hap in haps:
-            logger.debug(f"Removing {hap.path}")
-            shutil.rmtree(hap.path)
-
-        if verbose:
-            console.print(
-                f"{config.ICON_INFO} Deleted hap {hid}",
-                style=f"{config.COLOR_MAIN} bold",
             )
 
     def kill(self, haps: List[Hap], verbose: bool = True):
@@ -368,6 +237,6 @@ class Hapless(object):
         while hap_killed.active:
             hap_killed = self.get_hap(hid)
 
-        self.clean_one(hap_killed, verbose=False)
+        self.clean_one(hap_killed)
 
         self.run(cmd=cmd, name=name)
