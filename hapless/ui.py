@@ -20,6 +20,9 @@ class ConsoleUI:
     def __init__(self):
         self.console = Console(highlight=False)
 
+    def print(self, *args, **kwargs):
+        return self.console.print(*args, **kwargs)
+
     def stats(self, haps: List[Hap], verbose: bool = False):
         if not haps:
             self.console.print(

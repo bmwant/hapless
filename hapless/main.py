@@ -8,14 +8,11 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import psutil
-from rich.console import Console
 
 from hapless import config
 from hapless.hap import Hap, Status
 from hapless.ui import ConsoleUI
 from hapless.utils import kill_proc_tree, logger, wait_created
-
-console = Console(highlight=False)
 
 
 class Hapless(object):
@@ -86,7 +83,7 @@ class Hapless(object):
         with open(hap.stdout_path, "w") as stdout_pipe, open(
             hap.stderr_path, "w"
         ) as stderr_pipe:
-            console.print(f"{config.ICON_INFO} Launching", hap)
+            self.ui.print(f"{config.ICON_INFO} Launching", hap)
             shell_exec = os.getenv("SHELL")
             if shell_exec is not None:
                 logger.debug(f"Using {shell_exec} to run hap")
@@ -109,21 +106,21 @@ class Hapless(object):
 
     def _check_fast_failure(self, hap: Hap):
         if wait_created(hap._rc_file) and hap.rc != 0:
-            console.print(
+            self.ui.print(
                 f"{config.ICON_INFO} Hap exited too quickly. stderr message:",
                 style=f"{config.COLOR_ERROR} bold",
             )
             with open(hap.stderr_path) as f:
-                console.print(f.read())
+                self.ui.print(f.read())
             sys.exit(1)
 
     def pause_hap(self, hap: Hap):
         proc = hap.proc
         if proc is not None:
             proc.suspend()
-            console.print(f"{config.ICON_INFO} Paused", hap)
+            self.ui.print(f"{config.ICON_INFO} Paused", hap)
         else:
-            console.print(
+            self.ui.print(
                 f"{config.ICON_INFO} Cannot pause. Hap {hap} is not running",
                 style=f"{config.COLOR_ERROR} bold",
             )
@@ -133,9 +130,9 @@ class Hapless(object):
         proc = hap.proc
         if proc is not None and proc.status() == psutil.STATUS_STOPPED:
             proc.resume()
-            console.print(f"{config.ICON_INFO} Resumed", hap)
+            self.ui.print(f"{config.ICON_INFO} Resumed", hap)
         else:
-            console.print(
+            self.ui.print(
                 f"{config.ICON_INFO} Cannot resume. Hap {hap} is not suspended",
                 style=f"{config.COLOR_ERROR} bold",
             )
@@ -154,7 +151,7 @@ class Hapless(object):
     def logs(self, hap: Hap, stderr: bool = False, follow: bool = False):
         filepath = hap.stderr_path if stderr else hap.stdout_path
         if follow:
-            console.print(
+            self.ui.print(
                 f"{config.ICON_INFO} Streaming {filepath} file...",
                 style=f"{config.COLOR_MAIN} bold",
             )
@@ -185,12 +182,12 @@ class Hapless(object):
         haps_count = self._clean_haps(filter_haps=to_clean)
 
         if haps_count:
-            console.print(
+            self.ui.print(
                 f"{config.ICON_INFO} Deleted {haps_count} finished haps",
                 style=f"{config.COLOR_MAIN} bold",
             )
         else:
-            console.print(
+            self.ui.print(
                 f"{config.ICON_INFO} Nothing to clean",
                 style=f"{config.COLOR_ERROR} bold",
             )
@@ -204,12 +201,12 @@ class Hapless(object):
                 killed_counter += 1
 
         if killed_counter and verbose:
-            console.print(
+            self.ui.print(
                 f"{config.ICON_KILLED} Killed {killed_counter} active haps",
                 style=f"{config.COLOR_MAIN} bold",
             )
         elif verbose:
-            console.print(
+            self.ui.print(
                 f"{config.ICON_INFO} No active haps to kill",
                 style=f"{config.COLOR_ERROR} bold",
             )
@@ -219,10 +216,10 @@ class Hapless(object):
             sig_text = (
                 f"[bold]{sig.name}[/] ([{config.COLOR_MAIN}]{signal.strsignal(sig)}[/])"
             )
-            console.print(f"{config.ICON_INFO} Sending {sig_text} to hap {hap}")
+            self.ui.print(f"{config.ICON_INFO} Sending {sig_text} to hap {hap}")
             hap.proc.send_signal(sig)
         else:
-            console.print(
+            self.ui.print(
                 f"{config.ICON_INFO} Cannot send signal to the inactive hap",
                 style=f"{config.COLOR_ERROR} bold",
             )
