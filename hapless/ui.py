@@ -51,6 +51,9 @@ class ConsoleUI:
         active_haps = 0
         for hap in haps:
             active_haps += 1 if hap.active else 0
+            name = Text(hap.name)
+            if hap.restarts:
+                name += Text(f"@{hap.restarts}", style="dim")
             pid_text = (
                 f"{hap.pid}" if hap.active else Text(f"{hap.pid or '-'}", style="dim")
             )
@@ -61,7 +64,7 @@ class ConsoleUI:
             command_text.truncate(config.TRUNCATE_LENGTH)
             row = [
                 f"{hap.hid}",
-                hap.name,
+                name,
                 pid_text,
                 command_text if verbose else None,
                 status_text,
