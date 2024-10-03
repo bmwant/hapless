@@ -27,3 +27,16 @@ def test_create_hap_custom_hid(hapless):
     assert result.cmd == "echo hello"
     assert result.hid == "42"
     assert result.name == "hap-name"
+
+
+def test_get_hap_works_with_restarts(hapless):
+    raw_name = "hap-name@2"
+    hapless.create_hap(cmd="true", name=raw_name)
+    hap = hapless.get_hap(hap_alias="hap-name")
+    assert hap is not None
+    assert hap.raw_name == raw_name
+    assert hap.name == "hap-name"
+
+    # Check ignoring restarts suffix
+    no_hap = hapless.get_hap(hap_alias=raw_name)
+    assert no_hap is None

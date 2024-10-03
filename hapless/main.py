@@ -44,7 +44,8 @@ class Hapless(object):
             filename = self._hapless_dir / dir / "name"
             if filename.exists():
                 with open(filename) as f:
-                    name = f.read().strip()
+                    raw_name = f.read().strip()
+                    name = raw_name.split(config.RESTART_DELIM)[0]
                     names[name] = dir
         return names
 
