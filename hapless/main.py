@@ -247,5 +247,5 @@ class Hapless(object):
 
         self._clean_one(hap_killed)
 
-        name = f"{name}@{restarts + 1}"
+        name = f"{name}{config.RESTART_DELIM}{restarts + 1}"
         self.run(cmd=cmd, name=name)
