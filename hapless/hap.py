@@ -38,12 +38,14 @@ class Hap(object):
         *,
         name: Optional[str] = None,
         cmd: Optional[str] = None,
+        restarts: int = 0,
     ):
         if not hap_path.is_dir():
             raise ValueError(f"Path {hap_path} is not a directory")
 
         self._hap_path = hap_path
         self._hid: str = hap_path.name
+        self.restarts: int = restarts
 
         self._pid_file = hap_path / "pid"
         self._rc_file = hap_path / "rc"
@@ -68,7 +70,7 @@ class Hap(object):
 
     def _set_cmd(self, cmd: Optional[str]):
         """
-        Sets cmd for the first tiem on hap creation.
+        Sets cmd for the first time on hap creation.
         """
         if self.cmd is None:
             if cmd is None:
@@ -111,7 +113,7 @@ class Hap(object):
             logger.error(f"Cannot bind due to {e}")
 
     @staticmethod
-    def get_random_name(length: int = 6):
+    def get_random_name(length: int = 6) -> str:
         return "".join(
             random.sample(
                 string.ascii_lowercase + string.digits,
@@ -216,18 +218,18 @@ class Hap(object):
             return f.read().strip()
 
     @property
-    def path(self):
+    def path(self) -> Path:
         return self._hap_path
 
     @property
-    def stdout_path(self):
+    def stdout_path(self) -> Path:
         return self._hap_path / "stdout.log"
 
     @property
-    def stderr_path(self):
+    def stderr_path(self) -> Path:
         return self._hap_path / "stderr.log"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"#{self.hid} ({self.name})"
 
     def __rich__(self) -> str:
