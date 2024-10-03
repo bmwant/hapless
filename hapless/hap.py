@@ -38,14 +38,12 @@ class Hap(object):
         *,
         name: Optional[str] = None,
         cmd: Optional[str] = None,
-        restarts: int = 0,
     ):
         if not hap_path.is_dir():
             raise ValueError(f"Path {hap_path} is not a directory")
 
         self._hap_path = hap_path
         self._hid: str = hap_path.name
-        self.restarts: int = restarts
 
         self._pid_file = hap_path / "pid"
         self._rc_file = hap_path / "rc"
@@ -216,6 +214,11 @@ class Hap(object):
     def name(self) -> Optional[str]:
         with open(self._name_file) as f:
             return f.read().strip()
+
+    @cached_property
+    def restarts(self) -> int:
+        _, _, restarts = self.name.partition("@")
+        return int(restarts) if restarts else 0
 
     @property
     def path(self) -> Path:

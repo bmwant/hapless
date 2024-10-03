@@ -48,9 +48,10 @@ class Hapless(object):
                     names[name] = dir
         return names
 
-    def _get_next_hap_id(self) -> int:
+    def _get_next_hap_id(self) -> str:
         dirs = self._get_hap_dirs()
-        return 1 if not dirs else int(dirs[-1]) + 1
+        next_num = 1 if not dirs else int(dirs[-1]) + 1
+        return f"{next_num}"
 
     def get_hap(self, hap_alias: str) -> Optional[Hap]:
         dirs = self._get_hap_dirs()
@@ -74,12 +75,15 @@ class Hapless(object):
         return haps
 
     def create_hap(
-        self, cmd: str, name: Optional[str] = None, restarts: int = 0
+        self,
+        cmd: str,
+        hid: Optional[str] = None,
+        name: Optional[str] = None,
     ) -> Hap:
-        hid = self._get_next_hap_id()
+        hid = hid or self._get_next_hap_id()
         hap_dir = self._hapless_dir / f"{hid}"
         hap_dir.mkdir()
-        return Hap(hap_dir, cmd=cmd, name=name, restarts=restarts)
+        return Hap(hap_dir, cmd=cmd, name=name)
 
     def run_hap(self, hap: Hap):
         with open(hap.stdout_path, "w") as stdout_pipe, open(
@@ -145,9 +149,8 @@ class Hapless(object):
         cmd: str,
         name: Optional[str] = None,
         check: bool = False,
-        restarts: int = 0,
     ):
-        hap = self.create_hap(cmd=cmd, name=name, restarts=restarts)
+        hap = self.create_hap(cmd=cmd, name=name)
         pid = os.fork()
         if pid == 0:
             self.run_hap(hap)
@@ -244,4 +247,5 @@ class Hapless(object):
 
         self._clean_one(hap_killed)
 
-        self.run(cmd=cmd, name=name, restarts=restarts + 1)
+        name = f"{name}@{restarts + 1}"
+        self.run(cmd=cmd, name=name)

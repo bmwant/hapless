@@ -46,3 +46,7 @@ def test_hap_path_should_be_a_directory(tmp_path):
         Hap(hap_path)
 
     assert f"Path {hap_path} is not a directory" == str(e.value)
+
+
+def test_default_restarts(hap: Hap):
+    assert hap.restarts == 0
