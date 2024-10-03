@@ -51,7 +51,7 @@ class ConsoleUI:
         active_haps = 0
         for hap in haps:
             active_haps += 1 if hap.active else 0
-            name = Text(hap.name.split(config.RESTART_DELIM)[0])
+            name = Text(hap.name)
             if hap.restarts:
                 name += Text(f"{config.RESTART_DELIM}{hap.restarts}", style="dim")
             pid_text = (

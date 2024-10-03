@@ -54,17 +54,17 @@ class Hap(object):
         self._set_name(name)
         self._set_cmd(cmd)
 
-    def _set_name(self, name: Optional[str]):
+    def _set_name(self, raw_name: Optional[str]):
         """
         Sets name for the first time on hap creation.
         """
-        if name is None:
+        if raw_name is None:
             suffix = self.get_random_name()
-            name = f"hap-{suffix}"
+            raw_name = f"hap-{suffix}"
 
-        if self.name is None:
+        if self.raw_name is None:
             with open(self._name_file, "w") as f:
-                f.write(name)
+                f.write(raw_name)
 
     def _set_cmd(self, cmd: Optional[str]):
         """
@@ -211,14 +211,21 @@ class Hap(object):
 
     @property
     @allow_missing
-    def name(self) -> Optional[str]:
+    def raw_name(self) -> Optional[str]:
         with open(self._name_file) as f:
             return f.read().strip()
 
     @cached_property
+    def name(self) -> str:
+        """
+        Base name without restarts counter.
+        """
+        return self.raw_name.split(config.RESTART_DELIM)[0]
+
+    @cached_property
     def restarts(self) -> int:
-        _, _, restarts = self.name.partition("@")
-        return int(restarts) if restarts else 0
+        _, *rest = self.raw_name.rsplit("@", maxsplit=1)
+        return int(rest[0]) if rest else 0
 
     @property
     def path(self) -> Path:
