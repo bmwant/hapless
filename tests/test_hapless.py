@@ -20,3 +20,10 @@ def test_create_hap(hapless):
     assert result.name is not None
     assert isinstance(result.name, str)
     assert result.name.startswith("hap-")
+
+
+def test_create_hap_custom_hid(hapless):
+    result = hapless.create_hap(cmd="echo hello", hid="42", name="hap-name")
+    assert result.cmd == "echo hello"
+    assert result.hid == "42"
+    assert result.name == "hap-name"

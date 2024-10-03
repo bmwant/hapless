@@ -147,10 +147,11 @@ class Hapless(object):
     def run(
         self,
         cmd: str,
+        hid: Optional[str] = None,
         name: Optional[str] = None,
         check: bool = False,
     ):
-        hap = self.create_hap(cmd=cmd, name=name)
+        hap = self.create_hap(cmd=cmd, hid=hid, name=name)
         pid = os.fork()
         if pid == 0:
             self.run_hap(hap)
@@ -248,4 +249,4 @@ class Hapless(object):
         self._clean_one(hap_killed)
 
         name = f"{name}{config.RESTART_DELIM}{restarts + 1}"
-        self.run(cmd=cmd, name=name)
+        self.run(cmd=cmd, hid=hid, name=name)
