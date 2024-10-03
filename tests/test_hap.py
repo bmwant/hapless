@@ -28,6 +28,7 @@ def test_unbound_hap(hap: Hap):
     assert hap.cmd == "false"
     assert hap.status == "failed"
     assert hap.env is None
+    assert hap.restarts == 0
     assert not hap.active
 
     assert not hap.stdout_path.exists()
@@ -50,3 +51,8 @@ def test_hap_path_should_be_a_directory(tmp_path):
 
 def test_default_restarts(hap: Hap):
     assert hap.restarts == 0
+
+
+def test_correct_restarts_value(tmp_path):
+    hap = Hap(Path(tmp_path), name="hap-name@2", cmd="true")
+    assert hap.restarts == 2
