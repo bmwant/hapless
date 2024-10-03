@@ -51,10 +51,10 @@ class Hap(object):
         self._cmd_file = hap_path / "cmd"
         self._env_file = hap_path / "env"
 
-        self._set_name(name)
+        self._set_raw_name(name)
         self._set_cmd(cmd)
 
-    def _set_name(self, raw_name: Optional[str]):
+    def _set_raw_name(self, raw_name: Optional[str]):
         """
         Sets name for the first time on hap creation.
         """

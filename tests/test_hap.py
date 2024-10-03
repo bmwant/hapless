@@ -56,3 +56,9 @@ def test_default_restarts(hap: Hap):
 def test_correct_restarts_value(tmp_path):
     hap = Hap(Path(tmp_path), name="hap-name@2", cmd="true")
     assert hap.restarts == 2
+
+
+def test_raw_name(tmp_path):
+    hap = Hap(Path(tmp_path), name="hap-name@3", cmd="true")
+    assert hap.name == "hap-name"
+    assert hap.raw_name == "hap-name@3"
