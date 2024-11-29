@@ -39,6 +39,7 @@ importlib-metadata = { version = "^4.11.3", python = "<3.8" }
 pytest = "^7.4.4"
 pytest-cov = "^3.0.0"
 ruff = "^0.6.5"
+nox = {version = "^2024.10.9", python = ">=3.8"}
 
 [tool.poetry.scripts]
 hap = 'hapless.cli:cli'
@@ -59,8 +60,8 @@ line-length = 88
 # ruff check
 [tool.ruff.lint]
 extend-select = [
-  # isort
-  "I",
+    # isort
+    "I",
 ]
 
 [build-system]

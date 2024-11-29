@@ -13,7 +13,7 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 
 # 4 space indentation
-[*.py]
+[*.{py,toml}]
 indent_size = 4
 
 [Makefile]
