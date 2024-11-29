@@ -14,6 +14,12 @@ Available sections are:
 -   `Fixed` for any bug fixes.
 -   `Security` in case of vulnerabilities.
 
+## [v0.6.0] - 2024-11-29
+
+### Added
+
+-   New command `hap rename` to kill to update name of existing hap
+
 
 ## [v0.5.0] - 2024-10-01
 
@@ -139,6 +145,9 @@ Available sections are:
 ### Changed
 
 -   Initial release.
+
+
+[v0.6.0]: https://github.com/bmwant/hapless/compare/v0.5.1...v0.6.0
 
 [v0.5.0]: https://github.com/bmwant/hapless/compare/v0.4.0...v0.5.0
 

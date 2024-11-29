@@ -117,10 +117,23 @@ hap clean --all
 # Same as above
 hap cleanall
 ```
+
 ➡️ Restart a hap.
 
 - When restart command is called, hap will stop the process and start it again. The command is rerun from the current working directory.
 
 ```bash
 hap restart [hap-alias]
+```
+
+➡️ Rename existing hap.
+
+- When restart command is called, hap will stop the process and start it again. The command is rerun from the current working directory.
+
+```bash
+hap rename [hap-alias] [new-hap-name]
+# e.g. you can invoke with hap ID like
+hap rename 4 hap-new-name
+# or by hap current name like
+hap rename hap-name hap-new-name
 ```
