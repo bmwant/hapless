@@ -40,3 +40,23 @@ def test_get_hap_works_with_restarts(hapless):
     # Check ignoring restarts suffix
     no_hap = hapless.get_hap(hap_alias=raw_name)
     assert no_hap is None
+
+
+def test_rename_hap_preserves_restarts(hapless):
+    raw_name = "hap-name@3"
+    hapless.create_hap(cmd="true", name=raw_name)
+    hap = hapless.get_hap(hap_alias="hap-name")
+    assert hap is not None
+    assert hap.raw_name == raw_name
+    assert hap.name == "hap-name"
+
+    hapless.rename_hap(hap, "hap-new-name")
+    no_hap = hapless.get_hap(hap_alias="hap-name")
+    # Cannot get with with an old name
+    assert no_hap is None
+
+    hap = hapless.get_hap(hap_alias="hap-new-name")
+    assert hap is not None
+    assert hap.restarts == 3
+    assert hap.name == "hap-new-name"
+    assert hap.raw_name == "hap-new-name@3"

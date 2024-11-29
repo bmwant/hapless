@@ -171,3 +171,31 @@ def test_restart_invocation(get_or_exit_mock, runner):
         assert result.exit_code == 0
         get_or_exit_mock.assert_called_once_with("hap-me")
         restart_mock.assert_called_once_with(hap_mock)
+
+
+@patch("hapless.cli.get_or_exit")
+def test_rename_invocation(get_or_exit_mock, runner):
+    hap_mock = Mock()
+    get_or_exit_mock.return_value = hap_mock
+    with patch.object(runner.hapless, "rename_hap") as rename_mock:
+        result = runner.invoke(cli.cli, ["rename", "hap-me", "new-hap-name"])
+        assert result.exit_code == 0
+        get_or_exit_mock.assert_called_once_with("hap-me")
+        rename_mock.assert_called_once_with(hap_mock, "new-hap-name")
+
+
+@patch("hapless.cli.get_or_exit")
+def test_rename_name_exists(get_or_exit_mock, runner):
+    hap_mock = Mock()
+    other_hap = Mock()
+    get_or_exit_mock.return_value = hap_mock
+    with (
+        patch.object(runner.hapless, "rename_hap") as rename_mock,
+        patch.object(runner.hapless, "get_hap", return_value=other_hap) as get_hap_mock,
+    ):
+        result = runner.invoke(cli.cli, ["rename", "hap-me", "new-hap-name"])
+        assert result.exit_code == 1
+        assert "Hap with such name already exists" in result.output
+        get_or_exit_mock.assert_called_once_with("hap-me")
+        get_hap_mock.assert_called_once_with("new-hap-name")
+        rename_mock.assert_not_called()
