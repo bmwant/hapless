@@ -174,5 +174,20 @@ def restart(hap_alias):
     hapless.restart(hap)
 
 
+@cli.command(short_help="Sets new name/alias for the existing hap.")
+@click.argument("hap_alias", metavar="hap", required=True)
+@click.argument("new_name", metavar="new-name", required=True)
+def rename(hap_alias: str, new_name: str):
+    hap = get_or_exit(hap_alias)
+    same_name_hap = hapless.get_hap(new_name)
+    if same_name_hap is not None:
+        console.print(
+            f"{config.ICON_INFO} Hap with such name already exists: {same_name_hap}",
+            style=f"{config.COLOR_ERROR} bold",
+        )
+        sys.exit(1)
+    hapless.rename_hap(hap, new_name)
+
+
 if __name__ == "__main__":
     cli()

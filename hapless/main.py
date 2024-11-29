@@ -108,6 +108,7 @@ class Hapless(object):
 
             retcode = proc.wait()
 
+            # TODO: accessing private attribute, should be `set_rc` method
             with open(hap._rc_file, "w") as rc_file:
                 rc_file.write(f"{retcode}")
 
@@ -251,3 +252,13 @@ class Hapless(object):
 
         name = f"{name}{config.RESTART_DELIM}{restarts + 1}"
         self.run(cmd=cmd, hid=hid, name=name)
+
+    def rename_hap(self, hap: Hap, new_name: str):
+        rich_text = (
+            f"{config.ICON_INFO} Renamed [{config.COLOR_ACCENT}]{hap.name}[/] "
+            f"to [{config.COLOR_MAIN} bold]{new_name}[/]"
+        )
+        if hap.restarts:
+            new_name = f"{new_name}{config.RESTART_DELIM}{hap.restarts}"
+        hap.set_name(new_name)
+        self.ui.print(rich_text)

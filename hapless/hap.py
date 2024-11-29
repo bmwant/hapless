@@ -54,6 +54,10 @@ class Hap(object):
         self._set_raw_name(name)
         self._set_cmd(cmd)
 
+    def set_name(self, name: str):
+        with open(self._name_file, "w") as f:
+            f.write(name)
+
     def _set_raw_name(self, raw_name: Optional[str]):
         """
         Sets name for the first time on hap creation.
@@ -63,8 +67,7 @@ class Hap(object):
             raw_name = f"hap-{suffix}"
 
         if self.raw_name is None:
-            with open(self._name_file, "w") as f:
-                f.write(raw_name)
+            self.set_name(raw_name)
 
     def _set_cmd(self, cmd: Optional[str]):
         """

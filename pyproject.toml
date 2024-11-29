@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hapless"
-version = "0.5.1"
+version = "0.6.0"
 description = "Run and track processes in background"
 authors = ["Misha Behersky <bmwant@gmail.com>"]
 license = "MIT"
@@ -34,23 +34,30 @@ click = "^8.1.2"
 rich = "^13.5.2"
 importlib-metadata = { version = "^4.11.3", python = "<3.8" }
 "backports.cached-property" = { version = "^1.0.2", python = "<3.8" }
+# Optional dependencies installed as extras
+pytest = { version = "^7.4.4", optional = true }
+pytest-cov = { version = "^3.0.0", optional = true }
+ruff = { version = "^0.6.5", optional = true }
+nox = {version = "^2024.10.9", python = ">=3.8", optional = true }
+
+[tool.poetry.extras]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.4"
 pytest-cov = "^3.0.0"
 ruff = "^0.6.5"
+nox = {version = "^2024.10.9", python = ">=3.8"}
 
 [tool.poetry.scripts]
 hap = 'hapless.cli:cli'
 
 [tool.poetry.urls]
 "Blog post" = "https://bmwant.link/hapless-easily-run-and-manage-background-processes/"
-
-[tool.black]
-line-length = 88
-
-[tool.isort]
-profile = "black"
 
 [tool.ruff]
 # Same as Black.
@@ -59,8 +66,8 @@ line-length = 88
 # ruff check
 [tool.ruff.lint]
 extend-select = [
-  # isort
-  "I",
+    # isort
+    "I",
 ]
 
 [build-system]
