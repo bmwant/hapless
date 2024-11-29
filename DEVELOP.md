@@ -36,6 +36,17 @@ $ poetry run pytest --cov=hapless --cov-report=html tests/
 $ make coverage-report
 ```
 
+Run against multiple Python versions with [nox](https://nox.thea.codes/en/stable/index.html)
+
+```bash
+nox --list
+# Check all of the defined Python versions are available
+nox -s check_versions
+
+# Run tests against all versions
+nox -s test
+```
+
 ### Releasing
 
 Bump a version with features you want to include and build a package

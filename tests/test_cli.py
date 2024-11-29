@@ -1,3 +1,4 @@
+from contextlib import ExitStack
 from unittest.mock import Mock, patch
 
 from hapless import cli
@@ -189,10 +190,13 @@ def test_rename_name_exists(get_or_exit_mock, runner):
     hap_mock = Mock()
     other_hap = Mock()
     get_or_exit_mock.return_value = hap_mock
-    with (
-        patch.object(runner.hapless, "rename_hap") as rename_mock,
-        patch.object(runner.hapless, "get_hap", return_value=other_hap) as get_hap_mock,
-    ):
+    # NOTE: Python 3.7/3.8 compatibility
+    with ExitStack() as stack:
+        rename_mock = stack.enter_context(patch.object(runner.hapless, "rename_hap"))
+        get_hap_mock = stack.enter_context(
+            patch.object(runner.hapless, "get_hap", return_value=other_hap)
+        )
+
         result = runner.invoke(cli.cli, ["rename", "hap-me", "new-hap-name"])
         assert result.exit_code == 1
         assert "Hap with such name already exists" in result.output
