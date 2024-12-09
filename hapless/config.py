@@ -3,6 +3,8 @@ import os
 DEBUG = bool(os.getenv("HAPLESS_DEBUG", default=""))
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
+HAPLESS_DIR = os.getenv("HAPLESS_DIR")
+
 COLOR_MAIN = "#fdca40"
 COLOR_ACCENT = "#3aaed8"
 COLOR_ERROR = "#f64740"

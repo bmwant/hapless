@@ -2,7 +2,6 @@ import sys
 from typing import Optional
 
 import click
-from rich.console import Console
 
 from hapless import config
 from hapless.main import Hapless
@@ -14,8 +13,8 @@ except ImportError:
     # Fallback for Python 3.7
     from hapless.utils import shlex_join_backport as shlex_join
 
-console = Console(highlight=False)
-hapless = Hapless()
+hapless = Hapless(hapless_dir=config.HAPLESS_DIR)
+console = hapless.ui
 
 
 def get_or_exit(hap_alias: str):

@@ -5,7 +5,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import psutil
 
@@ -16,12 +16,12 @@ from hapless.utils import kill_proc_tree, logger, wait_created
 
 
 class Hapless(object):
-    def __init__(self, hapless_dir: Optional[Path] = None):
+    def __init__(self, hapless_dir: Optional[Union[Path, str]] = None):
         default_dir = Path(tempfile.gettempdir()) / "hapless"
         self._hapless_dir = hapless_dir or default_dir
-        logger.debug(f"Initialized within {self._hapless_dir} dir")
         if not self._hapless_dir.exists():
             self._hapless_dir.mkdir(parents=True, exist_ok=True)
+        logger.debug(f"Initialized within {self._hapless_dir} dir")
         self.ui = ConsoleUI()
 
     def stats(self, haps: List[Hap], verbose: bool = False):
@@ -87,9 +87,10 @@ class Hapless(object):
         return Hap(hap_dir, cmd=cmd, name=name)
 
     def run_hap(self, hap: Hap):
-        with open(hap.stdout_path, "w") as stdout_pipe, open(
-            hap.stderr_path, "w"
-        ) as stderr_pipe:
+        with (
+            open(hap.stdout_path, "w") as stdout_pipe,
+            open(hap.stderr_path, "w") as stderr_pipe,
+        ):
             self.ui.print(f"{config.ICON_INFO} Launching", hap)
             shell_exec = os.getenv("SHELL")
             if shell_exec is not None:
