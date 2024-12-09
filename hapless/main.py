@@ -1,3 +1,4 @@
+import getpass
 import os
 import shutil
 import signal
@@ -15,14 +16,26 @@ from hapless.ui import ConsoleUI
 from hapless.utils import kill_proc_tree, logger, wait_created
 
 
-class Hapless(object):
+class Hapless:
     def __init__(self, hapless_dir: Optional[Union[Path, str]] = None):
-        default_dir = Path(tempfile.gettempdir()) / "hapless"
-        self._hapless_dir = hapless_dir or default_dir
-        if not self._hapless_dir.exists():
-            self._hapless_dir.mkdir(parents=True, exist_ok=True)
-        logger.debug(f"Initialized within {self._hapless_dir} dir")
         self.ui = ConsoleUI()
+        user = getpass.getuser()
+        default_dir = Path(tempfile.gettempdir()) / f"hapless-{user}"
+
+        hapless_dir = Path(hapless_dir or default_dir)
+        try:
+            if not hapless_dir.exists():
+                hapless_dir.mkdir(parents=True, exist_ok=True)
+            os.utime(hapless_dir)
+        except PermissionError as e:
+            logger.error(f"Cannot initialize state directory {hapless_dir}: {e}")
+            self.ui.error(
+                f"State directory ({hapless_dir}) is not accessible by user {user}"
+            )
+            sys.exit(1)
+
+        self._hapless_dir = hapless_dir
+        logger.debug(f"Initialized within {self._hapless_dir} dir")
 
     def stats(self, haps: List[Hap], verbose: bool = False):
         self.ui.stats(haps, verbose=verbose)
@@ -129,10 +142,7 @@ class Hapless(object):
             proc.suspend()
             self.ui.print(f"{config.ICON_INFO} Paused", hap)
         else:
-            self.ui.print(
-                f"{config.ICON_INFO} Cannot pause. Hap {hap} is not running",
-                style=f"{config.COLOR_ERROR} bold",
-            )
+            self.ui.error(f"Cannot pause. Hap {hap} is not running")
             sys.exit(1)
 
     def resume_hap(self, hap: Hap):
@@ -141,10 +151,7 @@ class Hapless(object):
             proc.resume()
             self.ui.print(f"{config.ICON_INFO} Resumed", hap)
         else:
-            self.ui.print(
-                f"{config.ICON_INFO} Cannot resume. Hap {hap} is not suspended",
-                style=f"{config.COLOR_ERROR} bold",
-            )
+            self.ui.error(f"Cannot resume. Hap {hap} is not suspended")
             sys.exit(1)
 
     def run(

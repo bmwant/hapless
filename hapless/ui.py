@@ -3,6 +3,7 @@ try:
 except ModuleNotFoundError:
     # Fallback for Python 3.7
     from importlib_metadata import version
+
 from itertools import filterfalse
 from typing import List
 
@@ -22,6 +23,12 @@ class ConsoleUI:
 
     def print(self, *args, **kwargs):
         return self.console.print(*args, **kwargs)
+
+    def error(self, message: str):
+        return self.console.print(
+            f"{config.ICON_INFO} {message}",
+            style=f"{config.COLOR_ERROR} bold",
+        )
 
     def stats(self, haps: List[Hap], verbose: bool = False):
         if not haps:
