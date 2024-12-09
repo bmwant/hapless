@@ -106,20 +106,14 @@ def cleanall():
 def run(cmd, name, check):
     hap = hapless.get_hap(name)
     if hap is not None:
-        console.print(
-            f"{config.ICON_INFO} Hap with such name already exists: {hap}",
-            style=f"{config.COLOR_ERROR} bold",
-        )
+        console.error(f"Hap with such name already exists: {hap}")
         sys.exit(1)
 
     # NOTE: click doesn't like `required` property for `cmd` argument
     # https://click.palletsprojects.com/en/latest/arguments/#variadic-arguments
     cmd_escaped = shlex_join(cmd).strip()
     if not cmd_escaped:
-        console.print(
-            f"{config.ICON_INFO} You have to provide a command to run",
-            style=f"{config.COLOR_ERROR} bold",
-        )
+        console.error("You have to provide a command to run")
         sys.exit(1)
     hapless.run(cmd_escaped, name=name, check=check)
 
@@ -180,10 +174,7 @@ def rename(hap_alias: str, new_name: str):
     hap = get_or_exit(hap_alias)
     same_name_hap = hapless.get_hap(new_name)
     if same_name_hap is not None:
-        console.print(
-            f"{config.ICON_INFO} Hap with such name already exists: {same_name_hap}",
-            style=f"{config.COLOR_ERROR} bold",
-        )
+        console.print(f"Hap with such name already exists: {same_name_hap}")
         sys.exit(1)
     hapless.rename_hap(hap, new_name)
 
