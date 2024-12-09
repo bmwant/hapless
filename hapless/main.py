@@ -128,10 +128,7 @@ class Hapless:
 
     def _check_fast_failure(self, hap: Hap):
         if wait_created(hap._rc_file) and hap.rc != 0:
-            self.ui.print(
-                f"{config.ICON_INFO} Hap exited too quickly. stderr message:",
-                style=f"{config.COLOR_ERROR} bold",
-            )
+            self.ui.error("Hap exited too quickly. stderr message:")
             with open(hap.stderr_path) as f:
                 self.ui.print(f.read())
             sys.exit(1)
@@ -209,10 +206,7 @@ class Hapless:
                 style=f"{config.COLOR_MAIN} bold",
             )
         else:
-            self.ui.print(
-                f"{config.ICON_INFO} Nothing to clean",
-                style=f"{config.COLOR_ERROR} bold",
-            )
+            self.ui.error("Nothing to clean")
 
     def kill(self, haps: List[Hap], verbose: bool = True):
         killed_counter = 0
@@ -228,10 +222,7 @@ class Hapless:
                 style=f"{config.COLOR_MAIN} bold",
             )
         elif verbose:
-            self.ui.print(
-                f"{config.ICON_INFO} No active haps to kill",
-                style=f"{config.COLOR_ERROR} bold",
-            )
+            self.ui.error("No active haps to kill")
 
     def signal(self, hap: Hap, sig: signal.Signals):
         if hap.active:
@@ -241,10 +232,7 @@ class Hapless:
             self.ui.print(f"{config.ICON_INFO} Sending {sig_text} to hap {hap}")
             hap.proc.send_signal(sig)
         else:
-            self.ui.print(
-                f"{config.ICON_INFO} Cannot send signal to the inactive hap",
-                style=f"{config.COLOR_ERROR} bold",
-            )
+            self.ui.error("Cannot send signal to the inactive hap")
 
     def restart(self, hap: Hap):
         hid, name, cmd, restarts = hap.hid, hap.name, hap.cmd, hap.restarts
