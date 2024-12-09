@@ -51,9 +51,9 @@ See [USAGE.md](https://github.com/bmwant/hapless/blob/main/USAGE.md) for the com
 
 See [DEVELOP.md](https://github.com/bmwant/hapless/blob/main/DEVELOP.md) to setup your local development environment and feel free to create a pull request with a new feature.
 
-### Releases
+### Releases changelog
 
-See [CHANGELOG.md](https://github.com/bmwant/hapless/blob/main/CHANGELOG.md) for the new features included within each release.
+Changelog file was removed; you can now view the changes made in each release on the [Releases](https://github.com/bmwant/hapless/releases) page.
 
 ### See also
 
