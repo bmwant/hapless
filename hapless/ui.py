@@ -51,6 +51,7 @@ class ConsoleUI:
         table.add_column("PID")
         if verbose:
             table.add_column("Command")
+            table.add_column("Owner")
         table.add_column("Status")
         table.add_column("RC", justify="right")
         table.add_column("Runtime", justify="right")
@@ -75,6 +76,7 @@ class ConsoleUI:
                 name,
                 pid_text,
                 command_text if verbose else None,
+                hap.owner if verbose else None,
                 status_text,
                 f"{hap.rc}" if hap.rc is not None else "",
                 hap.runtime,

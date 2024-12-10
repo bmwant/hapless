@@ -20,10 +20,10 @@ console = hapless.ui
 def get_or_exit(hap_alias: str):
     hap = hapless.get_hap(hap_alias)
     if hap is None:
-        console.print(
-            f"{config.ICON_INFO} No such hap: {hap_alias}",
-            style=f"{config.COLOR_ERROR} bold",
-        )
+        console.error(f"No such hap: {hap_alias}")
+        sys.exit(1)
+    if not hap.accessible:
+        console.error(f"Cannot manage hap launched by another user. Owner: {hap.owner}")
         sys.exit(1)
     return hap
 
@@ -56,7 +56,7 @@ def _status(hap_alias: Optional[str] = None, verbose: bool = False):
         hap = get_or_exit(hap_alias)
         hapless.show(hap, verbose=verbose)
     else:
-        haps = hapless.get_haps()
+        haps = hapless.get_haps(accessible_only=False)
         hapless.stats(haps, verbose=verbose)
 
 

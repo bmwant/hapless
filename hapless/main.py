@@ -92,14 +92,14 @@ class Hapless:
             haps.append(Hap(hap_path))
         return haps
 
-    def get_haps(self) -> List[Hap]:
+    def get_haps(self, accessible_only=True) -> List[Hap]:
         """
         Get all haps that are managable by the current user.
+        If `accessible_only` is set to False, all haps will be returned.
         """
 
         def filter_haps(hap_arg: Hap) -> bool:
-            return True
-            # return hap_arg.accessible
+            return hap_arg.accessible if accessible_only else True
 
         haps = list(filter(filter_haps, self._get_all_haps()))
         return haps
