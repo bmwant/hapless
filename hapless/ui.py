@@ -28,6 +28,8 @@ class ConsoleUI:
         return self.console.print(
             f"{config.ICON_INFO} {message}",
             style=f"{config.COLOR_ERROR} bold",
+            overflow="ignore",
+            crop=False,
         )
 
     def stats(self, haps: List[Hap], verbose: bool = False):

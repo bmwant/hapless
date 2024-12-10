@@ -30,7 +30,7 @@ class Hapless:
         except PermissionError as e:
             logger.error(f"Cannot initialize state directory {hapless_dir}: {e}")
             self.ui.error(
-                f"State directory ({hapless_dir}) is not accessible by user {user}"
+                f"State directory {hapless_dir} is not accessible by user {user}"
             )
             sys.exit(1)
 
