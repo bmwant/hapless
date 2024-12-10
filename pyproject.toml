@@ -37,7 +37,7 @@ importlib-metadata = { version = "^4.11.3", python = "<3.8" }
 # Optional dependencies installed as extras
 pytest = { version = "^7.4.4", optional = true }
 pytest-cov = { version = "^3.0.0", optional = true }
-ruff = { version = "^0.6.5", optional = true }
+ruff = { version = "^0.8.2", optional = true }
 nox = {version = "^2024.10.9", python = ">=3.8", optional = true }
 
 [tool.poetry.extras]
@@ -50,7 +50,7 @@ dev = [
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.4"
 pytest-cov = "^3.0.0"
-ruff = "^0.6.5"
+ruff = "^0.8.2"
 nox = {version = "^2024.10.9", python = ">=3.8"}
 
 [tool.poetry.scripts]
@@ -62,6 +62,7 @@ hap = 'hapless.cli:cli'
 [tool.ruff]
 # Same as Black.
 line-length = 88
+target-version = "py37"
 
 # ruff check
 [tool.ruff.lint]

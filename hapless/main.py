@@ -100,10 +100,9 @@ class Hapless:
         return Hap(hap_dir, cmd=cmd, name=name)
 
     def run_hap(self, hap: Hap):
-        with (
-            open(hap.stdout_path, "w") as stdout_pipe,
-            open(hap.stderr_path, "w") as stderr_pipe,
-        ):
+        with open(hap.stdout_path, "w") as stdout_pipe, open(
+            hap.stderr_path, "w"
+        ) as stderr_pipe:
             self.ui.print(f"{config.ICON_INFO} Launching", hap)
             shell_exec = os.getenv("SHELL")
             if shell_exec is not None:
