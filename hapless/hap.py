@@ -1,5 +1,6 @@
 import json
 import os
+import pwd
 import random
 import string
 import time
@@ -60,7 +61,7 @@ class Hap(object):
 
     def _set_raw_name(self, raw_name: Optional[str]):
         """
-        Sets name for the first time on hap creation.
+        Set name for the first time on hap creation.
         """
         if raw_name is None:
             suffix = self.get_random_name()
@@ -71,7 +72,7 @@ class Hap(object):
 
     def _set_cmd(self, cmd: Optional[str]):
         """
-        Sets cmd for the first time on hap creation.
+        Set cmd for the first time on hap creation.
         """
         if self.cmd is None:
             if cmd is None:
@@ -241,6 +242,26 @@ class Hap(object):
     @property
     def stderr_path(self) -> Path:
         return self._hap_path / "stderr.log"
+
+    @property
+    def accessible(self) -> bool:
+        """
+        Check if current user has control over the hap.
+        """
+        try:
+            os.utime(self.path)
+            return True
+        except PermissionError:
+            return False
+
+    @property
+    def owner(self) -> str:
+        stat = self.path.stat()
+        try:
+            owner = pwd.getpwuid(stat.st_uid).pw_name
+        except KeyError:
+            owner = f"{stat.st_uid}:{stat.st_gid}"
+        return owner
 
     def __str__(self) -> str:
         return f"#{self.hid} ({self.name})"

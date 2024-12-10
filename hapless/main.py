@@ -20,7 +20,7 @@ class Hapless:
     def __init__(self, hapless_dir: Optional[Union[Path, str]] = None):
         self.ui = ConsoleUI()
         user = getpass.getuser()
-        default_dir = Path(tempfile.gettempdir()) / f"hapless-{user}"
+        default_dir = Path(tempfile.gettempdir()) / "hapless"
 
         hapless_dir = Path(hapless_dir or default_dir)
         try:
@@ -78,7 +78,11 @@ class Hapless:
         if hap_alias in names_map:
             return Hap(self._hapless_dir / names_map[hap_alias])
 
-    def get_haps(self) -> List[Hap]:
+    def _get_all_haps(self) -> List[Hap]:
+        """
+        Get all haps available in the hapless state directory.
+        Current user might only be able to access subset of them.
+        """
         haps = []
         if not self._hapless_dir.exists():
             return haps
@@ -86,6 +90,18 @@ class Hapless:
         for dir in self._get_hap_dirs():
             hap_path = self._hapless_dir / dir
             haps.append(Hap(hap_path))
+        return haps
+
+    def get_haps(self) -> List[Hap]:
+        """
+        Get all haps that are managable by the current user.
+        """
+
+        def filter_haps(hap_arg: Hap) -> bool:
+            return True
+            # return hap_arg.accessible
+
+        haps = list(filter(filter_haps, self._get_all_haps()))
         return haps
 
     def create_hap(
