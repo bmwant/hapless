@@ -1,3 +1,4 @@
+import getpass
 import os
 import shutil
 import signal
@@ -5,7 +6,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import psutil
 
@@ -15,14 +16,26 @@ from hapless.ui import ConsoleUI
 from hapless.utils import kill_proc_tree, logger, wait_created
 
 
-class Hapless(object):
-    def __init__(self, hapless_dir: Optional[Path] = None):
-        default_dir = Path(tempfile.gettempdir()) / "hapless"
-        self._hapless_dir = hapless_dir or default_dir
-        logger.debug(f"Initialized within {self._hapless_dir} dir")
-        if not self._hapless_dir.exists():
-            self._hapless_dir.mkdir(parents=True, exist_ok=True)
+class Hapless:
+    def __init__(self, hapless_dir: Optional[Union[Path, str]] = None):
         self.ui = ConsoleUI()
+        user = getpass.getuser()
+        default_dir = Path(tempfile.gettempdir()) / "hapless"
+
+        hapless_dir = Path(hapless_dir or default_dir)
+        try:
+            if not hapless_dir.exists():
+                hapless_dir.mkdir(parents=True, exist_ok=True)
+            os.utime(hapless_dir)
+        except PermissionError as e:
+            logger.error(f"Cannot initialize state directory {hapless_dir}: {e}")
+            self.ui.error(
+                f"State directory {hapless_dir} is not accessible by user {user}"
+            )
+            sys.exit(1)
+
+        self._hapless_dir = hapless_dir
+        logger.debug(f"Initialized within {self._hapless_dir} dir")
 
     def stats(self, haps: List[Hap], verbose: bool = False):
         self.ui.stats(haps, verbose=verbose)
@@ -65,7 +78,11 @@ class Hapless(object):
         if hap_alias in names_map:
             return Hap(self._hapless_dir / names_map[hap_alias])
 
-    def get_haps(self) -> List[Hap]:
+    def _get_all_haps(self) -> List[Hap]:
+        """
+        Get all haps available in the hapless state directory.
+        Current user might only be able to access subset of them.
+        """
         haps = []
         if not self._hapless_dir.exists():
             return haps
@@ -73,6 +90,18 @@ class Hapless(object):
         for dir in self._get_hap_dirs():
             hap_path = self._hapless_dir / dir
             haps.append(Hap(hap_path))
+        return haps
+
+    def get_haps(self, accessible_only=True) -> List[Hap]:
+        """
+        Get all haps that are managable by the current user.
+        If `accessible_only` is set to False, all haps will be returned.
+        """
+
+        def filter_haps(hap_arg: Hap) -> bool:
+            return hap_arg.accessible if accessible_only else True
+
+        haps = list(filter(filter_haps, self._get_all_haps()))
         return haps
 
     def create_hap(
@@ -114,10 +143,7 @@ class Hapless(object):
 
     def _check_fast_failure(self, hap: Hap):
         if wait_created(hap._rc_file) and hap.rc != 0:
-            self.ui.print(
-                f"{config.ICON_INFO} Hap exited too quickly. stderr message:",
-                style=f"{config.COLOR_ERROR} bold",
-            )
+            self.ui.error("Hap exited too quickly. stderr message:")
             with open(hap.stderr_path) as f:
                 self.ui.print(f.read())
             sys.exit(1)
@@ -128,10 +154,7 @@ class Hapless(object):
             proc.suspend()
             self.ui.print(f"{config.ICON_INFO} Paused", hap)
         else:
-            self.ui.print(
-                f"{config.ICON_INFO} Cannot pause. Hap {hap} is not running",
-                style=f"{config.COLOR_ERROR} bold",
-            )
+            self.ui.error(f"Cannot pause. Hap {hap} is not running")
             sys.exit(1)
 
     def resume_hap(self, hap: Hap):
@@ -140,10 +163,7 @@ class Hapless(object):
             proc.resume()
             self.ui.print(f"{config.ICON_INFO} Resumed", hap)
         else:
-            self.ui.print(
-                f"{config.ICON_INFO} Cannot resume. Hap {hap} is not suspended",
-                style=f"{config.COLOR_ERROR} bold",
-            )
+            self.ui.error(f"Cannot resume. Hap {hap} is not suspended")
             sys.exit(1)
 
     def run(
@@ -201,10 +221,7 @@ class Hapless(object):
                 style=f"{config.COLOR_MAIN} bold",
             )
         else:
-            self.ui.print(
-                f"{config.ICON_INFO} Nothing to clean",
-                style=f"{config.COLOR_ERROR} bold",
-            )
+            self.ui.error("Nothing to clean")
 
     def kill(self, haps: List[Hap], verbose: bool = True):
         killed_counter = 0
@@ -220,10 +237,7 @@ class Hapless(object):
                 style=f"{config.COLOR_MAIN} bold",
             )
         elif verbose:
-            self.ui.print(
-                f"{config.ICON_INFO} No active haps to kill",
-                style=f"{config.COLOR_ERROR} bold",
-            )
+            self.ui.error("No active haps to kill")
 
     def signal(self, hap: Hap, sig: signal.Signals):
         if hap.active:
@@ -233,10 +247,7 @@ class Hapless(object):
             self.ui.print(f"{config.ICON_INFO} Sending {sig_text} to hap {hap}")
             hap.proc.send_signal(sig)
         else:
-            self.ui.print(
-                f"{config.ICON_INFO} Cannot send signal to the inactive hap",
-                style=f"{config.COLOR_ERROR} bold",
-            )
+            self.ui.error("Cannot send signal to the inactive hap")
 
     def restart(self, hap: Hap):
         hid, name, cmd, restarts = hap.hid, hap.name, hap.cmd, hap.restarts

@@ -128,7 +128,7 @@ hap restart [hap-alias]
 
 ➡️ Rename existing hap.
 
-- When restart command is called, hap will stop the process and start it again. The command is rerun from the current working directory.
+- Change name of the existing hap to the new one. Does not allow to have duplicate names. Hap id (integer identificator) stays the same after renaming.
 
 ```bash
 hap rename [hap-alias] [new-hap-name]
@@ -137,3 +137,30 @@ hap rename 4 hap-new-name
 # or by hap current name like
 hap rename hap-name hap-new-name
 ```
+
+### ✏️ State directory
+
+- By default state directory is picked automatically within system's temporary directory. In case you want to store state somewhere else, you can override it by setting dedicated environment variable
+
+```bash
+export HAPLESS_DIR="/home/myuser/mystate"
+
+hap run echo hello
+```
+
+- To check that correct directory is used you can open detailed view for the hap and check that both `stdout`/`stderr` files are stored under the desired location.
+
+```bash
+hap show -v [hap-alias]
+```
+
+Alternatively, you can set debug flag and state folder will be printed on each invocation
+
+```bash
+export HAPLESS_DEBUG=1
+hap
+# DEBUG:hapless:Initialized within /home/myuser/mystate dir
+unset HAPLESS_DEBUG
+```
+
+> NOTE: make sure to update your shell initialization file `.profile`/`.bashrc`/`.zshrc`/etc for the change to persist between different terminal sessions. Otherwise, state will be saved in custom directory only within current shell.

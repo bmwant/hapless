@@ -1,4 +1,6 @@
+import getpass
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -38,6 +40,10 @@ def test_unbound_hap(hap: Hap):
 
     assert hap.runtime == "a moment"
 
+    assert hap.accessible is True
+    # Current user should be the owner of the hap
+    assert hap.owner == getpass.getuser()
+
 
 def test_hap_path_should_be_a_directory(tmp_path):
     hap_path = Path(tmp_path) / "hap-path"
@@ -62,3 +68,17 @@ def test_raw_name(tmp_path):
     hap = Hap(Path(tmp_path), name="hap-name@3", cmd="true")
     assert hap.name == "hap-name"
     assert hap.raw_name == "hap-name@3"
+
+
+def test_hap_inaccessible(hap: Hap):
+    with patch("os.utime", side_effect=PermissionError):
+        assert hap.accessible is False
+
+
+def test_hap_owner_unknown_uid(hap: Hap):
+    mocked_stat = MagicMock()
+    mocked_stat.st_uid = 6249
+    mocked_stat.st_gid = 6251
+
+    with patch("pathlib.Path.stat", return_value=mocked_stat):
+        assert hap.owner == "6249:6251"

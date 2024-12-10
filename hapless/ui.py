@@ -3,6 +3,7 @@ try:
 except ModuleNotFoundError:
     # Fallback for Python 3.7
     from importlib_metadata import version
+
 from itertools import filterfalse
 from typing import List
 
@@ -22,6 +23,14 @@ class ConsoleUI:
 
     def print(self, *args, **kwargs):
         return self.console.print(*args, **kwargs)
+
+    def error(self, message: str):
+        return self.console.print(
+            f"{config.ICON_INFO} {message}",
+            style=f"{config.COLOR_ERROR} bold",
+            overflow="ignore",
+            crop=False,
+        )
 
     def stats(self, haps: List[Hap], verbose: bool = False):
         if not haps:
@@ -44,6 +53,7 @@ class ConsoleUI:
         table.add_column("PID")
         if verbose:
             table.add_column("Command")
+            table.add_column("Owner")
         table.add_column("Status")
         table.add_column("RC", justify="right")
         table.add_column("Runtime", justify="right")
@@ -67,6 +77,7 @@ class ConsoleUI:
                 name,
                 pid_text,
                 command_text if verbose else None,
+                hap.owner if verbose else None,
                 status_text,
                 f"{hap.rc}" if hap.rc is not None else "",
                 hap.runtime,

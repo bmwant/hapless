@@ -2,7 +2,6 @@ import sys
 from typing import Optional
 
 import click
-from rich.console import Console
 
 from hapless import config
 from hapless.main import Hapless
@@ -14,17 +13,17 @@ except ImportError:
     # Fallback for Python 3.7
     from hapless.utils import shlex_join_backport as shlex_join
 
-console = Console(highlight=False)
-hapless = Hapless()
+hapless = Hapless(hapless_dir=config.HAPLESS_DIR)
+console = hapless.ui
 
 
 def get_or_exit(hap_alias: str):
     hap = hapless.get_hap(hap_alias)
     if hap is None:
-        console.print(
-            f"{config.ICON_INFO} No such hap: {hap_alias}",
-            style=f"{config.COLOR_ERROR} bold",
-        )
+        console.error(f"No such hap: {hap_alias}")
+        sys.exit(1)
+    if not hap.accessible:
+        console.error(f"Cannot manage hap launched by another user. Owner: {hap.owner}")
         sys.exit(1)
     return hap
 
@@ -57,7 +56,7 @@ def _status(hap_alias: Optional[str] = None, verbose: bool = False):
         hap = get_or_exit(hap_alias)
         hapless.show(hap, verbose=verbose)
     else:
-        haps = hapless.get_haps()
+        haps = hapless.get_haps(accessible_only=False)
         hapless.stats(haps, verbose=verbose)
 
 
@@ -107,20 +106,14 @@ def cleanall():
 def run(cmd, name, check):
     hap = hapless.get_hap(name)
     if hap is not None:
-        console.print(
-            f"{config.ICON_INFO} Hap with such name already exists: {hap}",
-            style=f"{config.COLOR_ERROR} bold",
-        )
+        console.error(f"Hap with such name already exists: {hap}")
         sys.exit(1)
 
     # NOTE: click doesn't like `required` property for `cmd` argument
     # https://click.palletsprojects.com/en/latest/arguments/#variadic-arguments
     cmd_escaped = shlex_join(cmd).strip()
     if not cmd_escaped:
-        console.print(
-            f"{config.ICON_INFO} You have to provide a command to run",
-            style=f"{config.COLOR_ERROR} bold",
-        )
+        console.error("You have to provide a command to run")
         sys.exit(1)
     hapless.run(cmd_escaped, name=name, check=check)
 
@@ -181,10 +174,7 @@ def rename(hap_alias: str, new_name: str):
     hap = get_or_exit(hap_alias)
     same_name_hap = hapless.get_hap(new_name)
     if same_name_hap is not None:
-        console.print(
-            f"{config.ICON_INFO} Hap with such name already exists: {same_name_hap}",
-            style=f"{config.COLOR_ERROR} bold",
-        )
+        console.print(f"Hap with such name already exists: {same_name_hap}")
         sys.exit(1)
     hapless.rename_hap(hap, new_name)
 
