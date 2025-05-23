@@ -14,6 +14,7 @@ from hapless import config
 from hapless.hap import Hap, Status
 from hapless.ui import ConsoleUI
 from hapless.utils import kill_proc_tree, logger, wait_created
+from hapless.formatters import TableFormatter, JSONFormatter # Added
 
 
 class Hapless:
@@ -37,11 +38,24 @@ class Hapless:
         self._hapless_dir = hapless_dir
         logger.debug(f"Initialized within {self._hapless_dir} dir")
 
-    def stats(self, haps: List[Hap], verbose: bool = False):
-        self.ui.stats(haps, verbose=verbose)
+    def stats(self, haps: List[Hap], verbose: bool = False, formatter_class=TableFormatter):
+        if not haps:
+            self.ui.console.print(
+                f"{config.ICON_INFO} No haps are currently running",
+                style=f"{config.COLOR_MAIN} bold",
+            )
+            return
 
-    def show(self, hap: Hap, verbose: bool = False):
-        self.ui.show_one(hap, verbose=verbose)
+        haps_data = [hap.to_dict(verbose=verbose) for hap in haps]
+        formatter = formatter_class(verbose=verbose)
+        formatted_output = formatter.format_haps(haps_data)
+        self.ui.stats(formatted_output)
+
+    def show(self, hap: Hap, verbose: bool = False, formatter_class=TableFormatter):
+        hap_data = hap.to_dict(verbose=verbose)
+        formatter = formatter_class(verbose=verbose)
+        formatted_output = formatter.format_hap(hap_data)
+        self.ui.show_one(formatted_output)
 
     @property
     def dir(self) -> Path:

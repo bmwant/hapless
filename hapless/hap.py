@@ -275,3 +275,43 @@ class Hap(object):
         if self.pid:
             return f"{rich_text} {pid_text}"
         return rich_text
+
+    def to_dict(self, verbose: bool = False) -> Dict[str, any]:
+        """
+        Returns a dictionary representation of the Hap object.
+
+        Args:
+            verbose: If True, include more detailed information.
+
+        Returns:
+            A dictionary containing Hap attributes.
+        """
+        data = {
+            "hid": self.hid,
+            "name": self.name,
+            "raw_name": self.raw_name,
+            "pid": self.pid,
+            "cmd": self.cmd.split() if self.cmd else [], # Store as list of args
+            "status": self.status.value, # Assuming Status is an Enum
+            "rc": self.rc,
+            "runtime": self.runtime, # This is already a humanized string
+            "restarts": self.restarts,
+            "active": self.active,
+            "owner": self.owner,
+            "start_time": self.start_time, # Already string or None
+            "end_time": self.end_time, # Already string or None
+            "stdout_path": str(self.stdout_path),
+            "stderr_path": str(self.stderr_path),
+            "path": str(self.path), # Added path as it's a key property
+        }
+
+        if verbose:
+            proc = self.proc # Access proc once
+            data["cwd"] = proc.cwd() if proc else None
+            data["ppid"] = proc.ppid() if proc else None
+            data["user"] = proc.username() if proc else None # psutil method is username()
+            data["env"] = self.env # self.env already handles fallback
+            # Consider adding more from proc if useful, e.g., memory_info, cpu_times
+            # For now, sticking to the requested fields.
+
+        return data

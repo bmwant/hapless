@@ -6,6 +6,7 @@ import click
 from hapless import config
 from hapless.main import Hapless
 from hapless.utils import validate_signal
+from hapless.formatters import TableFormatter, JSONFormatter # Added
 
 try:
     from shlex import join as shlex_join
@@ -31,33 +32,37 @@ def get_or_exit(hap_alias: str):
 @click.group(invoke_without_command=True)
 @click.version_option(message="hapless, version %(version)s")
 @click.option("-v", "--verbose", is_flag=True, default=False)
+@click.option("--json", "json_output", is_flag=True, default=False, help="Output in JSON format.") # Added
 @click.pass_context
-def cli(ctx, verbose):
+def cli(ctx, verbose, json_output): # Modified
     if ctx.invoked_subcommand is None:
-        _status(None, verbose=verbose)
+        _status(None, verbose=verbose, json_output=json_output) # Modified
 
 
 @cli.command(short_help="Display information about haps.")
 @click.argument("hap_alias", metavar="hap", required=False)
 @click.option("-v", "--verbose", is_flag=True, default=False)
-def status(hap_alias, verbose):
-    _status(hap_alias, verbose)
+@click.option("--json", "json_output", is_flag=True, default=False, help="Output in JSON format.") # Added
+def status(hap_alias, verbose, json_output): # Modified
+    _status(hap_alias, verbose=verbose, json_output=json_output) # Modified
 
 
 @cli.command(short_help="Same as a status.")
 @click.argument("hap_alias", metavar="hap", required=False)
 @click.option("-v", "--verbose", is_flag=True, default=False)
-def show(hap_alias, verbose):
-    _status(hap_alias, verbose)
+@click.option("--json", "json_output", is_flag=True, default=False, help="Output in JSON format.") # Added
+def show(hap_alias, verbose, json_output): # Modified
+    _status(hap_alias, verbose=verbose, json_output=json_output) # Modified
 
 
-def _status(hap_alias: Optional[str] = None, verbose: bool = False):
+def _status(hap_alias: Optional[str] = None, verbose: bool = False, json_output: bool = False): # Modified
+    formatter_class = JSONFormatter if json_output else TableFormatter # Added
     if hap_alias is not None:
         hap = get_or_exit(hap_alias)
-        hapless.show(hap, verbose=verbose)
+        hapless.show(hap, verbose=verbose, formatter_class=formatter_class) # Modified
     else:
         haps = hapless.get_haps(accessible_only=False)
-        hapless.stats(haps, verbose=verbose)
+        hapless.stats(haps, verbose=verbose, formatter_class=formatter_class) # Modified
 
 
 @cli.command(short_help="Output logs for a hap.")

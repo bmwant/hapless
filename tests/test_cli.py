@@ -1,7 +1,24 @@
 from contextlib import ExitStack
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, MagicMock # Added MagicMock
+import json # Added json
+from hapless.hap import Status # Added Status
 
 from hapless import cli
+
+
+# Helper for Mock Hap Data (as per subtask description)
+def create_mock_hap_dict(hid, name, status_val, verbose=False, pid=123, cmd="sleep 1"):
+    data = {
+        'hid': str(hid), 'name': name, 'raw_name': name, 'pid': pid, 'cmd': cmd.split(),
+        'status': status_val, 'rc': 0 if status_val == Status.SUCCESS.value else None,
+        'runtime': '1 second', 'restarts': 0, 'active': status_val == Status.RUNNING.value,
+        'owner': 'testuser', 'start_time': '2023-01-01T00:00:00', 'end_time': None,
+        'stdout_path': f'/tmp/hapless/{hid}/stdout.log', 'stderr_path': f'/tmp/hapless/{hid}/stderr.log',
+        'path': f'/tmp/hapless/{hid}'
+    }
+    if verbose:
+        data.update({'cwd': '/tmp', 'ppid': 1, 'user': 'testuser', 'env': {'TEST': 'VAR'}})
+    return data
 
 
 def test_executable_invocation(runner):
@@ -31,7 +48,7 @@ def test_no_command_invokes_status(status_mock, runner):
     result = runner.invoke(cli.cli)
 
     assert result.exit_code == 0
-    status_mock.assert_called_once_with(None, verbose=False)
+    status_mock.assert_called_once_with(None, verbose=False, json_output=False) # Modified
 
 
 @patch("hapless.cli._status")
@@ -39,7 +56,7 @@ def test_show_command_invokes_status(status_mock, runner):
     result = runner.invoke(cli.cli, ["show", "hap-me"])
 
     assert result.exit_code == 0
-    status_mock.assert_called_once_with("hap-me", False)
+    status_mock.assert_called_once_with("hap-me", False, json_output=False) # Modified
 
 
 @patch("hapless.cli._status")
@@ -47,12 +64,12 @@ def test_status_command_invokes_status(status_mock, runner):
     result = runner.invoke(cli.cli, ["status", "hap-me"])
 
     assert result.exit_code == 0
-    status_mock.assert_called_once_with("hap-me", False)
+    status_mock.assert_called_once_with("hap-me", False, json_output=False) # Modified
 
 
 @patch("hapless.cli.get_or_exit")
 def test_logs_invocation(get_or_exit_mock, runner):
-    hap_mock = Mock()
+    hap_mock = MagicMock(spec=cli.Hap) # Using MagicMock for spec
     get_or_exit_mock.return_value = hap_mock
     with patch.object(runner.hapless, "logs") as logs_mock:
         result = runner.invoke(cli.cli, ["logs", "hap-me", "--follow"])
@@ -203,3 +220,145 @@ def test_rename_name_exists(get_or_exit_mock, runner):
         get_or_exit_mock.assert_called_once_with("hap-me")
         get_hap_mock.assert_called_once_with("new-hap-name")
         rename_mock.assert_not_called()
+
+
+# --- Tests for JSON Output ---
+
+@patch.object(cli.hapless, "get_haps")
+def test_status_json_output_multiple_haps(get_haps_mock, runner):
+    mock_hap1_data = create_mock_hap_dict(1, 'hap1', Status.RUNNING.value)
+    mock_hap2_data = create_mock_hap_dict(2, 'hap2', Status.SUCCESS.value)
+
+    mock_hap1 = MagicMock(spec=cli.Hap)
+    mock_hap1.to_dict.return_value = mock_hap1_data
+    mock_hap1.accessible = True # Assuming get_haps filters by accessible if not False
+
+    mock_hap2 = MagicMock(spec=cli.Hap)
+    mock_hap2.to_dict.return_value = mock_hap2_data
+    mock_hap2.accessible = True
+
+    get_haps_mock.return_value = [mock_hap1, mock_hap2]
+
+    result = runner.invoke(cli.cli, ["status", "--json"])
+    assert result.exit_code == 0
+
+    output_data = json.loads(result.output)
+    assert isinstance(output_data, list)
+    assert len(output_data) == 2
+    assert output_data[0]['name'] == 'hap1'
+    assert output_data[0]['status'] == Status.RUNNING.value
+    assert output_data[1]['name'] == 'hap2'
+    assert output_data[1]['status'] == Status.SUCCESS.value
+
+    mock_hap1.to_dict.assert_called_once_with(verbose=False)
+    mock_hap2.to_dict.assert_called_once_with(verbose=False)
+    get_haps_mock.assert_called_once_with(accessible_only=False) # _status calls get_haps with accessible_only=False
+
+
+@patch.object(cli, "get_or_exit") # Patching get_or_exit directly for single hap scenarios
+def test_status_json_output_single_hap(get_or_exit_mock, runner):
+    mock_hap1_data = create_mock_hap_dict(1, 'hap1', Status.RUNNING.value)
+    mock_hap1 = MagicMock(spec=cli.Hap)
+    mock_hap1.to_dict.return_value = mock_hap1_data
+    get_or_exit_mock.return_value = mock_hap1
+
+    result = runner.invoke(cli.cli, ["status", "hap1", "--json"])
+    assert result.exit_code == 0
+
+    output_data = json.loads(result.output)
+    assert isinstance(output_data, dict)
+    assert output_data['name'] == 'hap1'
+    assert output_data['status'] == Status.RUNNING.value
+    assert 'env' not in output_data # Simple by default
+
+    mock_hap1.to_dict.assert_called_once_with(verbose=False)
+    get_or_exit_mock.assert_called_once_with("hap1")
+
+
+@patch.object(cli, "get_or_exit")
+def test_status_json_output_single_hap_verbose(get_or_exit_mock, runner):
+    mock_hap1_data = create_mock_hap_dict(1, 'hap1', Status.RUNNING.value, verbose=True)
+    mock_hap1 = MagicMock(spec=cli.Hap)
+    mock_hap1.to_dict.return_value = mock_hap1_data
+    get_or_exit_mock.return_value = mock_hap1
+
+    result = runner.invoke(cli.cli, ["status", "hap1", "--json", "--verbose"])
+    assert result.exit_code == 0
+
+    output_data = json.loads(result.output)
+    assert isinstance(output_data, dict)
+    assert output_data['name'] == 'hap1'
+    assert output_data['status'] == Status.RUNNING.value
+    assert 'env' in output_data
+    assert output_data['env'] == {'TEST': 'VAR'}
+
+    mock_hap1.to_dict.assert_called_once_with(verbose=True)
+    get_or_exit_mock.assert_called_once_with("hap1")
+
+
+@patch.object(cli.hapless, "get_haps")
+def test_main_command_json_output(get_haps_mock, runner):
+    mock_hap1_data = create_mock_hap_dict(1, 'hap1', Status.RUNNING.value)
+    mock_hap2_data = create_mock_hap_dict(2, 'hap2', Status.STOPPED.value)
+
+    mock_hap1 = MagicMock(spec=cli.Hap)
+    mock_hap1.to_dict.return_value = mock_hap1_data
+    mock_hap1.accessible = True
+
+    mock_hap2 = MagicMock(spec=cli.Hap)
+    mock_hap2.to_dict.return_value = mock_hap2_data
+    mock_hap2.accessible = True
+
+    get_haps_mock.return_value = [mock_hap1, mock_hap2]
+
+    result = runner.invoke(cli.cli, ["--json"]) # Main command: hapless --json
+    assert result.exit_code == 0
+
+    output_data = json.loads(result.output)
+    assert isinstance(output_data, list)
+    assert len(output_data) == 2
+    assert output_data[0]['name'] == 'hap1'
+    assert output_data[1]['name'] == 'hap2'
+
+    mock_hap1.to_dict.assert_called_once_with(verbose=False) # Default no-command is not verbose
+    mock_hap2.to_dict.assert_called_once_with(verbose=False)
+    get_haps_mock.assert_called_once_with(accessible_only=False)
+
+
+@patch.object(cli, "get_or_exit")
+def test_show_json_output_single_hap(get_or_exit_mock, runner):
+    mock_hap1_data = create_mock_hap_dict(1, 'hap1', Status.RUNNING.value, verbose=False) # show default is not verbose
+    mock_hap1 = MagicMock(spec=cli.Hap)
+    mock_hap1.to_dict.return_value = mock_hap1_data
+    get_or_exit_mock.return_value = mock_hap1
+
+    result = runner.invoke(cli.cli, ["show", "hap1", "--json"])
+    assert result.exit_code == 0
+
+    output_data = json.loads(result.output)
+    assert isinstance(output_data, dict)
+    assert output_data['name'] == 'hap1'
+    assert 'env' not in output_data
+
+    mock_hap1.to_dict.assert_called_once_with(verbose=False) # show command's default verbose is False
+    get_or_exit_mock.assert_called_once_with("hap1")
+
+
+@patch.object(cli, "get_or_exit")
+def test_show_json_output_single_hap_verbose(get_or_exit_mock, runner):
+    mock_hap1_data = create_mock_hap_dict(1, 'hap1', Status.RUNNING.value, verbose=True)
+    mock_hap1 = MagicMock(spec=cli.Hap)
+    mock_hap1.to_dict.return_value = mock_hap1_data
+    get_or_exit_mock.return_value = mock_hap1
+
+    result = runner.invoke(cli.cli, ["show", "hap1", "--json", "--verbose"])
+    assert result.exit_code == 0
+
+    output_data = json.loads(result.output)
+    assert isinstance(output_data, dict)
+    assert output_data['name'] == 'hap1'
+    assert 'env' in output_data
+    assert output_data['env'] == mock_hap1_data['env']
+
+    mock_hap1.to_dict.assert_called_once_with(verbose=True)
+    get_or_exit_mock.assert_called_once_with("hap1")
