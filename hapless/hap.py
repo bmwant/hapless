@@ -263,6 +263,25 @@ class Hap(object):
             owner = f"{stat.st_uid}:{stat.st_gid}"
         return owner
 
+    def serialize(self) -> dict:
+        """
+        Serialize hap object into a dictionary.
+        """
+        return {
+            "hid": self.hid,
+            "name": self.name,
+            "pid": str(self.pid) if self.pid is not None else None,
+            "rc": str(self.rc) if self.rc is not None else None,
+            "cmd": self.cmd,
+            "status": self.status.value,
+            "runtime": self.runtime,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "restarts": str(self.restarts),
+            "stdout_file": str(self.stdout_path),
+            "stderr_file": str(self.stderr_path),
+        }
+
     def __str__(self) -> str:
         return f"#{self.hid} ({self.name})"
 

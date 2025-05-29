@@ -20,11 +20,6 @@ coverage-report:
 	@poetry run pytest --cov=hapless --cov-report=html tests
 
 
-.PHONY: isort
-isort:
-	@poetry run isort .
-
-
 .PHONY: format
 format:
 	@poetry run ruff format .

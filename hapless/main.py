@@ -11,6 +11,7 @@ from typing import Dict, List, Optional, Union
 import psutil
 
 from hapless import config
+from hapless.formatters import Formatter
 from hapless.hap import Hap, Status
 from hapless.ui import ConsoleUI
 from hapless.utils import kill_proc_tree, logger, wait_created
@@ -37,11 +38,11 @@ class Hapless:
         self._hapless_dir = hapless_dir
         logger.debug(f"Initialized within {self._hapless_dir} dir")
 
-    def stats(self, haps: List[Hap], verbose: bool = False):
-        self.ui.stats(haps, verbose=verbose)
+    def stats(self, haps: List[Hap], formatter: Formatter):
+        self.ui.stats(haps, formatter=formatter)
 
-    def show(self, hap: Hap, verbose: bool = False):
-        self.ui.show_one(hap, verbose=verbose)
+    def show(self, hap: Hap, formatter: Formatter):
+        self.ui.show_one(hap, formatter=formatter)
 
     @property
     def dir(self) -> Path:

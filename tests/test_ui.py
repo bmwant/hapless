@@ -1,8 +1,7 @@
-from hapless.hap import Status
+from hapless.formatters import TableFormatter
 from hapless.ui import ConsoleUI
 
 
-def test_get_status_text():
+def test_default_formatter_is_table():
     ui = ConsoleUI()
-    result = ui._get_status_text(Status.SUCCESS)
-    assert result.plain == "• success"
+    assert isinstance(ui.default_formatter, TableFormatter)

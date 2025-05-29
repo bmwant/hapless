@@ -31,7 +31,7 @@ def test_no_command_invokes_status(status_mock, runner):
     result = runner.invoke(cli.cli)
 
     assert result.exit_code == 0
-    status_mock.assert_called_once_with(None, verbose=False)
+    status_mock.assert_called_once_with(None, verbose=False, json_output=False)
 
 
 @patch("hapless.cli._status")
@@ -39,7 +39,7 @@ def test_show_command_invokes_status(status_mock, runner):
     result = runner.invoke(cli.cli, ["show", "hap-me"])
 
     assert result.exit_code == 0
-    status_mock.assert_called_once_with("hap-me", False)
+    status_mock.assert_called_once_with("hap-me", False, json_output=False)
 
 
 @patch("hapless.cli._status")
@@ -47,7 +47,15 @@ def test_status_command_invokes_status(status_mock, runner):
     result = runner.invoke(cli.cli, ["status", "hap-me"])
 
     assert result.exit_code == 0
-    status_mock.assert_called_once_with("hap-me", False)
+    status_mock.assert_called_once_with("hap-me", False, json_output=False)
+
+
+@patch("hapless.cli._status")
+def test_status_accepts_json_argument(status_mock, runner):
+    result = runner.invoke(cli.cli, ["status", "hap-me", "--json"])
+
+    assert result.exit_code == 0
+    status_mock.assert_called_once_with("hap-me", False, json_output=True)
 
 
 @patch("hapless.cli.get_or_exit")

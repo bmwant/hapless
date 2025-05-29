@@ -30,7 +30,7 @@ def test_create_hap(hapless):
     assert result.name.startswith("hap-")
 
 
-def test_create_hap_custom_hid(hapless):
+def test_create_hap_custom_hid(hapless: Hapless):
     result = hapless.create_hap(cmd="echo hello", hid="42", name="hap-name")
     assert result.cmd == "echo hello"
     assert result.hid == "42"

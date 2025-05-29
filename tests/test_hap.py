@@ -24,6 +24,8 @@ def test_random_name_generation():
 
 
 def test_unbound_hap(hap: Hap):
+    assert isinstance(hap.name, str)
+    assert hap.name.startswith("hap-")
     assert hap.pid is None
     assert hap.proc is None
     assert hap.rc is None
@@ -82,3 +84,20 @@ def test_hap_owner_unknown_uid(hap: Hap):
 
     with patch("pathlib.Path.stat", return_value=mocked_stat):
         assert hap.owner == "6249:6251"
+
+
+def test_serialize(hap: Hap):
+    serialized = hap.serialize()
+    assert isinstance(serialized, dict)
+    assert serialized["hid"] == hap.hid
+    assert serialized["name"] == hap.name
+    assert serialized["pid"] is None
+    assert serialized["rc"] is None
+    assert serialized["cmd"] == hap.cmd
+    assert serialized["status"] == hap.status.value
+    assert serialized["runtime"] == hap.runtime
+    assert serialized["start_time"] is None
+    assert serialized["end_time"] is None
+    assert serialized["restarts"] == str(hap.restarts)
+    assert serialized["stdout_file"] == str(hap.stdout_path)
+    assert serialized["stderr_file"] == str(hap.stderr_path)
