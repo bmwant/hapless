@@ -5,6 +5,7 @@ except ModuleNotFoundError:
     from importlib_metadata import version
 
 import abc
+import json
 from itertools import filterfalse
 from typing import List
 
@@ -163,5 +164,8 @@ class JSONFormatter(Formatter):
     Formats Hap objects as a valid JSON.
     """
 
-    def format(self, hap: Hap) -> str:
-        return "{}"
+    def format_one(self, hap: Hap) -> str:
+        return json.dumps(hap.serialize())
+
+    def format_list(self, haps: List[Hap]) -> str:
+        return ""
