@@ -168,4 +168,4 @@ class JSONFormatter(Formatter):
         return json.dumps(hap.serialize())
 
     def format_list(self, haps: List[Hap]) -> str:
-        return ""
+        return json.dumps([hap.serialize() for hap in haps])

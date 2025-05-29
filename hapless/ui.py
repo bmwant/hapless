@@ -32,7 +32,7 @@ class ConsoleUI:
             return
         formatter = formatter or self.default_formatter
         haps_data = formatter.format_list(haps)
-        self.console.print(haps_data)
+        self.console.print(haps_data, soft_wrap=True)
 
     def show_one(self, hap: Hap, formatter: Optional[Formatter] = None):
         formatter = formatter or self.default_formatter
