@@ -39,7 +39,7 @@ def test_show_command_invokes_status(status_mock, runner):
     result = runner.invoke(cli.cli, ["show", "hap-me"])
 
     assert result.exit_code == 0
-    status_mock.assert_called_once_with("hap-me", False, False)
+    status_mock.assert_called_once_with("hap-me", False, json_output=False)
 
 
 @patch("hapless.cli._status")
