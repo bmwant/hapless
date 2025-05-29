@@ -48,7 +48,7 @@ def cli(ctx, verbose: bool, json_output: bool):
     "--json", "json_output", is_flag=True, default=False, help="Output in JSON format."
 )
 def status(hap_alias: Optional[str], verbose: bool, json_output: bool):
-    _status(hap_alias, verbose)
+    _status(hap_alias, verbose, json_output=json_output)
 
 
 @cli.command(short_help="Same as a status.")
