@@ -10,6 +10,7 @@ from itertools import filterfalse
 from typing import List
 
 from rich import box
+from rich.console import Group, RenderableType
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
@@ -27,11 +28,11 @@ class Formatter(abc.ABC):
         self.verbose = verbose
 
     @abc.abstractmethod
-    def format_one(self, hap: Hap) -> str:
+    def format_one(self, hap: Hap) -> RenderableType:
         pass
 
     @abc.abstractmethod
-    def format_list(self, haps: List[Hap]) -> str:
+    def format_list(self, haps: List[Hap]) -> RenderableType:
         pass
 
 
@@ -47,7 +48,7 @@ class TableFormatter(Formatter):
         status_text.append(f" {status.value}")
         return status_text
 
-    def format_one(self, hap: Hap) -> str:
+    def format_one(self, hap: Hap) -> Group:
         status_table = Table(show_header=False, show_footer=False, box=box.SIMPLE)
 
         status_text = self._get_status_text(hap.status)
@@ -87,7 +88,7 @@ class TableFormatter(Formatter):
             title=f"Hap {config.ICON_HAP}{hap.hid}",
             subtitle=hap.name,
         )
-        # self.console.print(status_panel)
+        result = Group(status_panel)
 
         environ = hap.env
         if self.verbose and environ is not None:
@@ -104,10 +105,10 @@ class TableFormatter(Formatter):
                 subtitle=f"{len(environ)} items",
                 border_style=config.COLOR_MAIN,
             )
-            # self.console.print(env_panel)
-        return status_panel
+            result = Group(status_panel, env_panel)
+        return result
 
-    def format_list(self, haps: List[Hap]) -> str:
+    def format_list(self, haps: List[Hap]) -> Table:
         package_version = version(__package__)
         table = Table(
             show_header=True,
