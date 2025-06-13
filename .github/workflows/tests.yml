@@ -43,7 +43,7 @@ jobs:
       - name: Check codestyle with ruff
         if: ${{ always() }}
         run: |
-          poetry run ruff format --check .
+          poetry run ruff format --diff .
 
       - name: Lint code with ruff
         if: ${{ always() }}
