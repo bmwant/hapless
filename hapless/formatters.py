@@ -117,7 +117,7 @@ class TableFormatter(Formatter):
             caption_style="dim",
             caption_justify="right",
         )
-        table.add_column("#", style="dim", width=2)
+        table.add_column("#", style="dim", min_width=2)
         table.add_column("Name")
         table.add_column("PID")
         if self.verbose:
