@@ -19,7 +19,7 @@ Install git hooks for the automatic linting and code formatting with [pre-commit
 ```bash
 pre-commit install
 pre-commit run --all-files  # to initialize for the first time
-pre-commit run flake8  # run a hook individually
+pre-commit run ruff-check  # run a hook individually
 ```
 
 Enable extra logging
@@ -58,10 +58,8 @@ poetry version major  # choose one based on semver rules
 poetry build
 ```
 
-Upload package to GitHub and PyPI
+Building and uploading package to PyPI is done automatically by GitHub workflow on tag creating
 
 ```bash
-git tag -a v0.1.2 -m "Version 0.1.2"
-git push --tags
-poetry publish
+make tag
 ```
