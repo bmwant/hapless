@@ -131,7 +131,7 @@ def run(cmd, name, check):
     if not cmd_escaped:
         console.error("You have to provide a command to run")
         sys.exit(1)
-    hapless.run(cmd_escaped, name=name, check=check)
+    hapless.run_command(cmd_escaped, name=name, check=check)
 
 
 @cli.command(short_help="Pause a specific hap.")
