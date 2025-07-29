@@ -116,7 +116,7 @@ class Hapless:
         hap_dir.mkdir()
         return Hap(hap_dir, cmd=cmd, name=name)
 
-    def run_hap(self, hap: Hap):
+    def _run_hap_subprocess(self, hap: Hap):
         with open(hap.stdout_path, "w") as stdout_pipe, open(
             hap.stderr_path, "w"
         ) as stderr_pipe:
@@ -167,21 +167,37 @@ class Hapless:
             self.ui.error(f"Cannot resume. Hap {hap} is not suspended")
             sys.exit(1)
 
-    def run(
+    def run_hap(
+        self,
+        hap: Hap,
+        check: bool = False,
+    ) -> None:
+        """
+        Run hap in a separate process.
+        If `check` is True, it will check for fast failure and exit
+        if hap terminates too quickly.
+        """
+        pid = os.fork()
+        if pid == 0:
+            self._run_hap_subprocess(hap)
+        else:
+            if check:
+                self._check_fast_failure(hap)
+            sys.exit(0)
+
+    def run_command(
         self,
         cmd: str,
         hid: Optional[str] = None,
         name: Optional[str] = None,
         check: bool = False,
-    ):
+    ) -> None:
+        """
+        For the command provided create a hap and run it.
+        If `hid` or `name` is not provided, it will be generated automatically.
+        """
         hap = self.create_hap(cmd=cmd, hid=hid, name=name)
-        pid = os.fork()
-        if pid == 0:
-            self.run_hap(hap)
-        else:
-            if check:
-                self._check_fast_failure(hap)
-            sys.exit(0)
+        self.run_hap(hap, check=check)
 
     def logs(self, hap: Hap, stderr: bool = False, follow: bool = False):
         filepath = hap.stderr_path if stderr else hap.stdout_path
@@ -263,7 +279,7 @@ class Hapless:
         self._clean_one(hap_killed)
 
         name = f"{name}{config.RESTART_DELIM}{restarts + 1}"
-        self.run(cmd=cmd, hid=hid, name=name)
+        self.run_command(cmd=cmd, hid=hid, name=name)
 
     def rename_hap(self, hap: Hap, new_name: str):
         rich_text = (

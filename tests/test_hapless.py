@@ -116,3 +116,23 @@ def test_state_dir_is_overriden(tmpdir):
     hap = hapless.create_hap(cmd="echo hello", hid="42", name="hap-name")
     assert hap.path.parent == Path(custom_state_dir)
     assert hap.path == Path(custom_state_dir) / hap.hid
+
+
+def test_run_hap_invocation(hapless: Hapless):
+    hap = hapless.create_hap("echo test", name="hap-name")
+    with patch("os.fork", return_value=0) as fork_mock, patch.object(
+        hapless, "_run_hap_subprocess"
+    ) as run_hap_subprocess_mock, patch.object(
+        hapless, "_check_fast_failure"
+    ) as check_fast_failure_mock:
+        hapless.run_hap(hap)
+
+        fork_mock.assert_called_once()
+        run_hap_subprocess_mock.assert_called_once_with(hap)
+        check_fast_failure_mock.assert_not_called()
+
+
+def test_run_command_invocation(hapless: Hapless):
+    with patch.object(hapless, "run_hap") as run_hap_mock:
+        hapless.run_command("echo test")
+        run_hap_mock.assert_called_once()

@@ -81,28 +81,30 @@ def test_logs_stderr_invocation(get_or_exit_mock, runner):
 
 
 def test_run_invocation(runner):
-    with patch.object(runner.hapless, "run") as run_mock:
+    with patch.object(runner.hapless, "run_command") as run_command_mock:
         result = runner.invoke(cli.cli, ["run", "script", "--check"])
         assert result.exit_code == 0
-        run_mock.assert_called_once_with("script", name=None, check=True)
+        run_command_mock.assert_called_once_with("script", name=None, check=True)
 
 
 def test_run_invocation_with_arguments(runner):
-    with patch.object(runner.hapless, "run") as run_mock:
+    with patch.object(runner.hapless, "run_command") as run_command_mock:
         result = runner.invoke(
             cli.cli, ["run", "--check", "--", "script", "--script-param"]
         )
         assert result.exit_code == 0
-        run_mock.assert_called_once_with("script --script-param", name=None, check=True)
+        run_command_mock.assert_called_once_with(
+            "script --script-param", name=None, check=True
+        )
 
 
 def test_run_invocation_name_provided(runner):
-    with patch.object(runner.hapless, "run") as run_mock:
+    with patch.object(runner.hapless, "run_command") as run_command_mock:
         result = runner.invoke(
             cli.cli, ["run", "--name", "hap-name", "--", "script", "--script-param"]
         )
         assert result.exit_code == 0
-        run_mock.assert_called_once_with(
+        run_command_mock.assert_called_once_with(
             "script --script-param", name="hap-name", check=False
         )
 
@@ -110,10 +112,10 @@ def test_run_invocation_name_provided(runner):
 def test_run_invocation_same_name_provided(runner):
     name = "hap-name"
     cmd = "script"
-    with patch.object(runner.hapless, "run") as run_mock:
+    with patch.object(runner.hapless, "run_command") as run_command_mock:
         result_pass = runner.invoke(cli.cli, ["run", "--name", name, cmd])
         assert result_pass.exit_code == 0
-        run_mock.assert_called_once_with(
+        run_command_mock.assert_called_once_with(
             cmd,
             name=name,
             check=False,
@@ -124,15 +126,15 @@ def test_run_invocation_same_name_provided(runner):
         # call again with the same name
         result_fail = runner.invoke(cli.cli, ["run", "--name", name, cmd])
         assert result_fail.exit_code == 1
-        assert run_mock.call_count == 1
+        assert run_command_mock.call_count == 1
 
 
 def test_run_empty_invocation(runner):
-    with patch.object(runner.hapless, "run") as run_mock:
+    with patch.object(runner.hapless, "run_command") as run_command_mock:
         result = runner.invoke(cli.cli, "run  ")
         assert result.exit_code == 1
         assert "You have to provide a command to run" in result.output
-        assert not run_mock.called
+        assert not run_command_mock.called
 
 
 def test_clean_invocation(runner):
