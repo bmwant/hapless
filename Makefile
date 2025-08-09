@@ -32,7 +32,7 @@ lint:
 
 .PHONY: tag
 tag:
-	@VERSION=$(poetry version --short)
-	@git tag -a "v${VERSION}" -m "Version ${VERSION}"
-	@git push origin "v${VERSION}"
-	@echo "Created and pushed tag v${VERSION}"
+	@VERSION=$$(poetry version --short); \
+	git tag -a "v$$VERSION" -m "Version $$VERSION"; \
+	git push origin "v$$VERSION"; \
+	echo "Created and pushed tag v$$VERSION"
