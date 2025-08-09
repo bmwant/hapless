@@ -18,8 +18,13 @@ from hapless.utils import kill_proc_tree, logger, wait_created
 
 
 class Hapless:
-    def __init__(self, hapless_dir: Optional[Union[Path, str]] = None):
-        self.ui = ConsoleUI()
+    def __init__(
+        self,
+        hapless_dir: Optional[Union[Path, str]] = None,
+        *,
+        quiet: bool = False,
+    ):
+        self.ui = ConsoleUI(disable=quiet)
         user = getpass.getuser()
         default_dir = Path(tempfile.gettempdir()) / "hapless"
 
