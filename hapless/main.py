@@ -18,8 +18,13 @@ from hapless.utils import kill_proc_tree, logger, wait_created
 
 
 class Hapless:
-    def __init__(self, hapless_dir: Optional[Union[Path, str]] = None):
-        self.ui = ConsoleUI()
+    def __init__(
+        self,
+        hapless_dir: Optional[Union[Path, str]] = None,
+        *,
+        quiet: bool = False,
+    ):
+        self.ui = ConsoleUI(disable=quiet)
         user = getpass.getuser()
         default_dir = Path(tempfile.gettempdir()) / "hapless"
 
@@ -110,16 +115,20 @@ class Hapless:
         cmd: str,
         hid: Optional[str] = None,
         name: Optional[str] = None,
+        *,
+        redirect_stderr: bool = True,
     ) -> Hap:
         hid = hid or self._get_next_hap_id()
         hap_dir = self._hapless_dir / f"{hid}"
         hap_dir.mkdir()
-        return Hap(hap_dir, cmd=cmd, name=name)
+        return Hap(hap_dir, cmd=cmd, name=name, redirect_stderr=redirect_stderr)
 
     def _run_hap_subprocess(self, hap: Hap):
-        with open(hap.stdout_path, "w") as stdout_pipe, open(
-            hap.stderr_path, "w"
-        ) as stderr_pipe:
+        try:
+            stdout_pipe = open(hap.stdout_path, "w")
+            stderr_pipe = stdout_pipe
+            if hap.stderr_path != hap.stdout_path:
+                stderr_pipe = open(hap.stderr_path, "w")
             self.ui.print(f"{config.ICON_INFO} Launching", hap)
             shell_exec = os.getenv("SHELL")
             if shell_exec is not None:
@@ -137,10 +146,13 @@ class Hapless:
             hap.bind(pid)
 
             retcode = proc.wait()
+        finally:
+            stdout_pipe.close()
+            stderr_pipe.close()
 
-            # TODO: accessing private attribute, should be `set_rc` method
-            with open(hap._rc_file, "w") as rc_file:
-                rc_file.write(f"{retcode}")
+        # TODO: accessing private attribute, should be `set_rc` method
+        with open(hap._rc_file, "w") as rc_file:
+            rc_file.write(f"{retcode}")
 
     def _check_fast_failure(self, hap: Hap):
         if wait_created(hap._rc_file) and hap.rc != 0:
@@ -171,19 +183,26 @@ class Hapless:
         self,
         hap: Hap,
         check: bool = False,
+        *,
+        blocking: bool = False,
     ) -> None:
         """
         Run hap in a separate process.
         If `check` is True, it will check for fast failure and exit
         if hap terminates too quickly.
         """
+        if blocking:
+            # NOTE: this is for the testing purposes only
+            self._run_hap_subprocess(hap)
+            return
+
         pid = os.fork()
         if pid == 0:
             self._run_hap_subprocess(hap)
-        else:
-            if check:
-                self._check_fast_failure(hap)
-            sys.exit(0)
+            return
+
+        if check:
+            self._check_fast_failure(hap)
 
     def run_command(
         self,

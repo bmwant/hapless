@@ -22,9 +22,9 @@ from hapless import config
 from hapless.utils import allow_missing, get_mtime, logger
 
 
-# TODO: add unbound status for the hap without associated pid
 class Status(str, Enum):
     # Active statuses
+    UNBOUNDED = "unbound"
     PAUSED = "paused"
     RUNNING = "running"
     # Finished statuses
@@ -39,7 +39,10 @@ class Hap(object):
         *,
         name: Optional[str] = None,
         cmd: Optional[str] = None,
-    ):
+        stdout_filepath: Optional[Path] = None,
+        stderr_filepath: Optional[Path] = None,
+        redirect_stderr: bool = False,
+    ) -> None:
         if not hap_path.is_dir():
             raise ValueError(f"Path {hap_path} is not a directory")
 
@@ -51,6 +54,10 @@ class Hap(object):
         self._name_file = hap_path / "name"
         self._cmd_file = hap_path / "cmd"
         self._env_file = hap_path / "env"
+
+        self._stdout_path = stdout_filepath or (hap_path / "stdout.log")
+        self._stderr_path = stderr_filepath or (hap_path / "stderr.log")
+        self._redirect_stderr = redirect_stderr
 
         self._set_raw_name(name)
         self._set_cmd(cmd)
@@ -237,11 +244,11 @@ class Hap(object):
 
     @property
     def stdout_path(self) -> Path:
-        return self._hap_path / "stdout.log"
+        return self._stdout_path
 
     @property
     def stderr_path(self) -> Path:
-        return self._hap_path / "stderr.log"
+        return self._stdout_path if self._redirect_stderr else self._stderr_path
 
     @property
     def accessible(self) -> bool:

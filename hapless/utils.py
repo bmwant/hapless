@@ -2,6 +2,7 @@ import logging
 import os
 import shlex
 import signal
+import sys
 import time
 from functools import wraps
 from pathlib import Path
@@ -11,15 +12,6 @@ import click
 import psutil
 
 from hapless import config
-
-logging.disable(level=logging.CRITICAL)
-
-if config.DEBUG:
-    logging.disable(logging.NOTSET)
-    logging.basicConfig(level=logging.DEBUG)
-
-
-logger = logging.getLogger(__package__)
 
 
 def allow_missing(func):
@@ -96,3 +88,19 @@ def kill_proc_tree(pid, sig=signal.SIGKILL, include_parent=True):
 def get_mtime(path: Path) -> Optional[float]:
     if path.exists():
         return os.path.getmtime(path)
+
+
+def configure_logger(name: str = __package__) -> logging.Logger:
+    logger = logging.getLogger(name)
+    handler = logging.StreamHandler(sys.stdout)
+    level = logging.DEBUG if config.DEBUG else logging.CRITICAL
+    logger.setLevel(level)
+    handler.setLevel(level)
+    # https://docs.python.org/3/library/logging.html#logrecord-attributes
+    formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s:%(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
+
+
+logger = configure_logger()

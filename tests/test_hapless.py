@@ -6,12 +6,12 @@ import pytest
 from hapless.main import Hapless
 
 
-def test_get_next_hap_id(hapless):
+def test_get_next_hap_id(hapless: Hapless):
     result = hapless._get_next_hap_id()
     assert result == "1"
 
 
-def test_get_hap_dirs_empty(hapless):
+def test_get_hap_dirs_empty(hapless: Hapless):
     result = hapless._get_hap_dirs()
     assert result == []
 
@@ -21,7 +21,7 @@ def test_get_hap_dirs_with_hap(hapless, hap):
     assert result == [hap.hid]
 
 
-def test_create_hap(hapless):
+def test_create_hap(hapless: Hapless):
     result = hapless.create_hap("echo hello")
     assert result.cmd == "echo hello"
     assert result.hid == "1"
@@ -37,7 +37,7 @@ def test_create_hap_custom_hid(hapless: Hapless):
     assert result.name == "hap-name"
 
 
-def test_get_hap_works_with_restarts(hapless):
+def test_get_hap_works_with_restarts(hapless: Hapless):
     raw_name = "hap-name@2"
     hapless.create_hap(cmd="true", name=raw_name)
     hap = hapless.get_hap(hap_alias="hap-name")
@@ -50,7 +50,7 @@ def test_get_hap_works_with_restarts(hapless):
     assert no_hap is None
 
 
-def test_rename_hap_preserves_restarts(hapless):
+def test_rename_hap_preserves_restarts(hapless: Hapless):
     raw_name = "hap-name@3"
     hapless.create_hap(cmd="true", name=raw_name)
     hap = hapless.get_hap(hap_alias="hap-name")
@@ -70,7 +70,7 @@ def test_rename_hap_preserves_restarts(hapless):
     assert hap.raw_name == "hap-new-name@3"
 
 
-def test_get_haps_only_accessible(hapless):
+def test_get_haps_only_accessible(hapless: Hapless):
     hap1 = hapless.create_hap("true", name="hap1")
     hap2 = hapless.create_hap("true", name="hap2")  # noqa: F841
     hap3 = hapless.create_hap("true", name="hap3")  # noqa: F841
@@ -82,7 +82,7 @@ def test_get_haps_only_accessible(hapless):
         assert haps[0].name == hap1.name
 
 
-def test_get_haps_return_all_entries(hapless):
+def test_get_haps_return_all_entries(hapless: Hapless):
     hap1 = hapless.create_hap("true", name="hap1")
     hap2 = hapless.create_hap("true", name="hap2")  # noqa: F841
     hap3 = hapless.create_hap("true", name="hap3")  # noqa: F841
@@ -136,3 +136,27 @@ def test_run_command_invocation(hapless: Hapless):
     with patch.object(hapless, "run_hap") as run_hap_mock:
         hapless.run_command("echo test")
         run_hap_mock.assert_called_once()
+
+
+def test_redirect_stderr(hapless: Hapless):
+    hap = hapless.create_hap(
+        "python -c 'import sys; sys.stderr.write(\"redirected stderr\")'",
+        name="hap-stderr",
+        redirect_stderr=True,
+    )
+    assert hap.stderr_path == hap.stdout_path
+    assert hap._redirect_stderr is True
+    hapless.run_hap(hap, blocking=True)
+    assert hap.stdout_path.exists()
+    assert hap.stdout_path.read_text() == "redirected stderr"
+
+
+def test_same_handle_can_be_closed_twice(tmpdir):
+    filepath = Path(tmpdir) / "samehandle.log"
+    filepath.touch()
+    stdout_handle = filepath.open("w")
+    stderr_handle = stdout_handle
+    stdout_handle.close()
+    stderr_handle.close()
+    assert stdout_handle.closed
+    assert stderr_handle.closed
