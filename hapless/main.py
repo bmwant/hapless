@@ -125,9 +125,6 @@ class Hapless:
 
     def _run_hap_subprocess(self, hap: Hap):
         try:
-            # with open(hap.stdout_path, "w") as stdout_pipe, open(
-            #     hap.stderr_path, "w"
-            # ) as stderr_pipe:
             stdout_pipe = open(hap.stdout_path, "w")
             stderr_pipe = stdout_pipe
             if hap.stderr_path != hap.stdout_path:

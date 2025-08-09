@@ -149,3 +149,14 @@ def test_redirect_stderr(hapless: Hapless):
     hapless.run_hap(hap, blocking=True)
     assert hap.stdout_path.exists()
     assert hap.stdout_path.read_text() == "redirected stderr"
+
+
+def test_same_handle_can_be_closed_twice(tmpdir):
+    filepath = Path(tmpdir) / "samehandle.log"
+    filepath.touch()
+    stdout_handle = filepath.open("w")
+    stderr_handle = stdout_handle
+    stdout_handle.close()
+    stderr_handle.close()
+    assert stdout_handle.closed
+    assert stderr_handle.closed
