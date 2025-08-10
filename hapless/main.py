@@ -198,10 +198,12 @@ class Hapless:
 
         pid = os.fork()
         if pid == 0:
-            # NOTE: sole purpose of the child is to run a subprocess
+            logger.debug(f"Running subprocess in child with pid {os.getpid()}")
             self._run_hap_subprocess(hap)
+            # NOTE: sole purpose of the child is to run a subprocess
             sys.exit(0)
 
+        logger.debug(f"Parent process continues with pid {os.getpid()}")
         if check:
             self._check_fast_failure(hap)
 
