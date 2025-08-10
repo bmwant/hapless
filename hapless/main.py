@@ -198,8 +198,9 @@ class Hapless:
 
         pid = os.fork()
         if pid == 0:
+            # NOTE: sole purpose of the child is to run a subprocess
             self._run_hap_subprocess(hap)
-            return
+            sys.exit(0)
 
         if check:
             self._check_fast_failure(hap)

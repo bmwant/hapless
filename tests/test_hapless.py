@@ -119,8 +119,30 @@ def test_state_dir_is_overriden(tmpdir):
 
 
 def test_run_hap_invocation(hapless: Hapless):
+    """
+    Check child launches a subprocess and exits.
+    """
     hap = hapless.create_hap("echo test", name="hap-name")
     with patch("os.fork", return_value=0) as fork_mock, patch.object(
+        hapless, "_run_hap_subprocess"
+    ) as run_hap_subprocess_mock, patch.object(
+        hapless, "_check_fast_failure"
+    ) as check_fast_failure_mock:
+        with pytest.raises(SystemExit) as e:
+            hapless.run_hap(hap)
+        assert e.value.code == 0
+
+        fork_mock.assert_called_once()
+        run_hap_subprocess_mock.assert_called_once_with(hap)
+        check_fast_failure_mock.assert_not_called()
+
+
+def test_run_hap_parent_process(hapless: Hapless):
+    """
+    Check child launches a subprocess and exits.
+    """
+    hap = hapless.create_hap("echo test", name="hap-name")
+    with patch("os.fork", return_value=12345) as fork_mock, patch.object(
         hapless, "_run_hap_subprocess"
     ) as run_hap_subprocess_mock, patch.object(
         hapless, "_check_fast_failure"
@@ -128,8 +150,25 @@ def test_run_hap_invocation(hapless: Hapless):
         hapless.run_hap(hap)
 
         fork_mock.assert_called_once()
-        run_hap_subprocess_mock.assert_called_once_with(hap)
+        run_hap_subprocess_mock.assert_not_called()
         check_fast_failure_mock.assert_not_called()
+
+
+def test_run_hap_parent_process_with_check(hapless: Hapless):
+    """
+    Check child launches a subprocess and exits.
+    """
+    hap = hapless.create_hap("echo test", name="hap-name")
+    with patch("os.fork", return_value=12345) as fork_mock, patch.object(
+        hapless, "_run_hap_subprocess"
+    ) as run_hap_subprocess_mock, patch.object(
+        hapless, "_check_fast_failure"
+    ) as check_fast_failure_mock:
+        hapless.run_hap(hap, check=True)
+
+        fork_mock.assert_called_once()
+        run_hap_subprocess_mock.assert_not_called()
+        check_fast_failure_mock.assert_called_once_with(hap)
 
 
 def test_run_command_invocation(hapless: Hapless):

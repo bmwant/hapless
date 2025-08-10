@@ -24,7 +24,7 @@ from hapless.utils import allow_missing, get_mtime, logger
 
 class Status(str, Enum):
     # Active statuses
-    UNBOUNDED = "unbound"
+    UNBOUND = "unbound"
     PAUSED = "paused"
     RUNNING = "running"
     # Finished statuses
