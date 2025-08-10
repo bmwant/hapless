@@ -15,3 +15,12 @@ def test_long_hids_are_visible(capsys, hapless):
     captured = capsys.readouterr()
     assert long_hid in captured.out
     assert hap.name in captured.out
+
+
+def test_disabled(capsys):
+    ui = ConsoleUI(disable=True)
+    ui.print("This should not be printed")
+    ui.error("This should not be printed either")
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err == ""
