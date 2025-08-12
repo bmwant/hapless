@@ -214,3 +214,22 @@ def test_same_handle_can_be_closed_twice(tmpdir):
     stderr_handle.close()
     assert stdout_handle.closed
     assert stderr_handle.closed
+
+
+def test_spawn_is_used_instead_of_fork(hapless: Hapless):
+    hap = hapless.create_hap("echo spawn1", name="hap-spawn-1")
+    with patch("hapless.config.NO_FORK", True), patch.object(
+        hapless, "_wrap_subprocess"
+    ) as wrap_subprocess_mock, patch.object(
+        hapless, "_run_via_fork"
+    ) as run_fork_mock, patch.object(
+        hapless, "_run_via_spawn"
+    ) as run_spawn_mock, patch.object(
+        hapless, "_check_fast_failure"
+    ) as check_fast_failure_mock:
+        hapless.run_hap(hap)
+
+        run_spawn_mock.assert_called_once_with(hap)
+        wrap_subprocess_mock.assert_not_called()
+        run_fork_mock.assert_not_called()
+        check_fast_failure_mock.assert_not_called()
