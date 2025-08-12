@@ -26,3 +26,4 @@ TRUNCATE_LENGTH = 36
 RESTART_DELIM = "@"
 
 NO_FORK = bool(os.getenv("HAPLESS_NO_FORK", default=""))
+# TODO: redirect stderr by default

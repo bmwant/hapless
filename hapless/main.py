@@ -209,15 +209,22 @@ class Hapless:
             self._check_fast_failure(hap)
 
     def _run_via_spawn(self, hap: Hap) -> None:
-        if shutil.which("hapwrap") is None:
+        exec_path = shutil.which("hapwrap")
+        if exec_path is None:
             self.ui.error(
                 "Cannot find wrapper to run process. Please reinstall hapless"
             )
             sys.exit(1)
 
-        cmd = f"hapwrap {hap.hid}"
-        proc = subprocess.Popen(cmd)
+        proc = subprocess.Popen(
+            [f"{exec_path}", f"{hap.hid}"],
+            start_new_session=True,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
         logger.debug(f"Running subprocess in child with pid {proc.pid}")
+        logger.debug(f"Using wrapper located at {exec_path}")
 
     def _run_via_fork(self, hap: Hap) -> None:
         pid = os.fork()
