@@ -196,7 +196,7 @@ class Hapless:
             self._wrap_subprocess(hap)
             return
 
-        # TODO: or os.platform == win32
+        # TODO: or sys.platform == "win32"
         if config.NO_FORK:
             logger.debug("Forking is disabled, running using spawn via wrapper")
             self._run_via_spawn(hap)
