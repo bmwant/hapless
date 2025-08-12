@@ -16,8 +16,7 @@ def test_creation(tmpdir):
     assert hap1.name == "hap-one"
     assert hap2.name == "hap-two"
 
-    # TODO: fix this so it is unbound instead
-    assert hap1.status == Status.FAILED
+    assert hap1.status == Status.UNBOUND
 
 
 def test_quiet_mode(tmpdir, capsys):

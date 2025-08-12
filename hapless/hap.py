@@ -133,6 +133,10 @@ class Hap(object):
     # TODO: add extended status to show panel proc.status()
     @property
     def status(self) -> Status:
+        if self.pid is None and self.rc is None:
+            # No existing process or no return code from the finished one
+            return Status.UNBOUND
+
         proc = self.proc
         if proc is not None:
             if proc.status() == psutil.STATUS_STOPPED:

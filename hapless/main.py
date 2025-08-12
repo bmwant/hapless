@@ -123,7 +123,7 @@ class Hapless:
         hap_dir.mkdir()
         return Hap(hap_dir, cmd=cmd, name=name, redirect_stderr=redirect_stderr)
 
-    def _run_hap_subprocess(self, hap: Hap):
+    def _wrap_subprocess(self, hap: Hap):
         try:
             stdout_pipe = open(hap.stdout_path, "w")
             stderr_pipe = stdout_pipe
@@ -193,19 +193,46 @@ class Hapless:
         """
         if blocking:
             # NOTE: this is for the testing purposes only
-            self._run_hap_subprocess(hap)
+            self._wrap_subprocess(hap)
             return
 
-        pid = os.fork()
-        if pid == 0:
-            logger.debug(f"Running subprocess in child with pid {os.getpid()}")
-            self._run_hap_subprocess(hap)
-            # NOTE: sole purpose of the child is to run a subprocess
-            sys.exit(0)
+        # TODO: or sys.platform == "win32"
+        if config.NO_FORK:
+            logger.debug("Forking is disabled, running using spawn via wrapper")
+            self._run_via_spawn(hap)
+        else:
+            logger.debug("Running hap using fork")
+            self._run_via_fork(hap)
 
         logger.debug(f"Parent process continues with pid {os.getpid()}")
         if check:
             self._check_fast_failure(hap)
+
+    def _run_via_spawn(self, hap: Hap) -> None:
+        exec_path = shutil.which("hapwrap")
+        if exec_path is None:
+            self.ui.error(
+                "Cannot find wrapper to run process. Please reinstall hapless"
+            )
+            sys.exit(1)
+
+        proc = subprocess.Popen(
+            [f"{exec_path}", f"{hap.hid}"],
+            start_new_session=True,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        logger.debug(f"Running subprocess in child with pid {proc.pid}")
+        logger.debug(f"Using wrapper located at {exec_path}")
+
+    def _run_via_fork(self, hap: Hap) -> None:
+        pid = os.fork()
+        if pid == 0:
+            logger.debug(f"Running subprocess in child with pid {os.getpid()}")
+            self._wrap_subprocess(hap)
+            # NOTE: sole purpose of the child is to run a subprocess
+            sys.exit(0)
 
     def run_command(
         self,
