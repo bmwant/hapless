@@ -3,9 +3,14 @@ from typing import Optional
 
 import click
 
-from hapless import config
+from hapless.cli_utils import (
+    console,
+    get_or_exit,
+    hap_argument,
+    hap_argument_optional,
+    hapless,
+)
 from hapless.formatters import JSONFormatter, TableFormatter
-from hapless.main import Hapless
 from hapless.utils import validate_signal
 
 try:
@@ -13,20 +18,6 @@ try:
 except ImportError:
     # Fallback for Python 3.7
     from hapless.utils import shlex_join_backport as shlex_join
-
-hapless = Hapless(hapless_dir=config.HAPLESS_DIR)
-console = hapless.ui
-
-
-def get_or_exit(hap_alias: str):
-    hap = hapless.get_hap(hap_alias)
-    if hap is None:
-        console.error(f"No such hap: {hap_alias}")
-        sys.exit(1)
-    if not hap.accessible:
-        console.error(f"Cannot manage hap launched by another user. Owner: {hap.owner}")
-        sys.exit(1)
-    return hap
 
 
 @click.group(invoke_without_command=True)
@@ -42,7 +33,7 @@ def cli(ctx, verbose: bool, json_output: bool):
 
 
 @cli.command(short_help="Display information about haps.")
-@click.argument("hap_alias", metavar="hap", required=False)
+@hap_argument_optional
 @click.option("-v", "--verbose", is_flag=True, default=False)
 @click.option(
     "--json", "json_output", is_flag=True, default=False, help="Output in JSON format."
@@ -52,7 +43,7 @@ def status(hap_alias: Optional[str], verbose: bool, json_output: bool):
 
 
 @cli.command(short_help="Same as a status.")
-@click.argument("hap_alias", metavar="hap", required=False)
+@hap_argument_optional
 @click.option("-v", "--verbose", is_flag=True, default=False)
 @click.option(
     "--json", "json_output", is_flag=True, default=False, help="Output in JSON format."
@@ -77,10 +68,10 @@ def _status(
 
 
 @cli.command(short_help="Output logs for a hap.")
-@click.argument("hap_alias", metavar="hap")
+@hap_argument
 @click.option("-f", "--follow", is_flag=True, default=False)
 @click.option("-e", "--stderr", is_flag=True, default=False)
-def logs(hap_alias, follow, stderr):
+def logs(hap_alias: str, follow, stderr):
     hap = get_or_exit(hap_alias)
     hapless.logs(hap, stderr=stderr, follow=follow)
 
@@ -135,23 +126,23 @@ def run(cmd, name, check):
 
 
 @cli.command(short_help="Pause a specific hap.")
-@click.argument("hap_alias", metavar="hap")
-def pause(hap_alias):
+@hap_argument
+def pause(hap_alias: str):
     hap = get_or_exit(hap_alias)
     hapless.pause_hap(hap)
 
 
 @cli.command(short_help="Resume execution of a paused hap.")
-@click.argument("hap_alias", metavar="hap")
-def resume(hap_alias):
+@hap_argument
+def resume(hap_alias: str):
     hap = get_or_exit(hap_alias)
     hapless.resume_hap(hap)
 
 
 @cli.command(short_help="Terminate a specific hap / all haps.")
-@click.argument("hap_alias", metavar="hap", required=False)
+@hap_argument_optional
 @click.option("-a", "--all", "killall", is_flag=True, default=False)
-def kill(hap_alias, killall):
+def kill(hap_alias: Optional[str], killall):
     if hap_alias is not None and killall:
         raise click.BadOptionUsage(
             "killall", "Cannot use --all flag while hap id provided"
@@ -169,22 +160,22 @@ def kill(hap_alias, killall):
 
 
 @cli.command(short_help="Send an arbitrary signal to a hap.")
-@click.argument("hap_alias", metavar="hap")
+@hap_argument
 @click.argument("signal", callback=validate_signal, metavar="signal-code")
-def signal(hap_alias, signal):
+def signal(hap_alias: str, signal):
     hap = get_or_exit(hap_alias)
     hapless.signal(hap, signal)
 
 
 @cli.command(short_help="Kills the hap and starts it again.")
-@click.argument("hap_alias", metavar="hap", required=True)
-def restart(hap_alias):
+@hap_argument
+def restart(hap_alias: str):
     hap = get_or_exit(hap_alias)
     hapless.restart(hap)
 
 
 @cli.command(short_help="Sets new name/alias for the existing hap.")
-@click.argument("hap_alias", metavar="hap", required=True)
+@hap_argument
 @click.argument("new_name", metavar="new-name", required=True)
 def rename(hap_alias: str, new_name: str):
     hap = get_or_exit(hap_alias)

@@ -24,3 +24,5 @@ FAILFAST_DELAY = 2
 DATETIME_FORMAT = "%H:%M:%S %Y/%m/%d"
 TRUNCATE_LENGTH = 36
 RESTART_DELIM = "@"
+
+NO_FORK = bool(os.getenv("HAPLESS_NO_FORK", default=""))
