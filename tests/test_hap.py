@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from hapless.hap import Hap
+from hapless.hap import Hap, Status
 
 
 def all_equal(iterable):
@@ -30,7 +30,7 @@ def test_unbound_hap(hap: Hap):
     assert hap.proc is None
     assert hap.rc is None
     assert hap.cmd == "false"
-    assert hap.status == "failed"
+    assert hap.status == Status.UNBOUND
     assert hap.env is None
     assert hap.restarts == 0
     assert not hap.active

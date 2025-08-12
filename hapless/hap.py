@@ -134,6 +134,10 @@ class Hap(object):
     @property
     def status(self) -> Status:
         proc = self.proc
+        if proc is None and self.rc is None:
+            # No existing process or no return code from the finished one
+            return Status.UNBOUND
+
         if proc is not None:
             if proc.status() == psutil.STATUS_STOPPED:
                 return Status.PAUSED
