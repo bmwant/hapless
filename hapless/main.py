@@ -220,8 +220,8 @@ class Hapless:
             [f"{exec_path}", f"{hap.hid}"],
             start_new_session=True,
             stdin=subprocess.DEVNULL,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
         logger.debug(f"Running subprocess in child with pid {proc.pid}")
         logger.debug(f"Using wrapper located at {exec_path}")
