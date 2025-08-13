@@ -193,16 +193,15 @@ def test_run_command_invocation(hapless: Hapless):
 
 
 def test_redirect_stderr(hapless: Hapless):
-    hap = hapless.create_hap(
-        "python -c 'import sys; sys.stderr.write(\"redirected stderr\")'",
-        name="hap-stderr",
-        redirect_stderr=True,
-    )
-    assert hap.stderr_path == hap.stdout_path
-    assert hap._redirect_stderr is True
-    hapless.run_hap(hap, blocking=True)
-    assert hap.stdout_path.exists()
-    assert hap.stdout_path.read_text() == "redirected stderr"
+    with patch("hapless.config.REDIRECT_STDERR", True):
+        hap = hapless.create_hap(
+            "python -c 'import sys; sys.stderr.write(\"redirected stderr\")'",
+            name="hap-stderr",
+        )
+        assert hap.stderr_path == hap.stdout_path
+        hapless.run_hap(hap, blocking=True)
+        assert hap.stdout_path.exists()
+        assert hap.stdout_path.read_text() == "redirected stderr"
 
 
 def test_same_handle_can_be_closed_twice(tmpdir):

@@ -115,13 +115,11 @@ class Hapless:
         cmd: str,
         hid: Optional[str] = None,
         name: Optional[str] = None,
-        *,
-        redirect_stderr: bool = True,
     ) -> Hap:
         hid = hid or self._get_next_hap_id()
         hap_dir = self._hapless_dir / f"{hid}"
         hap_dir.mkdir()
-        return Hap(hap_dir, cmd=cmd, name=name, redirect_stderr=redirect_stderr)
+        return Hap(hap_dir, cmd=cmd, name=name)
 
     def _wrap_subprocess(self, hap: Hap):
         try:
