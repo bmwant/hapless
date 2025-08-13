@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from hapless import Hap, Hapless, Status
+from hapless import Hap, Hapless, Status, config
 
 
 def test_creation(tmpdir):
@@ -32,3 +32,24 @@ def test_quiet_mode(tmpdir, capsys):
     assert e.value.code == 1
     assert captured.out == ""
     assert captured.err == ""
+
+
+def test_can_set_redirection_via_config(hapless: Hapless):
+    """
+    Check that quiet mode suppresses output.
+    """
+    config.REDIRECT_STDERR = True
+    hap = hapless.create_hap(
+        cmd="python -c 'import sys; sys.stderr.write(\"redirected stderr\")'",
+        name="hap-stderr",
+    )
+
+    assert hap.stderr_path == hap.stdout_path
+    hapless.run_hap(hap, blocking=True)
+    assert hap.stdout_path.exists()
+    assert hap.stdout_path.read_text() == "redirected stderr"
+
+    hap_reread = hapless.get_hap(hap.hid)
+    assert hap_reread is not None
+    assert hap_reread.stderr_path == hap_reread.stdout_path
+    assert not hap_reread._stderr_path.exists()
