@@ -36,7 +36,7 @@ def test_quiet_mode(tmpdir, capsys):
 
 def test_can_set_redirection_via_config(hapless: Hapless):
     """
-    Check that quiet mode suppresses output.
+    Test that redirection can be set programmatically when using Hapless interface.
     """
     config.REDIRECT_STDERR = True
     hap = hapless.create_hap(
