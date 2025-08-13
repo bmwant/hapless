@@ -325,6 +325,12 @@ class Hapless:
         while hap_killed.active:
             hap_killed = self.get_hap(hid)
 
+        rc_exists = wait_created(hap_killed._rc_file, timeout=1)
+        if not rc_exists:
+            logger.error(
+                f"{hap_killed} process was killed, but parent did not write return code"
+            )
+
         self._clean_one(hap_killed)
 
         name = f"{name}{config.RESTART_DELIM}{restarts + 1}"
