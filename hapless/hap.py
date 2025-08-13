@@ -99,7 +99,10 @@ class Hap(object):
 
         environ = {}
         if proc is not None:
-            environ = proc.environ()
+            try:
+                environ = proc.environ()
+            except (ProcessLookupError, psutil.NoSuchProcess) as e:
+                logger.error(f"Cannot get environment: {e}")
 
         if not environ:
             logger.warning(
@@ -113,7 +116,7 @@ class Hap(object):
 
     def bind(self, pid: int):
         """
-        Associate hap object with existing process by pid
+        Associate hap object with existing process by pid.
         """
         try:
             self._set_pid(pid)
