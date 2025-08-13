@@ -52,4 +52,4 @@ jobs:
 
       - name: Run unittests
         run: |
-          poetry run pytest -sv tests
+          poetry run pytest -sv -W error tests

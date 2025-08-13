@@ -116,7 +116,7 @@ class Hap(object):
 
     def bind(self, pid: int):
         """
-        Associate hap object with existing process by pid
+        Associate hap object with existing process by pid.
         """
         try:
             self._set_pid(pid)
