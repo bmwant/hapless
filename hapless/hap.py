@@ -101,7 +101,7 @@ class Hap(object):
         if proc is not None:
             try:
                 environ = proc.environ()
-            except ProcessLookupError as e:
+            except (ProcessLookupError, psutil.NoSuchProcess) as e:
                 logger.error(f"Cannot get environment: {e}")
 
         if not environ:
