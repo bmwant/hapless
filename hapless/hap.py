@@ -41,7 +41,6 @@ class Hap(object):
         cmd: Optional[str] = None,
         stdout_filepath: Optional[Path] = None,
         stderr_filepath: Optional[Path] = None,
-        redirect_stderr: bool = False,
     ) -> None:
         if not hap_path.is_dir():
             raise ValueError(f"Path {hap_path} is not a directory")
@@ -57,7 +56,6 @@ class Hap(object):
 
         self._stdout_path = stdout_filepath or (hap_path / "stdout.log")
         self._stderr_path = stderr_filepath or (hap_path / "stderr.log")
-        self._redirect_stderr = redirect_stderr
 
         self._set_raw_name(name)
         self._set_cmd(cmd)
@@ -255,7 +253,9 @@ class Hap(object):
 
     @property
     def stderr_path(self) -> Path:
-        return self._stdout_path if self._redirect_stderr else self._stderr_path
+        if config.REDIRECT_STDERR:
+            return self._stdout_path
+        return self._stderr_path
 
     @property
     def accessible(self) -> bool:
