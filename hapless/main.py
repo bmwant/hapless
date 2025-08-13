@@ -263,7 +263,7 @@ class Hapless:
         haps = list(filter(filter_haps, self.get_haps()))
         for hap in haps:
             logger.debug(f"Removing {hap.path}")
-            shutil.rmtree(hap.path)
+            shutil.rmtree(hap.path, ignore_errors=True)
         return len(haps)
 
     def _clean_one(self, hap: Hap):
@@ -328,7 +328,8 @@ class Hapless:
         rc_exists = wait_created(hap_killed._rc_file, timeout=1)
         if not rc_exists:
             logger.error(
-                f"{hap_killed} process was killed, but parent did not write return code"
+                f"Hap {hap_killed} process was killed, "
+                f"but parent did not write return code"
             )
 
         self._clean_one(hap_killed)
