@@ -9,18 +9,14 @@ from hapless.hap import Hap
 
 class ConsoleUI:
     def __init__(self, disable: bool = False) -> None:
-        self.console = Console(highlight=False)
+        self.console = Console(highlight=False, quiet=disable)
         self.default_formatter = TableFormatter()
         self.disable = disable
 
     def print(self, *args, **kwargs):
-        if self.disable:
-            return
         return self.console.print(*args, **kwargs)
 
     def error(self, message: str):
-        if self.disable:
-            return
         return self.console.print(
             f"{config.ICON_INFO} {message}",
             style=f"{config.COLOR_ERROR} bold",

@@ -252,6 +252,22 @@ def test_redirect_toggling_via_env_value(hapless: Hapless):
     assert hap3.stdout_path.read_text() == "redirected stderr3"
 
 
+def test_redirect_state_is_not_affected_after_creation(hapless: Hapless):
+    hap = hapless.create_hap(
+        cmd="python -c 'import sys; sys.stderr.write(\"redirected stderr\")'",
+        name="hap-redirect",
+        redirect_stderr=True,
+    )
+
+    with patch("hapless.config.REDIRECT_STDERR", False):
+        hapless.run_hap(hap, blocking=True)
+
+        assert hap.redirect_stderr is True
+        assert hap.stdout_path == hap.stderr_path
+        assert hap.stdout_path.exists()
+        assert hap.stdout_path.read_text() == "redirected stderr"
+
+
 def test_same_handle_can_be_closed_twice(tmpdir):
     filepath = Path(tmpdir) / "samehandle.log"
     filepath.touch()

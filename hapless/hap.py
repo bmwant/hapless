@@ -306,6 +306,9 @@ class Hap(object):
     def __str__(self) -> str:
         return f"#{self.hid} ({self.name})"
 
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__} {self} object at {hex(id(self))}>"
+
     def __rich__(self) -> str:
         pid_text = f"with PID [[{config.COLOR_MAIN} bold]{self.pid}[/]]"
         rich_text = (
