@@ -27,6 +27,4 @@ RESTART_DELIM = "@"
 
 NO_FORK = bool(os.getenv("HAPLESS_NO_FORK", default=""))
 
-# NOTE: this property is not stored on individual haps, so will produce
-# different results when changed between invocations
 REDIRECT_STDERR = bool(os.getenv("HAPLESS_REDIRECT_STDERR", default=""))

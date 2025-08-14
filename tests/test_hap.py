@@ -1,4 +1,5 @@
 import getpass
+import os
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -35,8 +36,9 @@ def test_unbound_hap(hap: Hap):
     assert hap.restarts == 0
     assert not hap.active
 
-    assert not hap.stdout_path.exists()
-    assert not hap.stderr_path.exists()
+    assert hap.stdout_path.exists()
+    # NOTE: this file behaves as a flag, if it exists we do not want to redirect stderr
+    assert hap.stderr_path.exists()
     assert hap.start_time is None
     assert hap.end_time is None
 
@@ -73,8 +75,11 @@ def test_raw_name(tmp_path):
 
 
 def test_hap_inaccessible(hap: Hap):
-    with patch("os.utime", side_effect=PermissionError):
+    with patch("os.access", return_value=False) as access_mock:
         assert hap.accessible is False
+        access_mock.assert_called_once_with(
+            hap.path, os.F_OK | os.R_OK | os.W_OK | os.X_OK
+        )
 
 
 def test_hap_owner_unknown_uid(hap: Hap):

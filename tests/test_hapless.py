@@ -76,8 +76,12 @@ def test_get_haps_only_accessible(hapless: Hapless):
     hap3 = hapless.create_hap("true", name="hap3")  # noqa: F841
 
     # NOTE: order is guaranteed, so we can rely on this side effect
-    with patch("os.utime", side_effect=(None, PermissionError, PermissionError)):
+    with patch(
+        "os.access",
+        side_effect=(True, False, False),
+    ) as access_mock:
         haps = hapless.get_haps()
+        assert access_mock.call_count == 3
         assert len(haps) == 1
         assert haps[0].name == hap1.name
 
@@ -87,12 +91,15 @@ def test_get_haps_return_all_entries(hapless: Hapless):
     hap2 = hapless.create_hap("true", name="hap2")  # noqa: F841
     hap3 = hapless.create_hap("true", name="hap3")  # noqa: F841
 
-    with patch("os.utime", side_effect=PermissionError):
+    with patch("os.access", return_value=False) as access_mock:
         haps = hapless.get_haps(accessible_only=False)
+        # filter function just ignores accessible attribute
+        access_mock.assert_not_called()
         assert len(haps) == 3
         assert hap1.accessible is False
         assert hap2.accessible is False
         assert hap3.accessible is False
+        assert access_mock.call_count == 3
 
 
 def test_state_dir_is_not_accessible(tmpdir, capsys):
