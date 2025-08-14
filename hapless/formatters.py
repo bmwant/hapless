@@ -42,7 +42,7 @@ class TableFormatter(Formatter):
     """
 
     def _get_status_text(self, status: Status) -> Text:
-        color = config.STATUS_COLORS.get(status)
+        color = config.STATUS_COLORS.get(status, "dim")
         status_text = Text()
         status_text.append(config.ICON_STATUS, style=color)
         status_text.append(f" {status.value}")
@@ -68,7 +68,11 @@ class TableFormatter(Formatter):
             status_table.add_row("Parent PID:", f"{proc.ppid()}")
             status_table.add_row("User:", f"{proc.username()}")
 
-        if self.verbose:
+        if self.verbose and hap.redirect_stderr:
+            # Paths are the same, show one line only
+            status_table.add_row("Logs file:", f"{hap.stdout_path}")
+
+        if self.verbose and not hap.redirect_stderr:
             status_table.add_row("Stdout file:", f"{hap.stdout_path}")
             status_table.add_row("Stderr file:", f"{hap.stderr_path}")
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hapless"
-version = "0.9.3"
+version = "0.9.4"
 description = "Run and track processes in background"
 authors = ["Misha Behersky <bmwant@gmail.com>"]
 license = "MIT"
@@ -80,6 +80,7 @@ extend-select = [
 [tool.pytest.ini_options]
 env = [
     "HAPLESS_NO_FORK=",
+    "HAPLESS_REDIRECT_STDERR=",
 ]
 
 [build-system]

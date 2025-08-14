@@ -39,8 +39,6 @@ class Hap(object):
         *,
         name: Optional[str] = None,
         cmd: Optional[str] = None,
-        stdout_filepath: Optional[Path] = None,
-        stderr_filepath: Optional[Path] = None,
         redirect_stderr: bool = False,
     ) -> None:
         if not hap_path.is_dir():
@@ -55,10 +53,10 @@ class Hap(object):
         self._cmd_file = hap_path / "cmd"
         self._env_file = hap_path / "env"
 
-        self._stdout_path = stdout_filepath or (hap_path / "stdout.log")
-        self._stderr_path = stderr_filepath or (hap_path / "stderr.log")
-        self._redirect_stderr = redirect_stderr
+        self._stdout_path = hap_path / "stdout.log"
+        self._stderr_path = hap_path / "stderr.log"
 
+        self._set_logfiles(redirect_stderr)
         self._set_raw_name(name)
         self._set_cmd(cmd)
 
@@ -93,6 +91,11 @@ class Hap(object):
 
         if not psutil.pid_exists(pid):
             raise RuntimeError(f"Process with pid {pid} is gone")
+
+    def _set_logfiles(self, redirect_stderr: bool):
+        if not self._stdout_path.exists() and not redirect_stderr:
+            self._stderr_path.touch(exist_ok=True, mode=0o644)
+        self._stdout_path.touch(exist_ok=True, mode=0o644)
 
     def _set_env(self):
         proc = self.proc
@@ -255,18 +258,22 @@ class Hap(object):
 
     @property
     def stderr_path(self) -> Path:
-        return self._stdout_path if self._redirect_stderr else self._stderr_path
+        if self.redirect_stderr:
+            return self._stdout_path
+        return self._stderr_path
+
+    @property
+    def redirect_stderr(self) -> bool:
+        return not self._stderr_path.exists()
 
     @property
     def accessible(self) -> bool:
         """
         Check if current user has control over the hap.
+        NOTE: EAFP is preferable here instead
+        https://docs.python.org/3/library/os.html#os.access
         """
-        try:
-            os.utime(self.path)
-            return True
-        except PermissionError:
-            return False
+        return os.access(self.path, os.F_OK | os.R_OK | os.W_OK | os.X_OK)
 
     @property
     def owner(self) -> str:
@@ -298,6 +305,9 @@ class Hap(object):
 
     def __str__(self) -> str:
         return f"#{self.hid} ({self.name})"
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__} {self} object at {hex(id(self))}>"
 
     def __rich__(self) -> str:
         pid_text = f"with PID [[{config.COLOR_MAIN} bold]{self.pid}[/]]"

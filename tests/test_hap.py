@@ -1,10 +1,15 @@
 import getpass
+import os
+import re
+from io import StringIO
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+from rich.console import Console
 
 from hapless.hap import Hap, Status
+from hapless.main import Hapless
 
 
 def all_equal(iterable):
@@ -35,8 +40,9 @@ def test_unbound_hap(hap: Hap):
     assert hap.restarts == 0
     assert not hap.active
 
-    assert not hap.stdout_path.exists()
-    assert not hap.stderr_path.exists()
+    assert hap.stdout_path.exists()
+    # NOTE: this file behaves as a flag, if it exists we do not want to redirect stderr
+    assert hap.stderr_path.exists()
     assert hap.start_time is None
     assert hap.end_time is None
 
@@ -73,8 +79,11 @@ def test_raw_name(tmp_path):
 
 
 def test_hap_inaccessible(hap: Hap):
-    with patch("os.utime", side_effect=PermissionError):
+    with patch("os.access", return_value=False) as access_mock:
         assert hap.accessible is False
+        access_mock.assert_called_once_with(
+            hap.path, os.F_OK | os.R_OK | os.W_OK | os.X_OK
+        )
 
 
 def test_hap_owner_unknown_uid(hap: Hap):
@@ -101,3 +110,26 @@ def test_serialize(hap: Hap):
     assert serialized["restarts"] == str(hap.restarts)
     assert serialized["stdout_file"] == str(hap.stdout_path)
     assert serialized["stderr_file"] == str(hap.stderr_path)
+
+
+def test_represent_unbound_hap(hapless: Hapless, capsys):
+    hap = hapless.create_hap("echo print", name="hap-print")
+    assert f"{hap}" == "#1 (hap-print)"
+    # default is <hapless.hap.Hap object at 0x103960440>
+    # <Hap #1 (hap-print) object at 0x102abc4e5>
+    repr_pattern = r"<Hap #1 \(hap-print\) object at 0x[0-9a-f]+>"
+    assert re.match(repr_pattern, repr(hap))
+
+    # Test rich representation
+    buffer = StringIO()
+    test_console = Console(
+        file=buffer,
+        force_terminal=True,
+        color_system="truecolor",
+    )
+    test_console.print(hap)
+    result = buffer.getvalue().strip()
+    assert (
+        result
+        == "hap ⚡️\x1b[1;36m1\x1b[0m \x1b[1m(\x1b[0m\x1b[1;38;2;253;202;64mhap-print\x1b[0m\x1b[1m)\x1b[0m"
+    )

@@ -116,18 +116,20 @@ class Hapless:
         hid: Optional[str] = None,
         name: Optional[str] = None,
         *,
-        redirect_stderr: bool = True,
+        redirect_stderr: Optional[bool] = None,
     ) -> Hap:
         hid = hid or self._get_next_hap_id()
         hap_dir = self._hapless_dir / f"{hid}"
         hap_dir.mkdir()
+        if redirect_stderr is None:
+            redirect_stderr = config.REDIRECT_STDERR
         return Hap(hap_dir, cmd=cmd, name=name, redirect_stderr=redirect_stderr)
 
     def _wrap_subprocess(self, hap: Hap):
         try:
             stdout_pipe = open(hap.stdout_path, "w")
             stderr_pipe = stdout_pipe
-            if hap.stderr_path != hap.stdout_path:
+            if not hap.redirect_stderr:
                 stderr_pipe = open(hap.stderr_path, "w")
             self.ui.print(f"{config.ICON_INFO} Launching", hap)
             shell_exec = os.getenv("SHELL")

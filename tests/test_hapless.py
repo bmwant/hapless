@@ -76,8 +76,12 @@ def test_get_haps_only_accessible(hapless: Hapless):
     hap3 = hapless.create_hap("true", name="hap3")  # noqa: F841
 
     # NOTE: order is guaranteed, so we can rely on this side effect
-    with patch("os.utime", side_effect=(None, PermissionError, PermissionError)):
+    with patch(
+        "os.access",
+        side_effect=(True, False, False),
+    ) as access_mock:
         haps = hapless.get_haps()
+        assert access_mock.call_count == 3
         assert len(haps) == 1
         assert haps[0].name == hap1.name
 
@@ -87,12 +91,15 @@ def test_get_haps_return_all_entries(hapless: Hapless):
     hap2 = hapless.create_hap("true", name="hap2")  # noqa: F841
     hap3 = hapless.create_hap("true", name="hap3")  # noqa: F841
 
-    with patch("os.utime", side_effect=PermissionError):
+    with patch("os.access", return_value=False) as access_mock:
         haps = hapless.get_haps(accessible_only=False)
+        # filter function just ignores accessible attribute
+        access_mock.assert_not_called()
         assert len(haps) == 3
         assert hap1.accessible is False
         assert hap2.accessible is False
         assert hap3.accessible is False
+        assert access_mock.call_count == 3
 
 
 def test_state_dir_is_not_accessible(tmpdir, capsys):
@@ -193,16 +200,72 @@ def test_run_command_invocation(hapless: Hapless):
 
 
 def test_redirect_stderr(hapless: Hapless):
+    with patch("hapless.config.REDIRECT_STDERR", True):
+        hap = hapless.create_hap(
+            "python -c 'import sys; sys.stderr.write(\"redirected stderr\")'",
+            name="hap-stderr",
+        )
+        assert hap.stderr_path == hap.stdout_path
+        hapless.run_hap(hap, blocking=True)
+        assert hap.stdout_path.exists()
+        assert hap.stdout_path.read_text() == "redirected stderr"
+
+
+def test_redirect_toggling_via_env_value(hapless: Hapless):
+    with patch("hapless.config.REDIRECT_STDERR", True):
+        hap1 = hapless.create_hap(
+            cmd="python -c 'import sys; sys.stderr.write(\"redirected stderr1\")'",
+            name="hap1-stderr",
+        )
+    with patch("hapless.config.REDIRECT_STDERR", False):
+        hap2 = hapless.create_hap(
+            cmd="python -c 'import sys; sys.stderr.write(\"not redirected stderr2\")'",
+            name="hap2-stderr",
+        )
+    with patch("hapless.config.REDIRECT_STDERR", True):
+        hap3 = hapless.create_hap(
+            cmd="python -c 'import sys; sys.stderr.write(\"redirected stderr3\")'",
+            name="hap3-stderr",
+        )
+
+    assert hap1.redirect_stderr is True
+    assert hap2.redirect_stderr is False
+    assert hap3.redirect_stderr is True
+
+    # Run all three haps
+    hapless.run_hap(hap1, blocking=True)
+    hapless.run_hap(hap2, blocking=True)
+    hapless.run_hap(hap3, blocking=True)
+
+    assert hap1.stdout_path == hap1.stderr_path
+    assert hap1.stdout_path.exists()
+    assert hap1.stdout_path.read_text() == "redirected stderr1"
+
+    assert hap2.stdout_path != hap2.stderr_path
+    assert hap2.stdout_path.exists()
+    assert hap2.stderr_path.exists()
+    assert hap2.stdout_path.read_text() == ""
+    assert hap2.stderr_path.read_text() == "not redirected stderr2"
+
+    assert hap3.stdout_path == hap3.stderr_path
+    assert hap3.stdout_path.exists()
+    assert hap3.stdout_path.read_text() == "redirected stderr3"
+
+
+def test_redirect_state_is_not_affected_after_creation(hapless: Hapless):
     hap = hapless.create_hap(
-        "python -c 'import sys; sys.stderr.write(\"redirected stderr\")'",
-        name="hap-stderr",
+        cmd="python -c 'import sys; sys.stderr.write(\"redirected stderr\")'",
+        name="hap-redirect",
         redirect_stderr=True,
     )
-    assert hap.stderr_path == hap.stdout_path
-    assert hap._redirect_stderr is True
-    hapless.run_hap(hap, blocking=True)
-    assert hap.stdout_path.exists()
-    assert hap.stdout_path.read_text() == "redirected stderr"
+
+    with patch("hapless.config.REDIRECT_STDERR", False):
+        hapless.run_hap(hap, blocking=True)
+
+        assert hap.redirect_stderr is True
+        assert hap.stdout_path == hap.stderr_path
+        assert hap.stdout_path.exists()
+        assert hap.stdout_path.read_text() == "redirected stderr"
 
 
 def test_same_handle_can_be_closed_twice(tmpdir):
