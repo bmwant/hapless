@@ -211,6 +211,47 @@ def test_redirect_stderr(hapless: Hapless):
         assert hap.stdout_path.read_text() == "redirected stderr"
 
 
+def test_redirect_toggling_via_env_value(hapless: Hapless):
+    with patch("hapless.config.REDIRECT_STDERR", True):
+        hap1 = hapless.create_hap(
+            cmd="python -c 'import sys; sys.stderr.write(\"redirected stderr1\")'",
+            name="hap1-stderr",
+        )
+    with patch("hapless.config.REDIRECT_STDERR", False):
+        hap2 = hapless.create_hap(
+            cmd="python -c 'import sys; sys.stderr.write(\"not redirected stderr2\")'",
+            name="hap2-stderr",
+        )
+    with patch("hapless.config.REDIRECT_STDERR", True):
+        hap3 = hapless.create_hap(
+            cmd="python -c 'import sys; sys.stderr.write(\"redirected stderr3\")'",
+            name="hap3-stderr",
+        )
+
+    assert hap1.redirect_stderr is True
+    assert hap2.redirect_stderr is False
+    assert hap3.redirect_stderr is True
+
+    # Run all three haps
+    hapless.run_hap(hap1, blocking=True)
+    hapless.run_hap(hap2, blocking=True)
+    hapless.run_hap(hap3, blocking=True)
+
+    assert hap1.stdout_path == hap1.stderr_path
+    assert hap1.stdout_path.exists()
+    assert hap1.stdout_path.read_text() == "redirected stderr1"
+
+    assert hap2.stdout_path != hap2.stderr_path
+    assert hap2.stdout_path.exists()
+    assert hap2.stderr_path.exists()
+    assert hap2.stdout_path.read_text() == ""
+    assert hap2.stderr_path.read_text() == "not redirected stderr2"
+
+    assert hap3.stdout_path == hap3.stderr_path
+    assert hap3.stdout_path.exists()
+    assert hap3.stdout_path.read_text() == "redirected stderr3"
+
+
 def test_same_handle_can_be_closed_twice(tmpdir):
     filepath = Path(tmpdir) / "samehandle.log"
     filepath.touch()

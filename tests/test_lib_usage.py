@@ -98,7 +98,3 @@ def test_toggling_redirect_state(hapless: Hapless):
     haps = hapless.get_haps()
     redirects = list(map(operator.attrgetter("redirect_stderr"), haps))
     assert redirects == [True, False, True]
-
-
-def test_toggling_redirect_via_env_value(hapless: Hapless):
-    pass
