@@ -49,8 +49,10 @@ class timed(object):
 
 
 def wait_created(
-    path: Path, interval: float = 0.1, timeout: float = config.FAILFAST_DELAY
-):
+    path: Path,
+    interval: float = 0.1,
+    timeout: float = config.FAILFAST_DELAY,
+) -> bool:
     start = time.time()
     while not path.exists() and time.time() - start < timeout:
         time.sleep(interval)

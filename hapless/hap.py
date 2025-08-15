@@ -93,6 +93,8 @@ class Hap(object):
             raise RuntimeError(f"Process with pid {pid} is gone")
 
     def _set_logfiles(self, redirect_stderr: bool):
+        if redirect_stderr:
+            logger.debug("Process stderr will be redirected to stdout file")
         if not self._stdout_path.exists() and not redirect_stderr:
             self._stderr_path.touch(exist_ok=True, mode=0o644)
         self._stdout_path.touch(exist_ok=True, mode=0o644)
