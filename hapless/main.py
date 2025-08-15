@@ -330,7 +330,6 @@ class Hapless:
             hap.restarts,
             hap.redirect_stderr,
         )
-
         if hap.active:
             self.kill([hap], verbose=False)
 

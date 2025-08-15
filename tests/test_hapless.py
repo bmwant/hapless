@@ -280,6 +280,35 @@ def test_redirect_state_is_not_affected_after_creation(hapless: Hapless):
         assert hap.stdout_path.read_text() == "redirected stderr"
 
 
+@pytest.mark.parametrize("redirect_stderr", [True, False])
+def test_restart_preservers_redirect_state(hapless: Hapless, redirect_stderr: bool):
+    hap = hapless.create_hap(
+        cmd="doesnotexist",
+        name="hap-redirect-state",
+        redirect_stderr=redirect_stderr,
+    )
+    hid = hap.hid
+    assert hap.redirect_stderr is redirect_stderr
+
+    with patch.object(hapless, "kill") as kill_mock, patch.object(
+        hapless, "get_hap", return_value=hap
+    ) as get_hap_mock, patch(
+        "hapless.main.wait_created",
+        return_value=True,
+    ) as wait_created_mock, patch.object(hapless, "run_command") as run_command_mock:
+        hapless.restart(hap)
+
+        kill_mock.assert_not_called()
+        get_hap_mock.assert_called_once_with(hid)
+        wait_created_mock.assert_called_once_with(ANY, timeout=1)
+        run_command_mock.assert_called_once_with(
+            cmd="doesnotexist",
+            hid=hid,
+            name="hap-redirect-state@1",
+            redirect_stderr=redirect_stderr,
+        )
+
+
 def test_same_handle_can_be_closed_twice(tmpdir):
     filepath = Path(tmpdir) / "samehandle.log"
     filepath.touch()
