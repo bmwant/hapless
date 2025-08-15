@@ -263,12 +263,15 @@ class Hapless:
                 style=f"{config.COLOR_MAIN} bold",
             )
             return subprocess.run(["tail", "-f", filepath])
-        else:
-            self.ui.print(
-                f"{config.ICON_INFO} Showing logs at {filepath}",
-                style=f"{config.COLOR_MAIN} bold",
-            )
-            return subprocess.run(["cat", filepath])
+
+        text = filepath.read_text()
+        if not text:
+            return
+        self.ui.print(
+            f"{config.ICON_INFO} Showing logs at {filepath}",
+            style=f"{config.COLOR_MAIN} bold",
+        )
+        self.ui.print_plain(text)
 
     def _clean_haps(self, filter_haps) -> int:
         haps = list(filter(filter_haps, self.get_haps()))

@@ -16,6 +16,17 @@ class ConsoleUI:
     def print(self, *args, **kwargs):
         return self.console.print(*args, **kwargs)
 
+    def print_plain(self, text: str):
+        return self.console.print(
+            text,
+            markup=False,
+            highlight=False,
+            emoji=False,
+            no_wrap=True,
+            overflow="ignore",
+            crop=False,
+        )
+
     def error(self, message: str):
         return self.console.print(
             f"{config.ICON_INFO} {message}",
