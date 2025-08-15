@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import ANY, Mock, patch
 
 import pytest
 
@@ -196,7 +196,19 @@ def test_run_hap_parent_process_with_check(hapless: Hapless):
 def test_run_command_invocation(hapless: Hapless):
     with patch.object(hapless, "run_hap") as run_hap_mock:
         hapless.run_command("echo test")
-        run_hap_mock.assert_called_once()
+        run_hap_mock.assert_called_once_with(ANY, check=False, blocking=False)
+
+
+def test_run_command_accepts_redirect_stderr_parameter(hapless: Hapless):
+    hap_mock = Mock()
+    with patch.object(hapless, "run_hap") as run_hap_mock, patch.object(
+        hapless, "create_hap", return_value=hap_mock
+    ) as create_hap_mock:
+        hapless.run_command("echo redirect", redirect_stderr=True)
+        create_hap_mock.assert_called_once_with(
+            cmd="echo redirect", hid=None, name=None, redirect_stderr=True
+        )
+        run_hap_mock.assert_called_once_with(hap_mock, check=False, blocking=False)
 
 
 def test_redirect_stderr(hapless: Hapless):
