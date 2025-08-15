@@ -242,13 +242,18 @@ class Hapless:
         hid: Optional[str] = None,
         name: Optional[str] = None,
         check: bool = False,
+        *,
+        redirect_stderr: Optional[bool] = None,
+        blocking: bool = False,
     ) -> None:
         """
         For the command provided create a hap and run it.
         If `hid` or `name` is not provided, it will be generated automatically.
         """
-        hap = self.create_hap(cmd=cmd, hid=hid, name=name)
-        self.run_hap(hap, check=check)
+        hap = self.create_hap(
+            cmd=cmd, hid=hid, name=name, redirect_stderr=redirect_stderr
+        )
+        self.run_hap(hap, check=check, blocking=blocking)
 
     def logs(self, hap: Hap, stderr: bool = False, follow: bool = False):
         filepath = hap.stderr_path if stderr else hap.stdout_path
@@ -317,8 +322,14 @@ class Hapless:
         else:
             self.ui.error("Cannot send signal to the inactive hap")
 
-    def restart(self, hap: Hap):
-        hid, name, cmd, restarts = hap.hid, hap.name, hap.cmd, hap.restarts
+    def restart(self, hap: Hap) -> None:
+        hid, name, cmd, restarts, redirect_stderr = (
+            hap.hid,
+            hap.name,
+            hap.cmd,
+            hap.restarts,
+            hap.redirect_stderr,
+        )
 
         if hap.active:
             self.kill([hap], verbose=False)
@@ -337,7 +348,7 @@ class Hapless:
         self._clean_one(hap_killed)
 
         name = f"{name}{config.RESTART_DELIM}{restarts + 1}"
-        self.run_command(cmd=cmd, hid=hid, name=name)
+        self.run_command(cmd=cmd, hid=hid, name=name, redirect_stderr=redirect_stderr)
 
     def rename_hap(self, hap: Hap, new_name: str):
         rich_text = (
