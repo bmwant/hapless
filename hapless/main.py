@@ -266,7 +266,9 @@ class Hapless:
 
         text = filepath.read_text()
         if not text:
+            self.ui.error("No logs found")
             return
+
         self.ui.print(
             f"{config.ICON_INFO} Showing logs at {filepath}",
             style=f"{config.COLOR_MAIN} bold",
