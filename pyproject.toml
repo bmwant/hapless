@@ -47,6 +47,10 @@ django-environ = [
     { version = "^0.10.0", python = "<3.9", optional = true },
     { version = "^0.12.0", python = ">=3.9", optional = true },
 ]
+structlog = [
+    { version = "^22.3.0", python = "<3.8", optional = true },
+    { version = "^25.4.0", python = ">=3.8", optional = true },
+]
 
 [tool.poetry.extras]
 dev = [

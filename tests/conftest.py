@@ -27,4 +27,4 @@ def hap(tmpdir) -> Generator[Hap, None, None]:
 
 @pytest.fixture
 def hapless(tmpdir) -> Generator[Hapless, None, None]:
-    yield Hapless(hapless_dir=Path(tmpdir))
+    yield Hapless(hapless_dir=Path(tmpdir), quiet=True)
