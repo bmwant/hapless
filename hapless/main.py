@@ -225,6 +225,7 @@ class Hapless:
     def _run_via_fork(self, hap: Hap) -> None:
         pid = os.fork()
         if pid == 0:
+            os.setsid()
             logger.debug(f"Running subprocess in child with pid {os.getpid()}")
             self._wrap_subprocess(hap)
             # NOTE: sole purpose of the child is to run a subprocess

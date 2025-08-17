@@ -88,8 +88,8 @@ extend-select = [
 
 [tool.pytest.ini_options]
 env = [
-    "HAPLESS_NO_FORK=",
-    "HAPLESS_REDIRECT_STDERR=",
+    "HAPLESS_NO_FORK=false",
+    "HAPLESS_REDIRECT_STDERR=false",
 ]
 
 [build-system]

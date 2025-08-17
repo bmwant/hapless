@@ -1,13 +1,13 @@
-import os
+from pathlib import Path
+from typing import Optional
 
 import environ
 
 env = environ.Env()
 
 DEBUG = env.bool("HAPLESS_DEBUG", default=False)
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-HAPLESS_DIR = os.getenv("HAPLESS_DIR")
+HAPLESS_DIR: Optional[Path] = env("HAPLESS_DIR", cast=Path, default=None)
 
 COLOR_MAIN = "#fdca40"
 COLOR_ACCENT = "#3aaed8"
