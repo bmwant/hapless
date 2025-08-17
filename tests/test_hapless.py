@@ -130,7 +130,9 @@ def test_run_hap_invocation(hapless: Hapless):
     Check child launches a subprocess and exits.
     """
     hap = hapless.create_hap("echo test", name="hap-name")
-    with patch("os.fork", return_value=0) as fork_mock, patch.object(
+    with patch("os.fork", return_value=0) as fork_mock, patch(
+        "os.setsid"
+    ) as setsid_mock, patch.object(
         hapless, "_wrap_subprocess"
     ) as wrap_subprocess_mock, patch.object(
         hapless, "_check_fast_failure"
@@ -139,7 +141,8 @@ def test_run_hap_invocation(hapless: Hapless):
             hapless.run_hap(hap)
         assert e.value.code == 0
 
-        fork_mock.assert_called_once()
+        fork_mock.assert_called_once_with()
+        setsid_mock.assert_called_once_with()
         wrap_subprocess_mock.assert_called_once_with(hap)
         check_fast_failure_mock.assert_not_called()
 
