@@ -157,11 +157,13 @@ class Hapless:
             rc_file.write(f"{retcode}")
 
     def _check_fast_failure(self, hap: Hap):
-        if wait_created(hap._rc_file) and hap.rc != 0:
+        # breakpoint()
+        if wait_created(hap._rc_file, console=self.ui.console) and hap.rc != 0:
             self.ui.error("Hap exited too quickly. stderr message:")
             with open(hap.stderr_path) as f:
                 self.ui.print(f.read())
             sys.exit(1)
+        self.ui.print("Successy")
 
     def pause_hap(self, hap: Hap):
         proc = hap.proc

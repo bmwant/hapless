@@ -158,7 +158,7 @@ files = [
 name = "django-environ"
 version = "0.10.0"
 description = "A package that allows you to utilize 12factor inspired environment variables to configure your Django application."
-optional = true
+optional = false
 python-versions = ">=3.5,<4"
 files = [
     {file = "django-environ-0.10.0.tar.gz", hash = "sha256:b3559a91439c9d774a9e0c1ced872364772c612cdf6dc919506a2b13f7a77225"},
@@ -174,7 +174,7 @@ testing = ["coverage[toml] (>=5.0a4)", "pytest (>=4.6.11)"]
 name = "django-environ"
 version = "0.12.0"
 description = "A package that allows you to utilize 12factor inspired environment variables to configure your Django application."
-optional = true
+optional = false
 python-versions = "<4,>=3.9"
 files = [
     {file = "django_environ-0.12.0-py2.py3-none-any.whl", hash = "sha256:92fb346a158abda07ffe6eb23135ce92843af06ecf8753f43adf9d2366dcc0ca"},
@@ -541,7 +541,7 @@ files = [
 name = "structlog"
 version = "22.3.0"
 description = "Structured Logging for Python"
-optional = true
+optional = false
 python-versions = ">=3.7"
 files = [
     {file = "structlog-22.3.0-py3-none-any.whl", hash = "sha256:b403f344f902b220648fa9f286a23c0cc5439a5844d271fec40562dbadbc70ad"},
@@ -562,7 +562,7 @@ typing = ["mypy", "rich", "twisted"]
 name = "structlog"
 version = "25.4.0"
 description = "Structured Logging for Python"
-optional = true
+optional = false
 python-versions = ">=3.8"
 files = [
     {file = "structlog-25.4.0-py3-none-any.whl", hash = "sha256:fe809ff5c27e557d14e613f45ca441aabda051d119ee5a0102aaba6ce40eed2c"},
@@ -635,4 +635,4 @@ dev = ["pytest", "pytest-cov", "pytest-env", "pytest-env", "ruff"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7"
-content-hash = "0b09e1a205d90a4262a30021abc311c1e7d8f66a3011987dae7bb1fadd08f936"
+content-hash = "0a8dfe76a0388a9387e0f63c90452119256f2315095de7aa16fcdd2f341f846d"

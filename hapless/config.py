@@ -1,9 +1,13 @@
 import os
 
-DEBUG = bool(os.getenv("HAPLESS_DEBUG", default=""))
+import environ
+
+env = environ.Env()
+
+DEBUG = env.bool("HAPLESS_DEBUG", default=False)
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-HAPLESS_DIR = os.getenv("HAPLESS_DIR")
+HAPLESS_DIR = env.path("HAPLESS_DIR")
 
 COLOR_MAIN = "#fdca40"
 COLOR_ACCENT = "#3aaed8"
@@ -20,11 +24,11 @@ ICON_INFO = "🧲"
 ICON_STATUS = "•"
 ICON_KILLED = "💀"
 
-FAILFAST_DELAY = 2
+FAILFAST_DELAY = 5
 DATETIME_FORMAT = "%H:%M:%S %Y/%m/%d"
 TRUNCATE_LENGTH = 36
 RESTART_DELIM = "@"
 
-NO_FORK = bool(os.getenv("HAPLESS_NO_FORK", default=""))
+NO_FORK = env.bool("HAPLESS_NO_FORK", default=False)
 
-REDIRECT_STDERR = bool(os.getenv("HAPLESS_REDIRECT_STDERR", default=""))
+REDIRECT_STDERR = env.bool("HAPLESS_REDIRECT_STDERR", default=False)

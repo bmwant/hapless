@@ -10,6 +10,9 @@ from typing import Optional
 
 import click
 import psutil
+from rich.live import Live
+from rich.spinner import Spinner
+from rich.text import Text
 
 from hapless import config
 
@@ -52,10 +55,22 @@ def wait_created(
     path: Path,
     interval: float = 0.1,
     timeout: float = config.FAILFAST_DELAY,
+    *,
+    console=None,
 ) -> bool:
     start = time.time()
-    while not path.exists() and time.time() - start < timeout:
-        time.sleep(interval)
+    with Live(console=console) as live:
+        elapsed = time.time() - start
+        while not path.exists() and time.time() - start < timeout:
+            spinner = Spinner(
+                "dots",
+                text=Text(
+                    f"waiting {int(elapsed)}s", style=f"bold {config.COLOR_MAIN}"
+                ),
+                style=f"bold {config.COLOR_MAIN}",
+            )
+            live.update(spinner)
+            time.sleep(interval)
     return path.exists()
 
 
