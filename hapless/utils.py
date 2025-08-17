@@ -4,13 +4,13 @@ import shlex
 import signal
 import sys
 import time
+from contextlib import nullcontext
 from functools import wraps
 from pathlib import Path
 from typing import Optional
 
 import click
 import psutil
-from rich.live import Live
 from rich.spinner import Spinner
 from rich.text import Text
 
@@ -51,25 +51,32 @@ class timed(object):
         return self
 
 
+class dummy_live(nullcontext):
+    def update(self, *args, **kwargs):
+        pass
+
+
 def wait_created(
     path: Path,
     interval: float = 0.1,
-    timeout: float = config.FAILFAST_DELAY,
+    timeout: float = config.FAILFAST_TIMEOUT,
     *,
-    console=None,
+    live_context=dummy_live(),
 ) -> bool:
     start = time.time()
-    with Live(console=console) as live:
-        elapsed = time.time() - start
-        while not path.exists() and time.time() - start < timeout:
+    with live_context:
+        elapsed = 0
+        while not path.exists() and elapsed < timeout:
+            elapsed = time.time() - start
             spinner = Spinner(
                 "dots",
-                text=Text(
-                    f"waiting {int(elapsed)}s", style=f"bold {config.COLOR_MAIN}"
+                text=Text.from_markup(
+                    f"checking process health for "
+                    f"[bold {config.COLOR_MAIN}]{int(timeout - elapsed)}s[/]..."
                 ),
-                style=f"bold {config.COLOR_MAIN}",
+                style=f"{config.COLOR_MAIN}",
             )
-            live.update(spinner)
+            live_context.update(spinner)
             time.sleep(interval)
     return path.exists()
 
