@@ -152,9 +152,7 @@ class Hapless:
             stdout_pipe.close()
             stderr_pipe.close()
 
-        # TODO: accessing private attribute, should be `set_rc` method
-        with open(hap._rc_file, "w") as rc_file:
-            rc_file.write(f"{retcode}")
+        hap.set_return_code(retcode)
 
     def _check_fast_failure(self, hap: Hap):
         timeout = config.FAILFAST_TIMEOUT
