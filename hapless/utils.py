@@ -2,7 +2,6 @@ import logging
 import os
 import shlex
 import signal
-import sys
 import time
 from contextlib import nullcontext
 from functools import wraps
@@ -11,6 +10,7 @@ from typing import Optional
 
 import click
 import psutil
+import structlog
 from rich.spinner import Spinner
 from rich.text import Text
 
@@ -114,16 +114,10 @@ def get_mtime(path: Path) -> Optional[float]:
         return os.path.getmtime(path)
 
 
-def configure_logger(name: str = __package__) -> logging.Logger:
-    logger = logging.getLogger(name)
-    handler = logging.StreamHandler(sys.stdout)
+def configure_logger() -> logging.Logger:
+    logger = structlog.get_logger()
     level = logging.DEBUG if config.DEBUG else logging.CRITICAL
-    logger.setLevel(level)
-    handler.setLevel(level)
-    # https://docs.python.org/3/library/logging.html#logrecord-attributes
-    formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s:%(message)s")
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(level))
     return logger
 
 

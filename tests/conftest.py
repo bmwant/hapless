@@ -1,12 +1,23 @@
+import logging
 from pathlib import Path
 from typing import Generator
 from unittest.mock import patch
 
 import pytest
+import structlog
 from click.testing import CliRunner
+from structlog import testing
 
 from hapless.hap import Hap
 from hapless.main import Hapless
+
+
+class LogCapture(testing.LogCapture):
+    @property
+    def text(self) -> str:
+        return "\n".join(
+            f"{entry['log_level'].upper()}: {entry['event']}" for entry in self.entries
+        )
 
 
 @pytest.fixture
@@ -28,3 +39,13 @@ def hap(tmpdir) -> Generator[Hap, None, None]:
 @pytest.fixture
 def hapless(tmpdir) -> Generator[Hapless, None, None]:
     yield Hapless(hapless_dir=Path(tmpdir), quiet=True)
+
+
+@pytest.fixture(name="log_output")
+def structlog_log_output():
+    log_capture = LogCapture()
+    structlog.configure(
+        processors=[log_capture],
+        wrapper_class=structlog.make_filtering_bound_logger(logging.DEBUG),
+    )
+    return log_capture
