@@ -26,7 +26,7 @@ TARGET_VERSIONS_AVAILABLE = poetry_python_versions()
 @nox.session(python=TARGET_VERSIONS_AVAILABLE)
 def test(session: nox.Session) -> None:
     # session.install(".")
-    session.install("-e", ".[dev]")
+    session.install(".[dev]")
     session.run("pytest", "tests")
 
 
