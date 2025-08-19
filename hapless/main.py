@@ -113,6 +113,7 @@ class Hapless:
     def create_hap(
         self,
         cmd: str,
+        workdir: Optional[Union[str, Path]] = None,
         hid: Optional[str] = None,
         name: Optional[str] = None,
         *,
@@ -123,7 +124,15 @@ class Hapless:
         hap_dir.mkdir()
         if redirect_stderr is None:
             redirect_stderr = config.REDIRECT_STDERR
-        return Hap(hap_dir, cmd=cmd, name=name, redirect_stderr=redirect_stderr)
+        if workdir is None or not Path(workdir).exists():
+            workdir = os.getcwd()
+        return Hap(
+            hap_dir,
+            name=name,
+            cmd=cmd,
+            workdir=workdir,
+            redirect_stderr=redirect_stderr,
+        )
 
     def _wrap_subprocess(self, hap: Hap):
         try:
@@ -234,6 +243,7 @@ class Hapless:
     def run_command(
         self,
         cmd: str,
+        workdir: Optional[Union[str, Path]] = None,
         hid: Optional[str] = None,
         name: Optional[str] = None,
         check: bool = False,
@@ -246,7 +256,11 @@ class Hapless:
         If `hid` or `name` is not provided, it will be generated automatically.
         """
         hap = self.create_hap(
-            cmd=cmd, hid=hid, name=name, redirect_stderr=redirect_stderr
+            cmd=cmd,
+            workdir=workdir,
+            hid=hid,
+            name=name,
+            redirect_stderr=redirect_stderr,
         )
         self.run_hap(hap, check=check, blocking=blocking)
 
@@ -345,10 +359,11 @@ class Hapless:
             self.ui.error("Cannot send signal to the inactive hap")
 
     def restart(self, hap: Hap) -> None:
-        hid, name, cmd, restarts, redirect_stderr = (
+        hid, name, cmd, workdir, restarts, redirect_stderr = (
             hap.hid,
             hap.name,
             hap.cmd,
+            hap.workdir,
             hap.restarts,
             hap.redirect_stderr,
         )
@@ -369,7 +384,13 @@ class Hapless:
         self._clean_one(hap_killed)
 
         name = f"{name}{config.RESTART_DELIM}{restarts + 1}"
-        self.run_command(cmd=cmd, hid=hid, name=name, redirect_stderr=redirect_stderr)
+        self.run_command(
+            cmd=cmd,
+            workdir=workdir,
+            hid=hid,
+            name=name,
+            redirect_stderr=redirect_stderr,
+        )
 
     def rename_hap(self, hap: Hap, new_name: str):
         rich_text = (
