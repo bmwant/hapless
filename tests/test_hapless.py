@@ -284,7 +284,7 @@ def test_redirect_state_is_not_affected_after_creation(hapless: Hapless):
 
 
 @pytest.mark.parametrize("redirect_stderr", [True, False])
-def test_restart_preservers_redirect_state(hapless: Hapless, redirect_stderr: bool):
+def test_restart_preserves_redirect_state(hapless: Hapless, redirect_stderr: bool):
     hap = hapless.create_hap(
         cmd="doesnotexist",
         name="hap-redirect-state",
