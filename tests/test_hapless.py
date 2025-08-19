@@ -16,7 +16,7 @@ def test_get_hap_dirs_empty(hapless: Hapless):
     assert result == []
 
 
-def test_get_hap_dirs_with_hap(hapless, hap):
+def test_get_hap_dirs_with_hap(hapless: Hapless, hap):
     result = hapless._get_hap_dirs()
     assert result == [hap.hid]
 
@@ -130,7 +130,9 @@ def test_run_hap_invocation(hapless: Hapless):
     Check child launches a subprocess and exits.
     """
     hap = hapless.create_hap("echo test", name="hap-name")
-    with patch("os.fork", return_value=0) as fork_mock, patch.object(
+    with patch("os.fork", return_value=0) as fork_mock, patch(
+        "os.setsid"
+    ) as setsid_mock, patch.object(
         hapless, "_wrap_subprocess"
     ) as wrap_subprocess_mock, patch.object(
         hapless, "_check_fast_failure"
@@ -139,7 +141,8 @@ def test_run_hap_invocation(hapless: Hapless):
             hapless.run_hap(hap)
         assert e.value.code == 0
 
-        fork_mock.assert_called_once()
+        fork_mock.assert_called_once_with()
+        setsid_mock.assert_called_once_with()
         wrap_subprocess_mock.assert_called_once_with(hap)
         check_fast_failure_mock.assert_not_called()
 
@@ -281,7 +284,7 @@ def test_redirect_state_is_not_affected_after_creation(hapless: Hapless):
 
 
 @pytest.mark.parametrize("redirect_stderr", [True, False])
-def test_restart_preservers_redirect_state(hapless: Hapless, redirect_stderr: bool):
+def test_restart_preserves_redirect_state(hapless: Hapless, redirect_stderr: bool):
     hap = hapless.create_hap(
         cmd="doesnotexist",
         name="hap-redirect-state",
@@ -337,3 +340,23 @@ def test_spawn_is_used_instead_of_fork(hapless: Hapless):
         wrap_subprocess_mock.assert_not_called()
         run_fork_mock.assert_not_called()
         check_fast_failure_mock.assert_not_called()
+
+
+def test_wrap_subprocess(hapless: Hapless):
+    hap = hapless.create_hap(cmd="echo subprocess", name="hap-subprocess")
+    with patch("subprocess.Popen") as popen_mock, patch.object(
+        hap, "bind"
+    ) as bind_mock, patch.object(hap, "set_return_code") as set_return_code_mock:
+        popen_mock.return_value.pid = 12345
+        popen_mock.return_value.wait.return_value = 0
+        hapless._wrap_subprocess(hap)
+
+        bind_mock.assert_called_once_with(12345)
+        popen_mock.assert_called_once_with(
+            "echo subprocess",
+            shell=True,
+            executable=ANY,
+            stdout=ANY,
+            stderr=ANY,
+        )
+        set_return_code_mock.assert_called_once_with(0)

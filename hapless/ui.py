@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from rich.console import Console
+from rich.live import Live
 
 from hapless import config
 from hapless.formatters import Formatter, TableFormatter
@@ -33,6 +34,13 @@ class ConsoleUI:
             style=f"{config.COLOR_ERROR} bold",
             overflow="ignore",
             crop=False,
+        )
+
+    def get_live(self):
+        return Live(
+            console=self.console,
+            refresh_per_second=10,
+            transient=True,
         )
 
     def stats(self, haps: List[Hap], formatter: Optional[Formatter] = None):

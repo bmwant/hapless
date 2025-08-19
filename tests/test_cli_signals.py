@@ -30,7 +30,7 @@ def test_kill_improper_invocation(runner):
     with patch.object(runner.hapless, "kill") as kill_mock:
         result = runner.invoke(cli.cli, ["kill"])
         assert result.exit_code == 2
-        assert "Provide hap alias to kill" in result.stdout
+        assert "Provide hap alias to kill" in result.output
         kill_mock.assert_not_called()
 
 
@@ -38,7 +38,7 @@ def test_killall_improper_invocation(runner):
     with patch.object(runner.hapless, "kill") as kill_mock:
         result = runner.invoke(cli.cli, ["kill", "hap-name", "-a"])
         assert result.exit_code == 2
-        assert "Cannot use --all flag while hap id provided" in result.stdout
+        assert "Cannot use --all flag while hap id provided" in result.output
         kill_mock.assert_not_called()
 
 
@@ -57,7 +57,7 @@ def test_signal_invalid_hap(runner):
     with patch.object(runner.hapless, "signal") as signal_mock:
         result = runner.invoke(cli.cli, ["signal", "invalid-hap", "9"])
         assert result.exit_code == 1
-        assert "No such hap" in result.stdout
+        assert "No such hap" in result.output
         signal_mock.assert_not_called()
 
 
@@ -69,7 +69,7 @@ def test_signal_wrong_code(get_or_exit_mock, runner):
     with patch.object(runner.hapless, "signal") as signal_mock:
         result = runner.invoke(cli.cli, ["signal", "hap-name", wrong_code])
         assert result.exit_code == 2
-        assert f"{wrong_code} is not a valid signal code" in result.stdout
+        assert f"{wrong_code} is not a valid signal code" in result.output
         get_or_exit_mock.assert_not_called()
         signal_mock.assert_not_called()
 
@@ -80,5 +80,5 @@ def test_signal_inactive_hap(get_or_exit_mock, runner):
     get_or_exit_mock.return_value = hap_mock
     result = runner.invoke(cli.cli, ["signal", "hap-name", "15"])
     assert result.exit_code == 0
-    assert "Cannot send signal to the inactive hap" in result.stdout
+    assert "Cannot send signal to the inactive hap" in result.output
     get_or_exit_mock.assert_called_once_with("hap-name")

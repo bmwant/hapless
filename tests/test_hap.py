@@ -1,5 +1,4 @@
 import getpass
-import logging
 import os
 import re
 from io import StringIO
@@ -80,16 +79,16 @@ def test_raw_name(tmp_path):
 
 
 @pytest.mark.parametrize("redirect_stderr", [True, False])
-def test_correct_redirect_state(tmp_path, caplog, redirect_stderr):
-    with caplog.at_level(logging.DEBUG, logger="hapless"):
-        hap = Hap(
-            Path(tmp_path),
-            name="hap-name",
-            cmd="doesnotexist",
-            redirect_stderr=redirect_stderr,
-        )
-        assert hap.redirect_stderr is redirect_stderr
-        assert ("stderr will be redirected to stdout" in caplog.text) is redirect_stderr
+def test_correct_redirect_state(tmp_path, log_output, redirect_stderr):
+    hap = Hap(
+        Path(tmp_path),
+        name="hap-name",
+        cmd="doesnotexist",
+        redirect_stderr=redirect_stderr,
+    )
+
+    assert hap.redirect_stderr is redirect_stderr
+    assert ("stderr will be redirected to stdout" in log_output.text) is redirect_stderr
 
 
 def test_hap_inaccessible(hap: Hap):

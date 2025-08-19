@@ -64,6 +64,10 @@ class Hap(object):
         with open(self._name_file, "w") as f:
             f.write(name)
 
+    def set_return_code(self, rc: int):
+        with open(self._rc_file, "w") as f:
+            f.write(f"{rc}")
+
     def _set_raw_name(self, raw_name: Optional[str]):
         """
         Set name for the first time on hap creation.

@@ -2,14 +2,17 @@ import logging
 import os
 import shlex
 import signal
-import sys
 import time
+from contextlib import nullcontext
 from functools import wraps
 from pathlib import Path
 from typing import Optional
 
 import click
 import psutil
+import structlog
+from rich.spinner import Spinner
+from rich.text import Text
 
 from hapless import config
 
@@ -48,14 +51,33 @@ class timed(object):
         return self
 
 
+class dummy_live(nullcontext):
+    def update(self, *args, **kwargs):
+        pass
+
+
 def wait_created(
     path: Path,
     interval: float = 0.1,
-    timeout: float = config.FAILFAST_DELAY,
+    timeout: float = config.FAILFAST_TIMEOUT,
+    *,
+    live_context=dummy_live(),
 ) -> bool:
     start = time.time()
-    while not path.exists() and time.time() - start < timeout:
-        time.sleep(interval)
+    with live_context:
+        elapsed = 0
+        while not path.exists() and elapsed < timeout:
+            elapsed = time.time() - start
+            spinner = Spinner(
+                "dots",
+                text=Text.from_markup(
+                    f"checking process health for "
+                    f"[bold {config.COLOR_MAIN}]{int(timeout - elapsed)}s[/]..."
+                ),
+                style=f"{config.COLOR_MAIN}",
+            )
+            live_context.update(spinner)
+            time.sleep(interval)
     return path.exists()
 
 
@@ -92,16 +114,10 @@ def get_mtime(path: Path) -> Optional[float]:
         return os.path.getmtime(path)
 
 
-def configure_logger(name: str = __package__) -> logging.Logger:
-    logger = logging.getLogger(name)
-    handler = logging.StreamHandler(sys.stdout)
+def configure_logger() -> logging.Logger:
+    logger = structlog.get_logger()
     level = logging.DEBUG if config.DEBUG else logging.CRITICAL
-    logger.setLevel(level)
-    handler.setLevel(level)
-    # https://docs.python.org/3/library/logging.html#logrecord-attributes
-    formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s:%(message)s")
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(level))
     return logger
 
 

@@ -152,34 +152,28 @@ class Hapless:
             stdout_pipe.close()
             stderr_pipe.close()
 
-        # TODO: accessing private attribute, should be `set_rc` method
-        with open(hap._rc_file, "w") as rc_file:
-            rc_file.write(f"{retcode}")
+        hap.set_return_code(retcode)
 
     def _check_fast_failure(self, hap: Hap):
-        if wait_created(hap._rc_file) and hap.rc != 0:
+        timeout = config.FAILFAST_TIMEOUT
+        if (
+            wait_created(
+                hap._rc_file,
+                live_context=self.ui.get_live(),
+                interval=0.5,
+                timeout=timeout,
+            )
+            and hap.rc != 0
+        ):
             self.ui.error("Hap exited too quickly. stderr message:")
-            with open(hap.stderr_path) as f:
-                self.ui.print(f.read())
+            self.ui.print(hap.stderr_path.read_text())
             sys.exit(1)
 
-    def pause_hap(self, hap: Hap):
-        proc = hap.proc
-        if proc is not None:
-            proc.suspend()
-            self.ui.print(f"{config.ICON_INFO} Paused", hap)
-        else:
-            self.ui.error(f"Cannot pause. Hap {hap} is not running")
-            sys.exit(1)
-
-    def resume_hap(self, hap: Hap):
-        proc = hap.proc
-        if proc is not None and proc.status() == psutil.STATUS_STOPPED:
-            proc.resume()
-            self.ui.print(f"{config.ICON_INFO} Resumed", hap)
-        else:
-            self.ui.error(f"Cannot resume. Hap {hap} is not suspended")
-            sys.exit(1)
+        self.ui.print(
+            f"{config.ICON_INFO} Hap is healthy "
+            f"and still running after {timeout} seconds",
+            style=f"{config.COLOR_ACCENT} bold",
+        )
 
     def run_hap(
         self,
@@ -231,6 +225,7 @@ class Hapless:
     def _run_via_fork(self, hap: Hap) -> None:
         pid = os.fork()
         if pid == 0:
+            os.setsid()
             logger.debug(f"Running subprocess in child with pid {os.getpid()}")
             self._wrap_subprocess(hap)
             # NOTE: sole purpose of the child is to run a subprocess
@@ -254,6 +249,24 @@ class Hapless:
             cmd=cmd, hid=hid, name=name, redirect_stderr=redirect_stderr
         )
         self.run_hap(hap, check=check, blocking=blocking)
+
+    def pause_hap(self, hap: Hap):
+        proc = hap.proc
+        if proc is not None:
+            proc.suspend()
+            self.ui.print(f"{config.ICON_INFO} Paused", hap)
+        else:
+            self.ui.error(f"Cannot pause. Hap {hap} is not running")
+            sys.exit(1)
+
+    def resume_hap(self, hap: Hap):
+        proc = hap.proc
+        if proc is not None and proc.status() == psutil.STATUS_STOPPED:
+            proc.resume()
+            self.ui.print(f"{config.ICON_INFO} Resumed", hap)
+        else:
+            self.ui.error(f"Cannot resume. Hap {hap} is not suspended")
+            sys.exit(1)
 
     def logs(self, hap: Hap, stderr: bool = False, follow: bool = False):
         filepath = hap.stderr_path if stderr else hap.stdout_path
