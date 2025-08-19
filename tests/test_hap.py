@@ -1,5 +1,4 @@
 import getpass
-import logging
 import os
 import re
 from io import StringIO
