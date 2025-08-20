@@ -10,7 +10,7 @@ from hapless.ui import ConsoleUI
 
 
 @pytest.fixture
-def hapless_with_ui(tmp_path) -> Generator[Hapless, None, None]:
+def hapless_with_ui(tmp_path: Path) -> Generator[Hapless, None, None]:
     yield Hapless(hapless_dir=tmp_path, quiet=False)
 
 
@@ -113,3 +113,27 @@ def test_workdir_is_displayed_in_versbose_mode(
     assert "Command:" in captured.out
     assert "Working dir:" in captured.out
     assert f"{tmp_path}" in captured.out  # Check for the title
+
+
+def test_launching_message(hapless_with_ui: Hapless, capsys):
+    hapless = hapless_with_ui
+    hap = hapless.create_hap("true")
+
+    with patch.object(
+        hapless, "_wrap_subprocess"
+    ) as wrap_subprocess_mock, patch.object(
+        hapless, "_run_via_spawn"
+    ) as run_spawn_mock, patch.object(
+        hapless, "_run_via_fork"
+    ) as run_fork_mock, patch.object(
+        hapless, "_check_fast_failure"
+    ) as check_fast_failure_mock:
+        hapless.run_hap(hap)
+
+        wrap_subprocess_mock.assert_not_called()
+        run_spawn_mock.assert_not_called()
+        run_fork_mock.assert_called_once_with(hap)
+        check_fast_failure_mock.assert_not_called()
+
+    captured = capsys.readouterr()
+    assert "Launching hap" in captured.out

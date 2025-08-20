@@ -140,7 +140,6 @@ class Hapless:
             stderr_pipe = stdout_pipe
             if not hap.redirect_stderr:
                 stderr_pipe = open(hap.stderr_path, "w")
-            self.ui.print(f"{config.ICON_INFO} Launching", hap)
             shell_exec = os.getenv("SHELL")
             if shell_exec is not None:
                 logger.debug(f"Using {shell_exec} to run hap")
@@ -202,6 +201,7 @@ class Hapless:
             self._wrap_subprocess(hap)
             return
 
+        self.ui.print(f"{config.ICON_INFO} Launching", hap)
         # TODO: or sys.platform == "win32"
         if config.NO_FORK:
             logger.debug("Forking is disabled, running using spawn via wrapper")
