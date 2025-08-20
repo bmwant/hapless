@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from unittest.mock import patch
 
@@ -48,8 +47,20 @@ def test_restart_uses_same_working_dir(hapless: Hapless, monkeypatch):
     assert "Malicious code execution" not in restarted_hap.stdout_path.read_text()
 
 
-def test_same_workdir_is_used_even_on_dir_change():
-    pass
+def test_same_workdir_is_used_even_on_dir_change(hapless: Hapless, monkeypatch):
+    monkeypatch.chdir(EXAMPLES_DIR)
+    hap = hapless.create_hap(
+        cmd="python -c 'import os; print(os.getcwd())'",
+        name="hap-workdir",
+    )
+    assert hap.workdir == EXAMPLES_DIR
+
+    monkeypatch.chdir(TESTS_DIR)
+    hapless.run_hap(hap, blocking=True)
+    assert hap.rc == 0
+    assert hap.stdout_path.exists()
+    assert f"{EXAMPLES_DIR}" in hap.stdout_path.read_text()
+    assert f"{TESTS_DIR}" not in hap.stdout_path.read_text()
 
 
 def test_different_scripts_called_if_directory_differs(hapless: Hapless, monkeypatch):
