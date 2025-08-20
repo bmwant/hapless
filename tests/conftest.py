@@ -32,15 +32,15 @@ def runner() -> Generator[CliRunner, None, None]:
 
 
 @pytest.fixture
-def hap(tmpdir) -> Generator[Hap, None, None]:
-    hapless = Hapless(hapless_dir=Path(tmpdir))
+def hap(tmp_path) -> Generator[Hap, None, None]:
+    hapless = Hapless(hapless_dir=tmp_path)
     yield hapless.create_hap("false")
 
 
 @pytest.fixture
-def hapless(tmpdir, monkeypatch) -> Generator[Hapless, None, None]:
-    monkeypatch.chdir(tmpdir)
-    yield Hapless(hapless_dir=Path(tmpdir), quiet=True)
+def hapless(tmp_path, monkeypatch) -> Generator[Hapless, None, None]:
+    monkeypatch.chdir(tmp_path)
+    yield Hapless(hapless_dir=tmp_path, quiet=True)
 
 
 @pytest.fixture(name="log_output")

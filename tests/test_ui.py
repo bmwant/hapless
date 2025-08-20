@@ -10,8 +10,8 @@ from hapless.ui import ConsoleUI
 
 
 @pytest.fixture
-def hapless_with_ui(tmpdir) -> Generator[Hapless, None, None]:
-    yield Hapless(hapless_dir=Path(tmpdir), quiet=False)
+def hapless_with_ui(tmp_path) -> Generator[Hapless, None, None]:
+    yield Hapless(hapless_dir=tmp_path, quiet=False)
 
 
 def test_default_formatter_is_table():
@@ -103,14 +103,13 @@ def test_rename_message(hapless_with_ui: Hapless, capsys):
 
 
 def test_workdir_is_displayed_in_versbose_mode(
-    hapless_with_ui: Hapless, tmpdir, capsys
+    hapless_with_ui: Hapless, tmp_path, capsys
 ):
     hapless = hapless_with_ui
-    workdir = Path(tmpdir)
-    hap = hapless.create_hap("true", workdir=workdir)
+    hap = hapless.create_hap("true", workdir=tmp_path)
     hapless.show(hap, formatter=TableFormatter(verbose=True))
 
     captured = capsys.readouterr()
     assert "Command:" in captured.out
     assert "Working dir:" in captured.out
-    assert f"{workdir}" in captured.out  # Check for the title
+    assert f"{tmp_path}" in captured.out  # Check for the title

@@ -51,6 +51,7 @@ def test_unbound_hap(hap: Hap):
     assert hap.accessible is True
     # Current user should be the owner of the hap
     assert hap.owner == getpass.getuser()
+    assert hap.workdir == os.getcwd()
 
 
 def test_hap_path_should_be_a_directory(tmp_path):
