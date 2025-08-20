@@ -1,6 +1,8 @@
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
 from hapless.main import Hapless
 
 TESTS_DIR = Path(__file__).parent
@@ -92,3 +94,26 @@ def test_different_scripts_called_if_directory_differs(hapless: Hapless, monkeyp
 
     assert hap1.cmd == hap2.cmd
     assert hap1.workdir != hap2.workdir
+
+
+def test_incorrect_workdir_provided(hapless: Hapless, tmp_path):
+    not_a_dir = tmp_path / "filename"
+    not_a_dir.touch()
+    with pytest.raises(ValueError) as e:
+        hap = hapless.create_hap(cmd="false", workdir=not_a_dir)  # noqa: F841
+
+    assert str(e.value) == "Workdir should be a path to existing directory"
+
+
+def test_fallback_workdir_to_current_dir(
+    hapless: Hapless, monkeypatch, tmp_path_factory
+):
+    fallback_workdir = tmp_path_factory.mktemp("hap_fallback_workdir")
+    monkeypatch.chdir(fallback_workdir)
+    hap = hapless.create_hap(
+        cmd="true",
+        workdir=None,
+        name="hap-workdir-fallback",
+    )
+    assert hap.workdir == fallback_workdir
+    assert hapless.dir != hap.workdir
