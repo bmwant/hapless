@@ -21,9 +21,10 @@ def test_restart_uses_same_working_dir(hapless: Hapless, monkeypatch):
     assert hap.rc == 0
     assert hap.stdout_path.exists()
     assert "Correct file is being run" in hap.stdout_path.read_text()
+
     # Contains script with the same filename
     monkeypatch.chdir(EXAMPLES_DIR / "nested")
-    # here we need blocking True mocking
+
     original_run = hapless.run_command
 
     def blocking_run(*args, **kwargs):
@@ -51,5 +52,32 @@ def test_same_workdir_is_used_even_on_dir_change():
     pass
 
 
-def test_different_scripts_called_if_directory_differs():
-    pass
+def test_different_scripts_called_if_directory_differs(hapless: Hapless, monkeypatch):
+    monkeypatch.chdir(EXAMPLES_DIR)
+    same_cmd = "python ./samename.py"
+    hap1 = hapless.create_hap(
+        cmd=same_cmd,
+        name="hap-same-cmd-1",
+    )
+    assert hap1.workdir == EXAMPLES_DIR
+
+    hapless.run_hap(hap1, blocking=True)
+    assert hap1.rc == 0
+    assert hap1.stdout_path.exists()
+    assert "Correct file is being run" in hap1.stdout_path.read_text()
+
+    # Contains script with the same filename
+    monkeypatch.chdir(EXAMPLES_DIR / "nested")
+    hap2 = hapless.create_hap(
+        cmd=same_cmd,
+        name="hap-same-cmd-2",
+    )
+    assert hap2.workdir == EXAMPLES_DIR / "nested"
+
+    hapless.run_hap(hap2, blocking=True)
+    assert hap2.rc == 0
+    assert hap2.stdout_path.exists()
+    assert "Malicious code execution" in hap2.stdout_path.read_text()
+
+    assert hap1.cmd == hap2.cmd
+    assert hap1.workdir != hap2.workdir
