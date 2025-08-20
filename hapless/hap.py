@@ -256,8 +256,8 @@ class Hap(object):
         if proc is not None:
             return proc.environ()
 
-        with open(self._env_file) as env_file:
-            return json.loads(env_file.read())
+        with open(self._env_file) as f:
+            return json.loads(f.read())
 
     @property
     @allow_missing
