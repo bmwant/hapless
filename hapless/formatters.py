@@ -60,11 +60,16 @@ class TableFormatter(Formatter):
             status_table.add_row("Return code:", f"{hap.rc}")
 
         cmd_text = Text(f"{hap.cmd}", style=f"{config.COLOR_ACCENT} bold")
-        status_table.add_row("Command:", cmd_text)
+        if self.verbose:
+            status_table.add_row("")
+            status_table.add_row("Command:", cmd_text)
+            status_table.add_row("Working dir:", f"{hap.workdir}")
+            status_table.add_row("")
+        else:
+            status_table.add_row("Command:", cmd_text)
 
         proc = hap.proc
         if self.verbose and proc is not None:
-            status_table.add_row("Working dir:", f"{proc.cwd()}")
             status_table.add_row("Parent PID:", f"{proc.ppid()}")
             status_table.add_row("User:", f"{proc.username()}")
 

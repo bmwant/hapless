@@ -100,3 +100,17 @@ def test_rename_message(hapless_with_ui: Hapless, capsys):
     assert "Renamed" in captured.out
     assert "old-name" in captured.out
     assert "new-name" in captured.out
+
+
+def test_workdir_is_displayed_in_versbose_mode(
+    hapless_with_ui: Hapless, tmpdir, capsys
+):
+    hapless = hapless_with_ui
+    workdir = Path(tmpdir)
+    hap = hapless.create_hap("true", workdir=workdir)
+    hapless.show(hap, formatter=TableFormatter(verbose=True))
+
+    captured = capsys.readouterr()
+    assert "Command:" in captured.out
+    assert "Working dir:" in captured.out
+    assert f"{workdir}" in captured.out  # Check for the title
