@@ -323,7 +323,7 @@ class Hap(object):
             "pid": str(self.pid) if self.pid is not None else None,
             "rc": str(self.rc) if self.rc is not None else None,
             "cmd": self.cmd,
-            "workdir": self.workdir,
+            "workdir": str(self.workdir),
             "status": self.status.value,
             "runtime": self.runtime,
             "start_time": self.start_time,

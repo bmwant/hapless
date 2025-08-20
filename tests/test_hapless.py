@@ -310,7 +310,7 @@ def test_restart_preserves_redirect_state(hapless: Hapless, redirect_stderr: boo
         wait_created_mock.assert_called_once_with(ANY, timeout=1)
         run_command_mock.assert_called_once_with(
             cmd="doesnotexist",
-            workdir=f"{hapless.dir}",
+            workdir=hapless.dir,
             hid=hid,
             name="hap-redirect-state@1",
             redirect_stderr=redirect_stderr,
@@ -359,6 +359,7 @@ def test_wrap_subprocess(hapless: Hapless):
         bind_mock.assert_called_once_with(12345)
         popen_mock.assert_called_once_with(
             "echo subprocess",
+            cwd=hap.workdir,
             shell=True,
             executable=ANY,
             stdout=ANY,
