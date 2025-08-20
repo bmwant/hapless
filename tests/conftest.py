@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 from typing import Generator
 from unittest.mock import patch
@@ -37,7 +38,8 @@ def hap(tmpdir) -> Generator[Hap, None, None]:
 
 
 @pytest.fixture
-def hapless(tmpdir) -> Generator[Hapless, None, None]:
+def hapless(tmpdir, monkeypatch) -> Generator[Hapless, None, None]:
+    monkeypatch.chdir(tmpdir)
     yield Hapless(hapless_dir=Path(tmpdir), quiet=True)
 
 

@@ -190,13 +190,13 @@ class Hap(object):
 
     @property
     @allow_missing
-    def cmd(self) -> str:
+    def cmd(self) -> Optional[str]:
         with open(self._cmd_file) as f:
             return f.read()
 
     @property
     @allow_missing
-    def workdir(self) -> str:
+    def workdir(self) -> Optional[str]:
         with open(self._workdir_file) as f:
             return f.read()
 

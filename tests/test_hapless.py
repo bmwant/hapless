@@ -209,7 +209,11 @@ def test_run_command_accepts_redirect_stderr_parameter(hapless: Hapless):
     ) as create_hap_mock:
         hapless.run_command("echo redirect", redirect_stderr=True)
         create_hap_mock.assert_called_once_with(
-            cmd="echo redirect", hid=None, name=None, redirect_stderr=True
+            cmd="echo redirect",
+            workdir=None,
+            hid=None,
+            name=None,
+            redirect_stderr=True,
         )
         run_hap_mock.assert_called_once_with(hap_mock, check=False, blocking=False)
 
@@ -306,6 +310,7 @@ def test_restart_preserves_redirect_state(hapless: Hapless, redirect_stderr: boo
         wait_created_mock.assert_called_once_with(ANY, timeout=1)
         run_command_mock.assert_called_once_with(
             cmd="doesnotexist",
+            workdir=f"{hapless.dir}",
             hid=hid,
             name="hap-redirect-state@1",
             redirect_stderr=redirect_stderr,
