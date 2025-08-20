@@ -146,6 +146,7 @@ class Hapless:
                 logger.debug(f"Using {shell_exec} to run hap")
             proc = subprocess.Popen(
                 hap.cmd,
+                cwd=hap.workdir,
                 shell=True,
                 executable=shell_exec,
                 stdout=stdout_pipe,
@@ -372,6 +373,7 @@ class Hapless:
 
         hap_killed = self.get_hap(hid)
         while hap_killed.active:
+            # NOTE: re-read is required as `proc` is a cached property
             hap_killed = self.get_hap(hid)
 
         rc_exists = wait_created(hap_killed._rc_file, timeout=1)

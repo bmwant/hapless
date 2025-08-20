@@ -97,7 +97,12 @@ def kill_proc_tree(pid, sig=signal.SIGKILL, include_parent=True):
     if pid == os.getpid():
         raise ValueError("Would not kill myself")
 
-    parent = psutil.Process(pid)
+    try:
+        parent = psutil.Process(pid)
+    except psutil.NoSuchProcess:
+        logger.warning(f"Process {pid} is already gone, nothing to kill")
+        return
+
     children = parent.children(recursive=True)
     if include_parent:
         children.append(parent)

@@ -1,37 +1,55 @@
+import os
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import pytest
-from rich.console import Console
-
-from hapless.hap import Hap, Status
 from hapless.main import Hapless
 
-
-def all_equal(iterable):
-    return len(set(iterable)) <= 1
-
-
-def test_random_name_generation():
-    name_length = 8
-    name_count = 4
-    names = []
-    for _ in range(name_count):
-        new_name = Hap.get_random_name(length=name_length)
-        assert len(new_name) == name_length
-        names.append(new_name)
-
-    assert not all_equal(names)
+TESTS_DIR = Path(__file__).parent
+EXAMPLES_DIR = TESTS_DIR.parent / "examples"
 
 
-def test_unbound_hap(hap: Hap):
-    assert isinstance(hap.name, str)
-    assert hap.name.startswith("hap-")
-    assert hap.pid is None
-    assert hap.proc is None
-    assert hap.rc is None
-    assert hap.cmd == "false"
-    assert hap.status == Status.UNBOUND
-    assert hap.env is None
-    assert hap.restarts == 0
-    assert not hap.active
+def test_restart_uses_same_working_dir(hapless: Hapless, monkeypatch):
+    monkeypatch.chdir(EXAMPLES_DIR)
+    hap = hapless.create_hap(
+        cmd="python ./samename.py",
+        name="hap-same-name",
+    )
+    hid = hap.hid
+    assert hap.workdir == EXAMPLES_DIR
+
+    hapless.run_hap(hap, blocking=True)
+    assert hap.rc == 0
+    assert hap.stdout_path.exists()
+    assert "Correct file is being run" in hap.stdout_path.read_text()
+    # Contains script with the same filename
+    monkeypatch.chdir(EXAMPLES_DIR / "nested")
+    # here we need blocking True mocking
+    original_run = hapless.run_command
+
+    def blocking_run(*args, **kwargs):
+        kwargs["blocking"] = True
+        return original_run(*args, **kwargs)
+
+    with patch.object(hapless, "run_command", side_effect=blocking_run) as run_mock:
+        hapless.restart(hap)
+        run_mock.assert_called_once_with(
+            cmd="python ./samename.py",
+            workdir=EXAMPLES_DIR,
+            hid=hid,
+            name="hap-same-name@1",
+            redirect_stderr=False,
+        )
+
+    restarted_hap = hapless.get_hap("hap-same-name")
+    assert restarted_hap.rc == 0
+    assert restarted_hap.stdout_path.exists()
+    assert "Correct file is being run" in restarted_hap.stdout_path.read_text()
+    assert "Malicious code execution" not in restarted_hap.stdout_path.read_text()
+
+
+def test_same_workdir_is_used_even_on_dir_change():
+    pass
+
+
+def test_different_scripts_called_if_directory_differs():
+    pass

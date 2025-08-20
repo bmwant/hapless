@@ -196,9 +196,9 @@ class Hap(object):
 
     @property
     @allow_missing
-    def workdir(self) -> Optional[str]:
+    def workdir(self) -> Optional[Path]:
         with open(self._workdir_file) as f:
-            return f.read()
+            return Path(f.read())
 
     @property
     @allow_missing
