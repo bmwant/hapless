@@ -137,3 +137,31 @@ def test_launching_message(hapless_with_ui: Hapless, capsys):
 
     captured = capsys.readouterr()
     assert "Launching hap" in captured.out
+
+
+def test_check_fast_failure_message(hapless_with_ui: Hapless, capsys):
+    hapless = hapless_with_ui
+    hap = hapless.create_hap("echo check", name="hap-check-message")
+    with patch.object(
+        hapless, "_wrap_subprocess"
+    ) as wrap_subprocess_mock, patch.object(
+        hapless, "_run_via_spawn"
+    ) as run_spawn_mock, patch.object(
+        hapless, "_run_via_fork"
+    ) as run_fork_mock, patch.object(
+        hapless, "_check_fast_failure", wraps=hapless._check_fast_failure
+    ) as check_fast_failure_mock, patch(
+        "hapless.main.wait_created", return_value=False
+    ) as wait_created_mock:
+        hapless.run_hap(hap, check=True)
+
+        wrap_subprocess_mock.assert_not_called()
+        run_spawn_mock.assert_not_called()
+        run_fork_mock.assert_called_once_with(hap)
+        check_fast_failure_mock.assert_called_once_with(hap)
+        wait_created_mock.assert_called_once()
+
+    captured = capsys.readouterr()
+    assert "Launching hap" in captured.out
+    assert "hap-check-message" in captured.out
+    assert "Hap is healthy and still running" in captured.out

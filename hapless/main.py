@@ -163,7 +163,7 @@ class Hapless:
 
         hap.set_return_code(retcode)
 
-    def _check_fast_failure(self, hap: Hap):
+    def _check_fast_failure(self, hap: Hap) -> None:
         timeout = config.FAILFAST_TIMEOUT
         if (
             wait_created(
@@ -333,7 +333,7 @@ class Hapless:
         else:
             self.ui.error("Nothing to clean")
 
-    def kill(self, haps: List[Hap], verbose: bool = True):
+    def kill(self, haps: List[Hap], verbose: bool = True) -> int:
         killed_counter = 0
         for hap in haps:
             if hap.active:
@@ -348,6 +348,7 @@ class Hapless:
             )
         elif verbose:
             self.ui.error("No active haps to kill")
+        return killed_counter
 
     def signal(self, hap: Hap, sig: signal.Signals):
         if hap.active:
