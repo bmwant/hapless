@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Generator
-from unittest.mock import patch
+from unittest.mock import ANY, PropertyMock, patch
 
 import pytest
 
@@ -11,7 +11,10 @@ from hapless.ui import ConsoleUI
 
 @pytest.fixture
 def hapless_with_ui(tmp_path: Path) -> Generator[Hapless, None, None]:
-    yield Hapless(hapless_dir=tmp_path, quiet=False)
+    hapless = Hapless(hapless_dir=tmp_path, quiet=False)
+    # Set a fixed width for the console to be able to assert on content that could fit
+    hapless.ui.console.width = 180
+    yield hapless
 
 
 def test_default_formatter_is_table():
@@ -139,7 +142,7 @@ def test_launching_message(hapless_with_ui: Hapless, capsys):
     assert "Launching hap" in captured.out
 
 
-def test_check_fast_failure_message(hapless_with_ui: Hapless, capsys):
+def test_check_fast_failure_ok_message(hapless_with_ui: Hapless, capsys):
     hapless = hapless_with_ui
     hap = hapless.create_hap("echo check", name="hap-check-message")
     with patch.object(
@@ -165,3 +168,28 @@ def test_check_fast_failure_message(hapless_with_ui: Hapless, capsys):
     assert "Launching hap" in captured.out
     assert "hap-check-message" in captured.out
     assert "Hap is healthy and still running" in captured.out
+
+
+def test_check_fast_failure_error_message(hapless_with_ui: Hapless, capsys):
+    hapless = hapless_with_ui
+    hap = hapless.create_hap("false", name="hap-check-failed-msg")
+    with patch.object(type(hap), "rc", new_callable=PropertyMock) as rc_mock, patch(
+        "hapless.main.wait_created", return_value=True
+    ) as wait_created_mock:
+        rc_mock.return_value = 1
+
+        with pytest.raises(SystemExit) as e:
+            hapless._check_fast_failure(hap)
+        assert e.value.code == 1
+
+        assert hap.rc == 1
+        wait_created_mock.assert_called_once_with(
+            hap._rc_file,
+            live_context=ANY,
+            interval=ANY,
+            timeout=ANY,
+        )
+
+    captured = capsys.readouterr()
+    assert "Hap exited too quickly" in captured.out
+    assert "Hap is healthy" not in captured.out
