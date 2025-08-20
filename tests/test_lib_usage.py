@@ -6,7 +6,7 @@ import pytest
 from hapless import Hap, Hapless, Status
 
 
-def test_creation(tmp_path):
+def test_creation(tmp_path: Path):
     hapless = Hapless(hapless_dir=tmp_path)
     hap1 = hapless.create_hap("echo one", name="hap-one")
     hap2 = hapless.create_hap("echo two", name="hap-two")
@@ -20,7 +20,7 @@ def test_creation(tmp_path):
     assert hap1.status == Status.UNBOUND
 
 
-def test_quiet_mode(tmp_path, capsys):
+def test_quiet_mode(tmp_path: Path, capsys):
     """
     Check that quiet mode suppresses output.
     """
