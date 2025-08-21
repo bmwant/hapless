@@ -4,6 +4,7 @@ from unittest.mock import ANY, PropertyMock, patch
 
 import pytest
 
+from hapless import config
 from hapless.formatters import TableFormatter
 from hapless.main import Hapless
 from hapless.ui import ConsoleUI
@@ -197,6 +198,7 @@ def test_check_fast_failure_error_message(hapless_with_ui: Hapless, capsys):
 
 def test_check_fast_failure_quick_but_success(hapless_with_ui: Hapless, capsys):
     hapless = hapless_with_ui
+    timeout = config.FAILFAST_TIMEOUT
     hap = hapless.create_hap("true", name="hap-check-fast-ok")
     with patch.object(
         type(hap), "rc", new_callable=PropertyMock, return_value=0
@@ -208,9 +210,10 @@ def test_check_fast_failure_quick_but_success(hapless_with_ui: Hapless, capsys):
             hap._rc_file,
             live_context=ANY,
             interval=ANY,
-            timeout=ANY,
+            timeout=timeout,
         )
 
     captured = capsys.readouterr()
-    assert "Hap exited too quickly" in captured.out
+    assert f"Hap finished successfully in less than {timeout} seconds" in captured.out
+    assert "Hap exited too quickly" not in captured.out
     assert "Hap is healthy" not in captured.out
