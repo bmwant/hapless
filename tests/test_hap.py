@@ -1,4 +1,5 @@
 import getpass
+import json
 import os
 import re
 from io import StringIO
@@ -51,6 +52,8 @@ def test_unbound_hap(hap: Hap):
     assert hap.accessible is True
     # Current user should be the owner of the hap
     assert hap.owner == getpass.getuser()
+    assert isinstance(hap.workdir, Path)
+    assert str(hap.workdir) == os.getcwd()
 
 
 def test_hap_path_should_be_a_directory(tmp_path):
@@ -123,6 +126,10 @@ def test_serialize(hap: Hap):
     assert serialized["restarts"] == str(hap.restarts)
     assert serialized["stdout_file"] == str(hap.stdout_path)
     assert serialized["stderr_file"] == str(hap.stderr_path)
+    # check all the fields are json-serializable
+    result = json.dumps(serialized)
+    assert isinstance(result, str)
+    assert "workdir" in result
 
 
 def test_represent_unbound_hap(hapless: Hapless, capsys):

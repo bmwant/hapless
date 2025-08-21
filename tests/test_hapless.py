@@ -102,10 +102,10 @@ def test_get_haps_return_all_entries(hapless: Hapless):
         assert access_mock.call_count == 3
 
 
-def test_state_dir_is_not_accessible(tmpdir, capsys):
+def test_state_dir_is_not_accessible(tmp_path, capsys):
     with patch("os.utime", side_effect=PermissionError):
         with pytest.raises(SystemExit) as e:
-            Hapless(hapless_dir=Path(tmpdir))
+            Hapless(hapless_dir=tmp_path)
 
         captured = capsys.readouterr()
 
@@ -113,16 +113,16 @@ def test_state_dir_is_not_accessible(tmpdir, capsys):
         assert e.value.code == 1
 
 
-def test_state_dir_is_overriden(tmpdir):
-    custom_state_dir = f"{tmpdir}/custom"
+def test_state_dir_is_overriden(tmp_path: Path):
+    custom_state_dir = tmp_path / "custom"
     hapless = Hapless(hapless_dir=custom_state_dir)
 
     assert isinstance(hapless.dir, Path)
-    assert str(hapless.dir) == custom_state_dir
+    assert hapless.dir == custom_state_dir
 
     hap = hapless.create_hap(cmd="echo hello", hid="42", name="hap-name")
-    assert hap.path.parent == Path(custom_state_dir)
-    assert hap.path == Path(custom_state_dir) / hap.hid
+    assert hap.path.parent == custom_state_dir
+    assert hap.path == custom_state_dir / hap.hid
 
 
 def test_run_hap_invocation(hapless: Hapless):
@@ -209,7 +209,11 @@ def test_run_command_accepts_redirect_stderr_parameter(hapless: Hapless):
     ) as create_hap_mock:
         hapless.run_command("echo redirect", redirect_stderr=True)
         create_hap_mock.assert_called_once_with(
-            cmd="echo redirect", hid=None, name=None, redirect_stderr=True
+            cmd="echo redirect",
+            workdir=None,
+            hid=None,
+            name=None,
+            redirect_stderr=True,
         )
         run_hap_mock.assert_called_once_with(hap_mock, check=False, blocking=False)
 
@@ -306,14 +310,15 @@ def test_restart_preserves_redirect_state(hapless: Hapless, redirect_stderr: boo
         wait_created_mock.assert_called_once_with(ANY, timeout=1)
         run_command_mock.assert_called_once_with(
             cmd="doesnotexist",
+            workdir=hapless.dir,
             hid=hid,
             name="hap-redirect-state@1",
             redirect_stderr=redirect_stderr,
         )
 
 
-def test_same_handle_can_be_closed_twice(tmpdir):
-    filepath = Path(tmpdir) / "samehandle.log"
+def test_same_handle_can_be_closed_twice(tmp_path):
+    filepath = tmp_path / "samehandle.log"
     filepath.touch()
     stdout_handle = filepath.open("w")
     stderr_handle = stdout_handle
@@ -354,6 +359,7 @@ def test_wrap_subprocess(hapless: Hapless):
         bind_mock.assert_called_once_with(12345)
         popen_mock.assert_called_once_with(
             "echo subprocess",
+            cwd=hap.workdir,
             shell=True,
             executable=ANY,
             stdout=ANY,

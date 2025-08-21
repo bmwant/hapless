@@ -113,6 +113,7 @@ class Hapless:
     def create_hap(
         self,
         cmd: str,
+        workdir: Optional[Union[str, Path]] = None,
         hid: Optional[str] = None,
         name: Optional[str] = None,
         *,
@@ -123,7 +124,15 @@ class Hapless:
         hap_dir.mkdir()
         if redirect_stderr is None:
             redirect_stderr = config.REDIRECT_STDERR
-        return Hap(hap_dir, cmd=cmd, name=name, redirect_stderr=redirect_stderr)
+        if workdir is None or not Path(workdir).exists():
+            workdir = os.getcwd()
+        return Hap(
+            hap_dir,
+            name=name,
+            cmd=cmd,
+            workdir=workdir,
+            redirect_stderr=redirect_stderr,
+        )
 
     def _wrap_subprocess(self, hap: Hap):
         try:
@@ -131,12 +140,12 @@ class Hapless:
             stderr_pipe = stdout_pipe
             if not hap.redirect_stderr:
                 stderr_pipe = open(hap.stderr_path, "w")
-            self.ui.print(f"{config.ICON_INFO} Launching", hap)
             shell_exec = os.getenv("SHELL")
             if shell_exec is not None:
                 logger.debug(f"Using {shell_exec} to run hap")
             proc = subprocess.Popen(
                 hap.cmd,
+                cwd=hap.workdir,
                 shell=True,
                 executable=shell_exec,
                 stdout=stdout_pipe,
@@ -154,26 +163,34 @@ class Hapless:
 
         hap.set_return_code(retcode)
 
-    def _check_fast_failure(self, hap: Hap):
+    def _check_fast_failure(self, hap: Hap) -> None:
         timeout = config.FAILFAST_TIMEOUT
-        if (
-            wait_created(
-                hap._rc_file,
-                live_context=self.ui.get_live(),
-                interval=0.5,
-                timeout=timeout,
+        wait_created(
+            hap._rc_file,
+            live_context=self.ui.get_live(),
+            interval=0.5,
+            timeout=timeout,
+        )
+        return_code: Optional[int] = hap.rc
+        if return_code is None:
+            # no return code yet, process is still running
+            self.ui.print(
+                f"{config.ICON_INFO} Hap is healthy "
+                f"and still running after {timeout} seconds",
+                style=f"{config.COLOR_ACCENT} bold",
             )
-            and hap.rc != 0
-        ):
+        elif return_code == 0:
+            # finished quickly, but successfully
+            self.ui.print(
+                f"{config.ICON_INFO} Hap finished successfully "
+                f"in less than {timeout} seconds",
+                style=f"{config.COLOR_ACCENT} bold",
+            )
+        else:
+            # non-zero return code
             self.ui.error("Hap exited too quickly. stderr message:")
             self.ui.print(hap.stderr_path.read_text())
             sys.exit(1)
-
-        self.ui.print(
-            f"{config.ICON_INFO} Hap is healthy "
-            f"and still running after {timeout} seconds",
-            style=f"{config.COLOR_ACCENT} bold",
-        )
 
     def run_hap(
         self,
@@ -192,6 +209,7 @@ class Hapless:
             self._wrap_subprocess(hap)
             return
 
+        self.ui.print(f"{config.ICON_INFO} Launching", hap)
         # TODO: or sys.platform == "win32"
         if config.NO_FORK:
             logger.debug("Forking is disabled, running using spawn via wrapper")
@@ -234,6 +252,7 @@ class Hapless:
     def run_command(
         self,
         cmd: str,
+        workdir: Optional[Union[str, Path]] = None,
         hid: Optional[str] = None,
         name: Optional[str] = None,
         check: bool = False,
@@ -246,7 +265,11 @@ class Hapless:
         If `hid` or `name` is not provided, it will be generated automatically.
         """
         hap = self.create_hap(
-            cmd=cmd, hid=hid, name=name, redirect_stderr=redirect_stderr
+            cmd=cmd,
+            workdir=workdir,
+            hid=hid,
+            name=name,
+            redirect_stderr=redirect_stderr,
         )
         self.run_hap(hap, check=check, blocking=blocking)
 
@@ -318,7 +341,7 @@ class Hapless:
         else:
             self.ui.error("Nothing to clean")
 
-    def kill(self, haps: List[Hap], verbose: bool = True):
+    def kill(self, haps: List[Hap], verbose: bool = True) -> int:
         killed_counter = 0
         for hap in haps:
             if hap.active:
@@ -333,6 +356,7 @@ class Hapless:
             )
         elif verbose:
             self.ui.error("No active haps to kill")
+        return killed_counter
 
     def signal(self, hap: Hap, sig: signal.Signals):
         if hap.active:
@@ -345,10 +369,11 @@ class Hapless:
             self.ui.error("Cannot send signal to the inactive hap")
 
     def restart(self, hap: Hap) -> None:
-        hid, name, cmd, restarts, redirect_stderr = (
+        hid, name, cmd, workdir, restarts, redirect_stderr = (
             hap.hid,
             hap.name,
             hap.cmd,
+            hap.workdir,
             hap.restarts,
             hap.redirect_stderr,
         )
@@ -357,6 +382,7 @@ class Hapless:
 
         hap_killed = self.get_hap(hid)
         while hap_killed.active:
+            # NOTE: re-read is required as `proc` is a cached property
             hap_killed = self.get_hap(hid)
 
         rc_exists = wait_created(hap_killed._rc_file, timeout=1)
@@ -369,7 +395,13 @@ class Hapless:
         self._clean_one(hap_killed)
 
         name = f"{name}{config.RESTART_DELIM}{restarts + 1}"
-        self.run_command(cmd=cmd, hid=hid, name=name, redirect_stderr=redirect_stderr)
+        self.run_command(
+            cmd=cmd,
+            workdir=workdir,
+            hid=hid,
+            name=name,
+            redirect_stderr=redirect_stderr,
+        )
 
     def rename_hap(self, hap: Hap, new_name: str):
         rich_text = (

@@ -7,7 +7,7 @@ import time
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 try:
     from functools import cached_property
@@ -23,8 +23,9 @@ from hapless.utils import allow_missing, get_mtime, logger
 
 
 class Status(str, Enum):
-    # Active statuses
+    # Created status
     UNBOUND = "unbound"
+    # Active statuses
     PAUSED = "paused"
     RUNNING = "running"
     # Finished statuses
@@ -39,6 +40,7 @@ class Hap(object):
         *,
         name: Optional[str] = None,
         cmd: Optional[str] = None,
+        workdir: Optional[Union[str, Path]] = None,
         redirect_stderr: bool = False,
     ) -> None:
         if not hap_path.is_dir():
@@ -51,6 +53,7 @@ class Hap(object):
         self._rc_file = hap_path / "rc"
         self._name_file = hap_path / "name"
         self._cmd_file = hap_path / "cmd"
+        self._workdir_file = hap_path / "workdir"
         self._env_file = hap_path / "env"
 
         self._stdout_path = hap_path / "stdout.log"
@@ -58,7 +61,7 @@ class Hap(object):
 
         self._set_logfiles(redirect_stderr)
         self._set_raw_name(name)
-        self._set_cmd(cmd)
+        self._set_command_context(cmd, workdir)
 
     def set_name(self, name: str):
         with open(self._name_file, "w") as f:
@@ -79,15 +82,29 @@ class Hap(object):
         if self.raw_name is None:
             self.set_name(raw_name)
 
-    def _set_cmd(self, cmd: Optional[str]):
+    def _set_command_context(
+        self,
+        cmd: Optional[str],
+        workdir: Optional[Union[str, Path]],
+    ) -> None:
         """
-        Set cmd for the first time on hap creation.
+        Set command and working directory for the first time on hap creation.
         """
         if self.cmd is None:
             if cmd is None:
                 raise ValueError("Command to run is not provided")
             with open(self._cmd_file, "w") as f:
                 f.write(cmd)
+
+        if self.workdir is None:
+            workdir = Path(workdir or os.getcwd())
+            # NOTE: should be ValueError, but we need defaults to keep
+            # compatibility with the older versions
+            if not workdir.exists() or not workdir.is_dir():
+                raise ValueError("Workdir should be a path to existing directory")
+
+            with open(self._workdir_file, "w") as f:
+                f.write(f"{workdir}")
 
     def _set_pid(self, pid: int):
         with open(self._pid_file, "w") as pid_file:
@@ -173,9 +190,15 @@ class Hap(object):
 
     @property
     @allow_missing
-    def cmd(self) -> str:
+    def cmd(self) -> Optional[str]:
         with open(self._cmd_file) as f:
             return f.read()
+
+    @property
+    @allow_missing
+    def workdir(self) -> Optional[Path]:
+        with open(self._workdir_file) as f:
+            return Path(f.read())
 
     @property
     @allow_missing
@@ -233,8 +256,8 @@ class Hap(object):
         if proc is not None:
             return proc.environ()
 
-        with open(self._env_file) as env_file:
-            return json.loads(env_file.read())
+        with open(self._env_file) as f:
+            return json.loads(f.read())
 
     @property
     @allow_missing
@@ -300,6 +323,7 @@ class Hap(object):
             "pid": str(self.pid) if self.pid is not None else None,
             "rc": str(self.rc) if self.rc is not None else None,
             "cmd": self.cmd,
+            "workdir": str(self.workdir),
             "status": self.status.value,
             "runtime": self.runtime,
             "start_time": self.start_time,
