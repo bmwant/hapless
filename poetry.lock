@@ -188,17 +188,14 @@ testing = ["coverage[toml] (>=5.0a4)", "pytest (>=4.6.11)", "setuptools (>=71.0.
 
 [[package]]
 name = "exceptiongroup"
-version = "1.3.0"
+version = "1.2.2"
 description = "Backport of PEP 654 (exception groups)"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "exceptiongroup-1.3.0-py3-none-any.whl", hash = "sha256:4d111e6e0c13d0644cad6ddaa7ed0261a0b36971f6d23e7ec9b4b9097da78a10"},
-    {file = "exceptiongroup-1.3.0.tar.gz", hash = "sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88"},
+    {file = "exceptiongroup-1.2.2-py3-none-any.whl", hash = "sha256:3111b9d131c238bec2f8f516e123e14ba243563fb135d3fe885990585aa7795b"},
+    {file = "exceptiongroup-1.2.2.tar.gz", hash = "sha256:47c2edf7c6738fafb49fd34290706d1a1a2f4d1c6df275526b62cbb4aa5393cc"},
 ]
-
-[package.dependencies]
-typing-extensions = {version = ">=4.6.0", markers = "python_version < \"3.13\""}
 
 [package.extras]
 test = ["pytest (>=6)"]
@@ -585,13 +582,13 @@ files = [
 
 [[package]]
 name = "typing-extensions"
-version = "4.7.1"
-description = "Backported and Experimental Type Hints for Python 3.7+"
+version = "4.0.0"
+description = "Backported and Experimental Type Hints for Python 3.6+"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.6"
 files = [
-    {file = "typing_extensions-4.7.1-py3-none-any.whl", hash = "sha256:440d5dd3af93b060174bf433bccd69b0babc3b15b1a8dca43789fd7f61514b36"},
-    {file = "typing_extensions-4.7.1.tar.gz", hash = "sha256:b75ddc264f0ba5615db7ba217daeb99701ad295353c45f9e95963337ceeeffb2"},
+    {file = "typing_extensions-4.0.0-py3-none-any.whl", hash = "sha256:829704698b22e13ec9eaf959122315eabb370b0884400e9818334d8b677023d9"},
+    {file = "typing_extensions-4.0.0.tar.gz", hash = "sha256:2cdf80e4e04866a9b3689a51869016d36db0814d84b8d8a568d22781d45d27ed"},
 ]
 
 [[package]]
@@ -635,4 +632,4 @@ dev = ["pytest", "pytest-cov", "pytest-env", "pytest-env", "ruff"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7"
-content-hash = "0a8dfe76a0388a9387e0f63c90452119256f2315095de7aa16fcdd2f341f846d"
+content-hash = "7df28cd0adcaf3b005c25e27502eb1c3828bdbb7787ff042684dc75b66e92220"

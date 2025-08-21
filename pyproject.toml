@@ -51,6 +51,7 @@ pytest-env = [
     { version = "0.8.2", python = "<3.8", optional = true },
     { version = "^1.1.2", python = ">=3.8", optional = true },
 ]
+typing-extensions = "4.0.0"
 
 
 [tool.poetry.extras]
