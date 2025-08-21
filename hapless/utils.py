@@ -6,20 +6,24 @@ import time
 from contextlib import nullcontext
 from functools import wraps
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional, TypeVar
 
 import click
 import psutil
 import structlog
 from rich.spinner import Spinner
 from rich.text import Text
+from typing_extensions import ParamSpec
 
 from hapless import config
 
+P = ParamSpec("P")
+R = TypeVar("R")
 
-def allow_missing(func):
+
+def allow_missing(func: Callable[P, R]) -> Callable[P, Optional[R]]:
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[R]:
         try:
             return func(*args, **kwargs)
         except FileNotFoundError:

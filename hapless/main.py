@@ -165,24 +165,30 @@ class Hapless:
 
     def _check_fast_failure(self, hap: Hap) -> None:
         timeout = config.FAILFAST_TIMEOUT
-        if (
-            wait_created(
-                hap._rc_file,
-                live_context=self.ui.get_live(),
-                interval=0.5,
-                timeout=timeout,
+        wait_created(
+            hap._rc_file,
+            live_context=self.ui.get_live(),
+            interval=0.5,
+            timeout=timeout,
+        )
+        return_code: Optional[int] = hap.rc
+        if return_code is None:
+            self.ui.print(
+                f"{config.ICON_INFO} Hap is healthy "
+                f"and still running after {timeout} seconds",
+                style=f"{config.COLOR_ACCENT} bold",
             )
-            and hap.rc != 0
-        ):
+        elif return_code == 0:
+            self.ui.print(
+                f"{config.ICON_INFO} Hap is healthy "
+                f"and still running after {timeout} seconds",
+                style=f"{config.COLOR_ACCENT} bold",
+            )
+        else:
+            # non-zero return code
             self.ui.error("Hap exited too quickly. stderr message:")
             self.ui.print(hap.stderr_path.read_text())
             sys.exit(1)
-
-        self.ui.print(
-            f"{config.ICON_INFO} Hap is healthy "
-            f"and still running after {timeout} seconds",
-            style=f"{config.COLOR_ACCENT} bold",
-        )
 
     def run_hap(
         self,
