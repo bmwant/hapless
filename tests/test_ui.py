@@ -105,7 +105,7 @@ def test_rename_message(hapless_with_ui: Hapless, capsys):
     assert "new-name" in captured.out
 
 
-def test_workdir_is_displayed_in_versbose_mode(
+def test_workdir_is_displayed_in_verbose_mode(
     hapless_with_ui: Hapless, tmp_path, capsys
 ):
     hapless = hapless_with_ui
@@ -115,7 +115,7 @@ def test_workdir_is_displayed_in_versbose_mode(
     captured = capsys.readouterr()
     assert "Command:" in captured.out
     assert "Working dir:" in captured.out
-    assert f"{tmp_path}" in captured.out  # Check for the title
+    assert f"{tmp_path}" in captured.out
 
 
 def test_launching_message(hapless_with_ui: Hapless, capsys):
