@@ -193,3 +193,24 @@ def test_check_fast_failure_error_message(hapless_with_ui: Hapless, capsys):
     captured = capsys.readouterr()
     assert "Hap exited too quickly" in captured.out
     assert "Hap is healthy" not in captured.out
+
+
+def test_check_fast_failure_quick_but_success(hapless_with_ui: Hapless, capsys):
+    hapless = hapless_with_ui
+    hap = hapless.create_hap("true", name="hap-check-fast-ok")
+    with patch.object(
+        type(hap), "rc", new_callable=PropertyMock, return_value=0
+    ), patch("hapless.main.wait_created", return_value=True) as wait_created_mock:
+        hapless._check_fast_failure(hap)
+
+        assert hap.rc == 0
+        wait_created_mock.assert_called_once_with(
+            hap._rc_file,
+            live_context=ANY,
+            interval=ANY,
+            timeout=ANY,
+        )
+
+    captured = capsys.readouterr()
+    assert "Hap exited too quickly" in captured.out
+    assert "Hap is healthy" not in captured.out

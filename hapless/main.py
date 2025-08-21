@@ -173,15 +173,17 @@ class Hapless:
         )
         return_code: Optional[int] = hap.rc
         if return_code is None:
+            # no return code yet, process is still running
             self.ui.print(
                 f"{config.ICON_INFO} Hap is healthy "
                 f"and still running after {timeout} seconds",
                 style=f"{config.COLOR_ACCENT} bold",
             )
         elif return_code == 0:
+            # finished quickly, but successfully
             self.ui.print(
-                f"{config.ICON_INFO} Hap is healthy "
-                f"and still running after {timeout} seconds",
+                f"{config.ICON_INFO} Hap finished successfully "
+                f"in less than {timeout} seconds",
                 style=f"{config.COLOR_ACCENT} bold",
             )
         else:
