@@ -246,8 +246,9 @@ class Hapless:
             os.setsid()
             logger.debug(f"Running subprocess in child with pid {os.getpid()}")
             self._wrap_subprocess(hap)
-            # NOTE: sole purpose of the child is to run a subprocess
-            sys.exit(0)
+            # NOTE: to prevent deadlocks in multi-threaded environments
+            # https://docs.python.org/3/library/os.html#os._exit
+            os._exit(0)
 
     def run_command(
         self,
