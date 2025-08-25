@@ -132,33 +132,38 @@ def test_run_hap_invocation(hapless: Hapless):
     hap = hapless.create_hap("echo test", name="hap-name")
     with patch("os.fork", return_value=0) as fork_mock, patch(
         "os.setsid"
-    ) as setsid_mock, patch.object(
-        hapless, "_wrap_subprocess"
-    ) as wrap_subprocess_mock, patch.object(
-        hapless, "_check_fast_failure"
-    ) as check_fast_failure_mock:
-        with pytest.raises(SystemExit) as e:
-            hapless.run_hap(hap)
-        assert e.value.code == 0
-
-        fork_mock.assert_called_once_with()
-        setsid_mock.assert_called_once_with()
-        wrap_subprocess_mock.assert_called_once_with(hap)
-        check_fast_failure_mock.assert_not_called()
-
-
-def test_run_hap_parent_process(hapless: Hapless):
-    """
-    Check child launches a subprocess and exits.
-    """
-    hap = hapless.create_hap("echo test", name="hap-name")
-    with patch("os.fork", return_value=12345) as fork_mock, patch.object(
+    ) as setsid_mock, patch("os._exit") as os_exit_mock, patch(
+        "sys.exit"
+    ) as sys_exit_mock, patch.object(
         hapless, "_wrap_subprocess"
     ) as wrap_subprocess_mock, patch.object(
         hapless, "_check_fast_failure"
     ) as check_fast_failure_mock:
         hapless.run_hap(hap)
 
+        fork_mock.assert_called_once_with()
+        setsid_mock.assert_called_once_with()
+        wrap_subprocess_mock.assert_called_once_with(hap)
+        check_fast_failure_mock.assert_not_called()
+        os_exit_mock.assert_called_once_with(0)
+        sys_exit_mock.assert_not_called()
+
+
+def test_run_hap_parent_process(hapless: Hapless):
+    """
+    Check parent continues after the fork.
+    """
+    hap = hapless.create_hap("echo test", name="hap-name")
+    with patch("os.fork", return_value=12345) as fork_mock, patch.object(
+        hapless, "_wrap_subprocess"
+    ) as wrap_subprocess_mock, patch.object(
+        hapless, "_check_fast_failure"
+    ) as check_fast_failure_mock, patch.object(
+        hapless, "_run_via_fork", wraps=hapless._run_via_fork
+    ) as run_via_fork_mock:
+        hapless.run_hap(hap)
+
+        run_via_fork_mock.assert_called_once_with(hap)
         fork_mock.assert_called_once()
         wrap_subprocess_mock.assert_not_called()
         check_fast_failure_mock.assert_not_called()
