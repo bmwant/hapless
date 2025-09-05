@@ -17,7 +17,6 @@ classifiers = [
     "Topic :: System",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -27,28 +26,22 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 psutil = "^6.1.0"
 humanize = "^4.1.0"
 click = "^8.1.2"
 rich = "^13.5.2"
-importlib-metadata = { version = "^4.11.3", python = "<3.8" }
-"backports.cached-property" = { version = "^1.0.2", python = "<3.8" }
 django-environ = [
     { version = "^0.10.0", python = "<3.9" },
     { version = "^0.12.0", python = ">=3.9" },
 ]
-structlog = [
-    { version = "^22.3.0", python = "<3.8" },
-    { version = "^25.4.0", python = ">=3.8" },
-]
+structlog = "^25.4.0"
 # Optional dependencies installed as extras
 pytest = { version = "^7.4.4", optional = true }
 pytest-cov = { version = "^3.0.0", optional = true }
 ruff = { version = "^0.9.0", optional = true }
 nox = { version = "^2024.10.9", python = ">=3.8", optional = true }
 pytest-env = [
-    { version = "0.8.2", python = "<3.8", optional = true },
     { version = "^1.1.2", python = ">=3.8", optional = true },
 ]
 typing-extensions = "4.0.0"
@@ -66,7 +59,7 @@ dev = [
 pytest = "^7.4.4"
 pytest-cov = "^3.0.0"
 ruff = "^0.9.0"
-nox = { version = "^2024.10.9", python = ">=3.8" }
+nox = "^2024.10.9"
 
 [tool.poetry.scripts]
 hap = 'hapless.cli:cli'

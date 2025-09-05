@@ -3,8 +3,8 @@ import subprocess
 
 import nox
 
-POETRY_EXEC = "poetry1.5"  # NOTE: old exec while still supporting 3.7
-TARGET_VERSIONS = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+POETRY_EXEC = "poetry1.8"
+TARGET_VERSIONS = ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
 
 def poetry_python_versions():

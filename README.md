@@ -36,13 +36,13 @@ $ python -m pip install --user hapless
 
 ```bash
 # Run arbitrary script
-$ hap run -- python long_running.py
+hap run -- python long_running.py
 
 # Show summary table
-$ hap
+hap
 
 # Display status of the specific process
-$ hap status 1
+hap status 1
 ```
 
 See [USAGE.md](https://github.com/bmwant/hapless/blob/main/USAGE.md) for the complete list of commands and available parameters.
