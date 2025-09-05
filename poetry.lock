@@ -156,13 +156,13 @@ files = [
 
 [[package]]
 name = "django-environ"
-version = "0.10.0"
+version = "0.11.2"
 description = "A package that allows you to utilize 12factor inspired environment variables to configure your Django application."
 optional = false
-python-versions = ">=3.5,<4"
+python-versions = ">=3.6,<4"
 files = [
-    {file = "django-environ-0.10.0.tar.gz", hash = "sha256:b3559a91439c9d774a9e0c1ced872364772c612cdf6dc919506a2b13f7a77225"},
-    {file = "django_environ-0.10.0-py2.py3-none-any.whl", hash = "sha256:510f8c9c1d0a38b0815f91504270c29440a0cf44fab07f55942fa8d31bbb9be6"},
+    {file = "django-environ-0.11.2.tar.gz", hash = "sha256:f32a87aa0899894c27d4e1776fa6b477e8164ed7f6b3e410a62a6d72caaf64be"},
+    {file = "django_environ-0.11.2-py2.py3-none-any.whl", hash = "sha256:0ff95ab4344bfeff693836aa978e6840abef2e2f1145adff7735892711590c05"},
 ]
 
 [package.extras]
@@ -580,4 +580,4 @@ dev = ["nox", "pytest", "pytest-cov", "pytest-env", "ruff"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "5491656f19479f7804944184e7b365656c5b36b39fd09f980ba8f2379e0288d1"
+content-hash = "e6e11997f6bd2606f9ca2c61b5f33138a773450a465f57f763a8673d6f66d0a4"
