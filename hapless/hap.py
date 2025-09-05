@@ -6,14 +6,9 @@ import string
 import time
 from datetime import datetime
 from enum import Enum
+from functools import cached_property
 from pathlib import Path
 from typing import Dict, Optional, Union
-
-try:
-    from functools import cached_property
-except ImportError:
-    # Fallback for Python 3.7
-    from backports.cached_property import cached_property
 
 import humanize
 import psutil
