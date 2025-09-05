@@ -575,9 +575,9 @@ docs = ["furo (>=2023.7.26)", "proselint (>=0.13)", "sphinx (>=7.1.2,!=7.3)", "s
 test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7)", "packaging (>=23.1)", "pytest (>=7.4)", "pytest-env (>=0.8.2)", "pytest-freezer (>=0.4.8)", "pytest-mock (>=3.11.1)", "pytest-randomly (>=3.12)", "pytest-timeout (>=2.1)", "setuptools (>=68)", "time-machine (>=2.10)"]
 
 [extras]
-dev = ["pytest", "pytest-cov", "pytest-env", "ruff"]
+dev = ["nox", "pytest", "pytest-cov", "pytest-env", "ruff"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "18c628d32dfe38daeda0e43b1e82dc9b74a3b5a0f9277a7ca478ee26e30497ef"
+content-hash = "5491656f19479f7804944184e7b365656c5b36b39fd09f980ba8f2379e0288d1"
