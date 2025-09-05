@@ -8,7 +8,7 @@ on:
         required: true
 
 env:
-  POETRY_VERSION: "1.5.1"
+  POETRY_VERSION: "1.8.5"
 
 jobs:
   draft-new-release:

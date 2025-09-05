@@ -11,16 +11,15 @@ on:
       - release
 
 env:
-  # Pinned to this version to still support Python 3.7
-  POETRY_VERSION: "1.5.1"
+  # Pinned to this version to still support Python 3.8
+  POETRY_VERSION: "1.8.5"
 
 jobs:
   test:
-    # Temp fix while 3.7 is still supported
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - name: Checkout code

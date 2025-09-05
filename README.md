@@ -19,30 +19,30 @@ Simplest way of running and tracking processes in the background.
 ### Installation
 
 ```bash
-$ pip install hapless
+pip install hapless
 
 # or to make sure proper pip is used for the given python executable
-$ python -m pip install hapless
+python -m pip install hapless
 ```
 
 Install into user-specific directory in case of any permissions-related issues.
 
 ```bash
-$ pip install --user hapless
-$ python -m pip install --user hapless
+pip install --user hapless
+python -m pip install --user hapless
 ```
 
 ### Usage
 
 ```bash
 # Run arbitrary script
-$ hap run -- python long_running.py
+hap run -- python long_running.py
 
 # Show summary table
-$ hap
+hap
 
 # Display status of the specific process
-$ hap status 1
+hap status 1
 ```
 
 See [USAGE.md](https://github.com/bmwant/hapless/blob/main/USAGE.md) for the complete list of commands and available parameters.
@@ -51,9 +51,13 @@ See [USAGE.md](https://github.com/bmwant/hapless/blob/main/USAGE.md) for the com
 
 See [DEVELOP.md](https://github.com/bmwant/hapless/blob/main/DEVELOP.md) to setup your local development environment and feel free to create a pull request with a new feature.
 
-### Releases changelog
+### Releases
 
-Changelog file was removed; you can now view the changes made in each release on the [Releases](https://github.com/bmwant/hapless/releases) page.
+Changes made in each release can be found on the [Releases](https://github.com/bmwant/hapless/releases) page.
+
+Python versions compatibility:
+
+* `0.11.1` is the last version to support Python `3.7`
 
 ### See also
 

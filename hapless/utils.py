@@ -1,6 +1,5 @@
 import logging
 import os
-import shlex
 import signal
 import time
 from contextlib import nullcontext
@@ -30,11 +29,6 @@ def allow_missing(func: Callable[P, R]) -> Callable[P, Optional[R]]:
             pass
 
     return wrapper
-
-
-def shlex_join_backport(split_command):
-    """Return a shell-escaped string"""
-    return " ".join(shlex.quote(arg) for arg in split_command)
 
 
 class timed(object):

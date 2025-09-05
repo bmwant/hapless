@@ -1,4 +1,5 @@
 import sys
+from shlex import join as shlex_join
 from typing import Optional
 
 import click
@@ -12,12 +13,6 @@ from hapless.cli_utils import (
 )
 from hapless.formatters import JSONFormatter, TableFormatter
 from hapless.utils import validate_signal
-
-try:
-    from shlex import join as shlex_join
-except ImportError:
-    # Fallback for Python 3.7
-    from hapless.utils import shlex_join_backport as shlex_join
 
 
 @click.group(invoke_without_command=True)
