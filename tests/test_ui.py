@@ -1,5 +1,5 @@
-from collections.abc import Generator
 from pathlib import Path
+from typing import Generator
 from unittest.mock import ANY, PropertyMock, patch
 
 import pytest
