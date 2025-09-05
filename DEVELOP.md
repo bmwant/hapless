@@ -39,7 +39,12 @@ make coverage-report
 Run against multiple Python versions with [nox](https://nox.thea.codes/en/stable/index.html)
 
 ```bash
+# Use uv as a default backend for virtual environment creation
+export NOX_DEFAULT_VENV_BACKEND=uv
+
+# Show available nox sessions
 nox --list
+
 # Check all of the defined Python versions are available
 nox -s check_versions
 
