@@ -80,6 +80,29 @@ def test_logs_stderr_invocation(get_or_exit_mock, runner):
         logs_mock.assert_called_once_with(hap_mock, stderr=True, follow=False)
 
 
+@patch("hapless.cli.get_or_exit")
+def test_errors_invocation(get_or_exit_mock, runner):
+    hap_mock = Mock()
+    get_or_exit_mock.return_value = hap_mock
+    with patch.object(runner.hapless, "logs") as logs_mock:
+        result = runner.invoke(cli.cli, ["errors", "hap-me", "--follow"])
+        assert result.exit_code == 0
+        get_or_exit_mock.assert_called_once_with("hap-me")
+        logs_mock.assert_called_once_with(hap_mock, stderr=True, follow=True)
+
+
+@patch("hapless.cli.get_or_exit")
+def test_errors_help_invocation(get_or_exit_mock, runner):
+    with patch.object(runner.hapless, "logs") as logs_mock:
+        result = runner.invoke(cli.cli, ["errors", "--help"])
+        assert result.exit_code == 0
+        assert "Output stderr logs for a hap" in result.output
+        assert "--follow" in result.output
+        assert "--stderr" not in result.output
+        get_or_exit_mock.assert_not_called()
+        logs_mock.assert_not_called()
+
+
 def test_run_invocation(runner):
     with patch.object(runner.hapless, "run_command") as run_command_mock:
         result = runner.invoke(cli.cli, ["run", "script", "--check"])

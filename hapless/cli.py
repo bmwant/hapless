@@ -66,9 +66,26 @@ def _status(
 @hap_argument
 @click.option("-f", "--follow", is_flag=True, default=False)
 @click.option("-e", "--stderr", is_flag=True, default=False)
-def logs(hap_alias: str, follow, stderr):
+def logs(hap_alias: str, follow: bool, stderr: bool):
     hap = get_or_exit(hap_alias)
     hapless.logs(hap, stderr=stderr, follow=follow)
+
+
+@cli.command(short_help="Output error logs for a hap.")
+@hap_argument
+@click.option(
+    "-f",
+    "--follow",
+    is_flag=True,
+    default=False,
+    help="Print new log lines as they are added.",
+)
+def errors(hap_alias: str, follow: bool):
+    """
+    Output stderr logs for a hap. Same as running `logs -e` command.
+    """
+    hap = get_or_exit(hap_alias)
+    hapless.logs(hap, stderr=True, follow=follow)
 
 
 @cli.command(short_help="Remove successfully completed haps.")
