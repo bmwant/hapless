@@ -1,11 +1,6 @@
-try:
-    from importlib.metadata import version
-except ModuleNotFoundError:
-    # Fallback for Python 3.7
-    from importlib_metadata import version
-
 import abc
 import json
+from importlib.metadata import version
 from itertools import filterfalse
 from typing import List
 
