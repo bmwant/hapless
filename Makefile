@@ -20,6 +20,12 @@ coverage-report:
 	@poetry run pytest --cov=hapless --cov-report=html tests
 
 
+.PHONY: nox
+nox:
+	@NOX_DEFAULT_VENV_BACKEND=uv \
+	poetry run nox -s test
+
+
 .PHONY: format
 format:
 	@poetry run ruff format .
