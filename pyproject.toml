@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hapless"
-version = "0.12.0"
+version = "0.13.0"
 description = "Run and track processes in background"
 authors = ["Misha Behersky <bmwant@gmail.com>"]
 license = "MIT"
@@ -22,6 +22,8 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Unix Shell",
 ]
 
