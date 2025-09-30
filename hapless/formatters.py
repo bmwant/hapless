@@ -141,7 +141,7 @@ class TableFormatter(Formatter):
                 f"{hap.pid}" if hap.active else Text(f"{hap.pid or '-'}", style="dim")
             )
             command_text = Text(
-                hap.cmd, overflow="ellipsis", style=f"{config.COLOR_ACCENT}"
+                f"{hap.cmd}", overflow="ellipsis", style=f"{config.COLOR_ACCENT}"
             )
             status_text = self._get_status_text(hap.status)
             command_text.truncate(config.TRUNCATE_LENGTH)
