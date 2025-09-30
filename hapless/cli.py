@@ -154,7 +154,7 @@ def resume(hap_alias: str):
 @cli.command(short_help="Terminate a specific hap / all haps.")
 @hap_argument_optional
 @click.option("-a", "--all", "killall", is_flag=True, default=False)
-def kill(hap_alias: Optional[str], killall):
+def kill(hap_alias: Optional[str], killall: bool):
     if hap_alias is not None and killall:
         raise click.BadOptionUsage(
             "killall", "Cannot use --all flag while hap id provided"
@@ -167,7 +167,8 @@ def kill(hap_alias: Optional[str], killall):
         haps = hapless.get_haps()
         hapless.kill(haps)
     else:
-        hap = get_or_exit(hap_alias)
+        # NOTE: `hap_alias` is guaranteed not to be None here
+        hap = get_or_exit(hap_alias)  # ty: ignore[invalid-argument-type]
         hapless.kill([hap])
 
 
@@ -179,14 +180,14 @@ def signal(hap_alias: str, signal):
     hapless.signal(hap, signal)
 
 
-@cli.command(short_help="Kills the hap and starts it again.")
+@cli.command(short_help="Kill the hap and start it again.")
 @hap_argument
 def restart(hap_alias: str):
     hap = get_or_exit(hap_alias)
     hapless.restart(hap)
 
 
-@cli.command(short_help="Sets new name/alias for the existing hap.")
+@cli.command(short_help="Set new name/alias for the existing hap.")
 @hap_argument
 @click.argument("new_name", metavar="new-name", required=True)
 def rename(hap_alias: str, new_name: str):

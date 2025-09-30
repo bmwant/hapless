@@ -7,6 +7,10 @@ from hapless.cli_utils import get_or_exit, hap_argument, hapless
 from hapless.utils import logger
 
 
+def isatty():
+    return sys.stdin.isatty() and sys.stdout.isatty()
+
+
 @click.group(invoke_without_command=True)
 @hap_argument
 def wrap_hap(hap_alias: str) -> None:
