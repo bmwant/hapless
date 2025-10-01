@@ -113,7 +113,8 @@ class TableFormatter(Formatter):
         return result
 
     def format_list(self, haps: List[Hap]) -> Table:
-        package_version = version(__package__)
+        package_name = __package__ or __name__.split(".")[0]
+        package_version = version(package_name)
         table = Table(
             show_header=True,
             header_style=f"{config.COLOR_MAIN} bold",
@@ -158,7 +159,7 @@ class TableFormatter(Formatter):
             table.add_row(*filterfalse(lambda x: x is None, row))
 
         if self.verbose:
-            table.title = f"{config.ICON_HAP} {__package__}, {package_version}"
+            table.title = f"{config.ICON_HAP} {package_name}, {package_version}"
             table.caption = f"{active_haps} active / {len(haps)} total"
 
         return table

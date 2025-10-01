@@ -54,6 +54,7 @@ jobs:
         run: |
           poetry run ty --version
           poetry run ty check .
+          poetry run ty check tests/ || true
 
       - name: Run unittests
         run: |
