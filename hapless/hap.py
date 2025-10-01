@@ -210,7 +210,7 @@ class Hap(object):
         elif self._pid_file.exists():
             start_time = cast(float, get_mtime(self._pid_file))
             finish_time = cast(
-                float, get_mtime(self._rc_file) or get_mtime(self.stdout_path)
+                float, get_mtime(self._rc_file) or get_mtime(self.stderr_path)
             )
             runtime = finish_time - start_time
 
