@@ -38,7 +38,7 @@ def test_internal_wrap_hap_not_unbound(get_or_exit_mock, runner, tmp_path, log_o
         prop_mock.assert_called_once_with()
         wrap_mock.assert_not_called()
         assert (
-            "ERROR: Hap hap-me has to be unbound, found instead failed"
+            "ERROR: Hap hap-me has to be unbound, found instead Status.FAILED"
             in log_output.text
         )
 

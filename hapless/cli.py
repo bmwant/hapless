@@ -210,7 +210,7 @@ def _wrap_hap(hap_alias: str) -> None:
 
     hap = get_or_exit(hap_alias)
     if hap.status != Status.UNBOUND:
-        message = f"Hap {hap} has to be unbound, found instead {hap.status}\n"
+        message = f"Hap {hap} has to be unbound, found instead {str(hap.status)}\n"
         with open(hap.stderr_path, "a") as f:
             f.write(message)
         logger.error(message)
