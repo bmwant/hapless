@@ -36,6 +36,11 @@ lint:
 	@poetry run ruff check .
 
 
+.PHONY: ty
+ty:
+	@poetry run ty check .
+
+
 .PHONY: tag
 tag:
 	@VERSION=$$(poetry version --short); \

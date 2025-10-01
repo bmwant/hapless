@@ -8,7 +8,6 @@ on:
   pull_request:
     branches:
       - main
-      - release
 
 env:
   # Pinned to this version to still support Python 3.8
@@ -42,12 +41,20 @@ jobs:
       - name: Check codestyle with ruff
         if: ${{ always() }}
         run: |
+          poetry run ruff --version
           poetry run ruff format --diff .
 
       - name: Lint code with ruff
         if: ${{ always() }}
         run: |
           poetry run ruff check .
+
+      - name: Type check code with ty
+        if: ${{ always() }}
+        run: |
+          poetry run ty --version
+          poetry run ty check .
+          poetry run ty check tests/ || true
 
       - name: Run unittests
         run: |

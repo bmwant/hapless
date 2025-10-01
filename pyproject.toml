@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hapless"
-version = "0.13.0"
+version = "0.14.0"
 description = "Run and track processes in background"
 authors = ["Misha Behersky <bmwant@gmail.com>"]
 license = "MIT"
@@ -45,6 +45,7 @@ pytest-cov = { version = "^3.0.0", optional = true }
 ruff = { version = "^0.9.0", optional = true }
 nox = { version = "^2024.10.9", optional = true }
 pytest-env = { version = "^1.1.2", optional = true }
+ty = { version = "^0.0.1a21", optional = true }
 
 
 [tool.poetry.extras]
@@ -53,6 +54,7 @@ dev = [
     "pytest-cov",
     "pytest-env",
     "ruff",
+    "ty",
     "nox",
 ]
 
@@ -64,7 +66,6 @@ nox = "^2024.10.9"
 
 [tool.poetry.scripts]
 hap = 'hapless.cli:cli'
-hapwrap = 'hapless.wrapper:wrap_hap'
 
 [tool.poetry.urls]
 "Blog post" = "https://bmwant.link/hapless-easily-run-and-manage-background-processes/"
@@ -78,6 +79,11 @@ target-version = "py38"
 extend-select = [
     # isort
     "I",
+]
+
+[tool.ty.src]
+exclude = [
+    "tests/",
 ]
 
 [tool.pytest.ini_options]

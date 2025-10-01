@@ -4,6 +4,7 @@ from typing import Optional
 
 import click
 
+from hapless import config
 from hapless.cli_utils import (
     console,
     get_or_exit,
@@ -12,7 +13,8 @@ from hapless.cli_utils import (
     hapless,
 )
 from hapless.formatters import JSONFormatter, TableFormatter
-from hapless.utils import validate_signal
+from hapless.hap import Status
+from hapless.utils import isatty, logger, validate_signal
 
 
 @click.group(invoke_without_command=True)
@@ -126,14 +128,14 @@ def run(cmd, name, check):
     hap = hapless.get_hap(name)
     if hap is not None:
         console.error(f"Hap with such name already exists: {hap}")
-        sys.exit(1)
+        return sys.exit(1)
 
     # NOTE: click doesn't like `required` property for `cmd` argument
     # https://click.palletsprojects.com/en/latest/arguments/#variadic-arguments
     cmd_escaped = shlex_join(cmd).strip()
     if not cmd_escaped:
         console.error("You have to provide a command to run")
-        sys.exit(1)
+        return sys.exit(1)
     hapless.run_command(cmd_escaped, name=name, check=check)
 
 
@@ -154,7 +156,7 @@ def resume(hap_alias: str):
 @cli.command(short_help="Terminate a specific hap / all haps.")
 @hap_argument_optional
 @click.option("-a", "--all", "killall", is_flag=True, default=False)
-def kill(hap_alias: Optional[str], killall):
+def kill(hap_alias: Optional[str], killall: bool):
     if hap_alias is not None and killall:
         raise click.BadOptionUsage(
             "killall", "Cannot use --all flag while hap id provided"
@@ -167,7 +169,8 @@ def kill(hap_alias: Optional[str], killall):
         haps = hapless.get_haps()
         hapless.kill(haps)
     else:
-        hap = get_or_exit(hap_alias)
+        # NOTE: `hap_alias` is guaranteed not to be None here
+        hap = get_or_exit(hap_alias)  # ty: ignore[invalid-argument-type]
         hapless.kill([hap])
 
 
@@ -179,14 +182,14 @@ def signal(hap_alias: str, signal):
     hapless.signal(hap, signal)
 
 
-@cli.command(short_help="Kills the hap and starts it again.")
+@cli.command(short_help="Kill the hap and start it again.")
 @hap_argument
 def restart(hap_alias: str):
     hap = get_or_exit(hap_alias)
     hapless.restart(hap)
 
 
-@cli.command(short_help="Sets new name/alias for the existing hap.")
+@cli.command(short_help="Set new name/alias for the existing hap.")
 @hap_argument
 @click.argument("new_name", metavar="new-name", required=True)
 def rename(hap_alias: str, new_name: str):
@@ -194,8 +197,25 @@ def rename(hap_alias: str, new_name: str):
     same_name_hap = hapless.get_hap(new_name)
     if same_name_hap is not None:
         console.print(f"Hap with such name already exists: {same_name_hap}")
-        sys.exit(1)
+        return sys.exit(1)
     hapless.rename_hap(hap, new_name)
+
+
+@cli.command("__internal_wrap_hap", hidden=True)
+@hap_argument
+def _wrap_hap(hap_alias: str) -> None:
+    if isatty() and not config.DEBUG:
+        logger.critical("Internal command is not supposed to be run manually")
+        return sys.exit(1)
+
+    hap = get_or_exit(hap_alias)
+    if hap.status != Status.UNBOUND:
+        message = f"Hap {hap} has to be unbound, found instead {str(hap.status)}\n"
+        with open(hap.stderr_path, "a") as f:
+            f.write(message)
+        logger.error(message)
+        return sys.exit(1)
+    hapless._wrap_subprocess(hap)
 
 
 if __name__ == "__main__":
