@@ -1,5 +1,7 @@
 from unittest.mock import Mock, PropertyMock, patch
 
+import pytest
+
 from hapless import cli
 from hapless.hap import Status
 
@@ -47,7 +49,10 @@ def test_wrap_cannot_be_launched_interactively(
     isatty_mock, get_or_exit_mock, runner, log_output
 ):
     isatty_mock.return_value = True
-    with patch.object(runner.hapless, "_wrap_subprocess") as wrap_mock:
+    get_or_exit_mock.side_effect = lambda _: pytest.fail("Should not be called")
+    with patch.object(runner.hapless, "_wrap_subprocess") as wrap_mock, patch(
+        "hapless.config.DEBUG", False
+    ):
         result = runner.invoke(cli.cli, ["__internal_wrap_hap", "hap-me"])
         assert result.exit_code == 1
         get_or_exit_mock.assert_not_called()
