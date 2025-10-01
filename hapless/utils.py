@@ -1,6 +1,7 @@
 import logging
 import os
 import signal
+import sys
 import time
 from contextlib import nullcontext
 from functools import wraps
@@ -115,6 +116,10 @@ def kill_proc_tree(pid, sig=signal.SIGKILL, include_parent=True):
 def get_mtime(path: Path) -> Optional[float]:
     if path.exists():
         return os.path.getmtime(path)
+
+
+def isatty() -> bool:
+    return sys.stdin.isatty() and sys.stdout.isatty()
 
 
 def configure_logger() -> logging.Logger:
