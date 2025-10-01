@@ -66,7 +66,6 @@ nox = "^2024.10.9"
 
 [tool.poetry.scripts]
 hap = 'hapless.cli:cli'
-hapwrap = 'hapless.wrapper:wrap_hap'
 
 [tool.poetry.urls]
 "Blog post" = "https://bmwant.link/hapless-easily-run-and-manage-background-processes/"

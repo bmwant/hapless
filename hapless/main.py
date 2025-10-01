@@ -212,7 +212,7 @@ class Hapless:
         self.ui.print(f"{config.ICON_INFO} Launching", hap)
         # TODO: or sys.platform == "win32"
         if config.NO_FORK:
-            logger.debug("Forking is disabled, running using spawn via wrapper")
+            logger.debug("Forking is disabled, running using spawn")
             self._run_via_spawn(hap)
         else:
             logger.debug("Running hap using fork")
@@ -223,22 +223,16 @@ class Hapless:
             self._check_fast_failure(hap)
 
     def _run_via_spawn(self, hap: Hap) -> None:
-        exec_path = shutil.which("hapwrap")
-        if exec_path is None:
-            self.ui.error(
-                "Cannot find wrapper to run process. Please reinstall hapless"
-            )
-            sys.exit(1)
-
+        exec_path = Path(sys.argv[0])
         proc = subprocess.Popen(
-            [f"{exec_path}", f"{hap.hid}"],
+            [f"{exec_path}", "__internal_wrap_hap", f"{hap.hid}"],
             start_new_session=True,
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
         logger.debug(f"Running subprocess in child with pid {proc.pid}")
-        logger.debug(f"Using wrapper located at {exec_path}")
+        logger.debug(f"Using executable at {exec_path}")
 
     def _run_via_fork(self, hap: Hap) -> None:
         pid = os.fork()
