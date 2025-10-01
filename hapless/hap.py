@@ -8,7 +8,7 @@ from datetime import datetime
 from enum import Enum
 from functools import cached_property
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, cast
 
 import humanize
 import psutil
@@ -208,8 +208,10 @@ class Hap(object):
         if proc is not None:
             runtime = time.time() - proc.create_time()
         elif self._pid_file.exists():
-            start_time = get_mtime(self._pid_file)
-            finish_time = get_mtime(self._rc_file) or get_mtime(self.stderr_path)
+            start_time = cast(float, get_mtime(self._pid_file))
+            finish_time = cast(
+                float, get_mtime(self._rc_file) or get_mtime(self.stdout_path)
+            )
             runtime = finish_time - start_time
 
         return humanize.naturaldelta(runtime)
