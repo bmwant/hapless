@@ -81,6 +81,11 @@ extend-select = [
     "I",
 ]
 
+[tool.ty.src]
+exclude = [
+    "tests/",
+]
+
 [tool.pytest.ini_options]
 env = [
     "HAPLESS_DEBUG=false",
