@@ -14,7 +14,7 @@ from hapless import config
 from hapless.formatters import Formatter
 from hapless.hap import Hap, Status
 from hapless.ui import ConsoleUI
-from hapless.utils import kill_proc_tree, logger, wait_created
+from hapless.utils import get_exec_path, kill_proc_tree, logger, wait_created
 
 
 class Hapless:
@@ -223,7 +223,7 @@ class Hapless:
             self._check_fast_failure(hap)
 
     def _run_via_spawn(self, hap: Hap) -> None:
-        exec_path = Path(sys.argv[0])
+        exec_path = get_exec_path()
         proc = subprocess.Popen(
             [f"{exec_path}", "__internal_wrap_hap", f"{hap.hid}"],
             start_new_session=True,
