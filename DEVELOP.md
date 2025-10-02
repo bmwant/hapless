@@ -14,6 +14,13 @@ poetry run pytest -sv tests
 make tests
 ```
 
+Lint the code and run type checking
+
+```bash
+make lint
+make ty
+```
+
 Install git hooks for the automatic linting and code formatting with [pre-commit](https://pre-commit.com/)
 
 ```bash

@@ -26,7 +26,7 @@ def runner() -> Generator[CliRunner, None, None]:
     with cli_runner.isolated_filesystem() as path:
         hapless_test = Hapless(hapless_dir=Path(path))
         with patch("hapless.cli.hapless", hapless_test) as hapless_mock:
-            cli_runner.hapless = hapless_mock
+            cli_runner.hapless = hapless_mock  # ty: ignore[unresolved-attribute]
             yield cli_runner
 
 

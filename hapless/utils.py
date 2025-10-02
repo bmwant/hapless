@@ -1,8 +1,10 @@
 import logging
 import os
+import shutil
 import signal
 import sys
 import time
+from collections import deque
 from contextlib import nullcontext
 from functools import wraps
 from pathlib import Path
@@ -120,6 +122,24 @@ def get_mtime(path: Path) -> Optional[float]:
 
 def isatty() -> bool:
     return sys.stdin.isatty() and sys.stdout.isatty()
+
+
+def get_exec_path() -> Path:
+    if str(sys.argv[0]).endswith("hap"):
+        exec_path = sys.argv[0]
+    else:
+        logger.warning("Unusual invocation, checking `hap` in PATH")
+        exec_path = shutil.which("hap")
+
+    if exec_path is None:
+        raise RuntimeError("Cannot find `hap` executable, please reinstall hapless")
+
+    return Path(exec_path)
+
+
+def tail_lines(filepath: Path, n: int = 20):
+    with open(filepath) as f:
+        return deque(f, n)
 
 
 def configure_logger() -> logging.Logger:
