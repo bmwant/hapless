@@ -82,9 +82,7 @@ extend-select = [
 ]
 
 [tool.ty.src]
-exclude = [
-    "tests/",
-]
+exclude = []
 
 [tool.pytest.ini_options]
 env = [

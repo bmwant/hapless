@@ -43,6 +43,7 @@ def test_restart_uses_same_working_dir(hapless: Hapless, monkeypatch):
         )
 
     restarted_hap = hapless.get_hap("hap-same-name")
+    assert restarted_hap is not None
     assert restarted_hap.rc == 0
     assert restarted_hap.stdout_path.exists()
     assert "Correct file is being run" in restarted_hap.stdout_path.read_text()
