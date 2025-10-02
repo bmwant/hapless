@@ -1,6 +1,6 @@
 import sys
 from shlex import join as shlex_join
-from typing import Optional
+from typing import Optional, Tuple
 
 import click
 
@@ -124,7 +124,7 @@ def cleanall():
     default=False,
     help="Verify command launched does not fail immediately.",
 )
-def run(cmd: tuple[str, ...], name: str, check: bool):
+def run(cmd: Tuple[str, ...], name: str, check: bool):
     hap = hapless.get_hap(name)
     if hap is not None:
         console.error(f"Hap with such name already exists: {hap}")
