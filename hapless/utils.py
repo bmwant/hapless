@@ -4,6 +4,7 @@ import shutil
 import signal
 import sys
 import time
+from collections import deque
 from contextlib import nullcontext
 from functools import wraps
 from pathlib import Path
@@ -134,6 +135,11 @@ def get_exec_path() -> Path:
         raise RuntimeError("Cannot find `hap` executable, please reinstall hapless")
 
     return Path(exec_path)
+
+
+def tail_lines(filepath: Path, n: int = 20):
+    with open(filepath) as f:
+        return deque(f, n)
 
 
 def configure_logger() -> logging.Logger:

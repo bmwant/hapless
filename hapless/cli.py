@@ -99,7 +99,7 @@ def errors(hap_alias: str, follow: bool):
     default=False,
     help="Include failed haps for the removal.",
 )
-def clean(clean_all):
+def clean(clean_all: bool):
     hapless.clean(clean_all=clean_all)
 
 
@@ -124,7 +124,7 @@ def cleanall():
     default=False,
     help="Verify command launched does not fail immediately.",
 )
-def run(cmd, name, check):
+def run(cmd: tuple[str, ...], name: str, check: bool):
     hap = hapless.get_hap(name)
     if hap is not None:
         console.error(f"Hap with such name already exists: {hap}")
