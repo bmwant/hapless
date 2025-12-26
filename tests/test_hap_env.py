@@ -7,7 +7,8 @@ from unittest.mock import Mock, PropertyMock, patch
 import pytest
 
 from hapless.hap import Hap
-from hapless.main import Hapless
+
+# from hapless.main import Hapless
 
 
 @pytest.fixture
@@ -65,18 +66,18 @@ def test_proc_env_is_used_as_primaty_source(hap: Hap, write_env_factory):
         assert hap.env == {"ENV_KEY": "ENV_VALUE_FROM_PROC"}
 
 
-def test_correct_env_is_picked_up():
-    hapless = Hapless()
-    # hap = hapless.create_hap(
-    #     cmd="python -c 'import os; print(os.getenv(\"HAPLESS_TEST_ENV_VAR\"))'",
-    #     name="hap-env-test",
-    #     env={"HAPLESS_TEST_ENV_VAR": "hapless_env_value"},
-    # )
+# def test_correct_env_is_picked_up():
+#     hapless = Hapless()
+# hap = hapless.create_hap(
+#     cmd="python -c 'import os; print(os.getenv(\"HAPLESS_TEST_ENV_VAR\"))'",
+#     name="hap-env-test",
+#     env={"HAPLESS_TEST_ENV_VAR": "hapless_env_value"},
+# )
 
-    # hapless.run_hap(hap, blocking=True)
-    # assert hap.rc == 0
-    # assert hap.stdout_path.exists()
-    # assert hap.stdout_path.read_text().strip() == "hapless_env_value"
+# hapless.run_hap(hap, blocking=True)
+# assert hap.rc == 0
+# assert hap.stdout_path.exists()
+# assert hap.stdout_path.read_text().strip() == "hapless_env_value"
 
 
 # def test_env_preserved_on_restart(hapless: Hapless):
