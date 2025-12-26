@@ -58,6 +58,7 @@ class Hap(object):
         self._set_logfiles(redirect_stderr)
         self._set_raw_name(name)
         self._set_command_context(cmd, workdir)
+        self._set_env(env)
 
     def set_name(self, name: str):
         with open(self._name_file, "w") as f:
@@ -116,25 +117,22 @@ class Hap(object):
             self._stderr_path.touch(exist_ok=True, mode=0o644)
         self._stdout_path.touch(exist_ok=True, mode=0o644)
 
-    def _set_env(self):
+    def _get_proc_env(self) -> Dict[str, str]:
         proc = self.proc
-
         environ = {}
         if proc is not None:
             try:
                 environ = proc.environ()
             except (ProcessLookupError, psutil.NoSuchProcess) as e:
                 logger.error(f"Cannot get environment: {e}")
+        return environ
 
-        if not environ:
-            logger.warning(
-                "Cannot get environment from the process. "
-                "Fallback to current environment"
-            )
-            environ = dict(os.environ)
+    def _set_env(self, env: Optional[Dict[str, str]] = None):
+        if env is None:
+            env = dict(os.environ)
 
         with open(self._env_file, "w") as env_file:
-            env_file.write(json.dumps(environ))
+            env_file.write(json.dumps(env))
 
     def bind(self, pid: int):
         """
@@ -142,7 +140,6 @@ class Hap(object):
         """
         try:
             self._set_pid(pid)
-            self._set_env()
         except (RuntimeError, psutil.AccessDenied) as e:
             logger.error(f"Cannot bind due to {e}")
 

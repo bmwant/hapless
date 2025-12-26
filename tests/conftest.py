@@ -33,7 +33,7 @@ def runner() -> Generator[CliRunner, None, None]:
 @pytest.fixture
 def hap(tmp_path: Path) -> Generator[Hap, None, None]:
     hapless = Hapless(hapless_dir=tmp_path)
-    yield hapless.create_hap("false")
+    yield hapless.create_hap("false", env={})
 
 
 @pytest.fixture

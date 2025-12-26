@@ -37,7 +37,7 @@ def test_unbound_hap(hap: Hap):
     assert hap.rc is None
     assert hap.cmd == "false"
     assert hap.status == Status.UNBOUND
-    assert hap.env is None
+    assert hap.env == {}
     assert hap.restarts == 0
     assert not hap.active
 

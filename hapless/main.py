@@ -113,6 +113,7 @@ class Hapless:
     def create_hap(
         self,
         cmd: str,
+        env: Optional[Dict[str, str]] = None,
         workdir: Optional[Union[str, Path]] = None,
         hid: Optional[str] = None,
         name: Optional[str] = None,
@@ -126,10 +127,13 @@ class Hapless:
             redirect_stderr = config.REDIRECT_STDERR
         if workdir is None or not Path(workdir).exists():
             workdir = os.getcwd()
+        if env is None:
+            env = dict(os.environ)
         return Hap(
             hap_dir,
             name=name,
             cmd=cmd,
+            env=env,
             workdir=workdir,
             redirect_stderr=redirect_stderr,
         )
@@ -247,6 +251,7 @@ class Hapless:
     def run_command(
         self,
         cmd: str,
+        env: Optional[Dict[str, str]] = None,
         workdir: Optional[Union[str, Path]] = None,
         hid: Optional[str] = None,
         name: Optional[str] = None,
@@ -261,6 +266,7 @@ class Hapless:
         """
         hap = self.create_hap(
             cmd=cmd,
+            env=env,
             workdir=workdir,
             hid=hid,
             name=name,

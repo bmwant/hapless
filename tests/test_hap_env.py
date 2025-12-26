@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from typing import Dict
 from unittest.mock import Mock, PropertyMock, patch
@@ -18,12 +19,23 @@ def write_env_factory():
     return write_env
 
 
-def test_env_is_none_on_creation(hap: Hap):
+def test_empty_env_provided_on_creation(tmp_path):
+    hap = Hap(tmp_path, cmd="true", env={})
     assert hap.pid is None
     assert hap.proc is None
     assert hap.rc is None
     assert not hap.active
-    assert hap.env is None
+    assert hap.env == {}
+
+
+@patch.dict(os.environ, {"ENV_KEY": "TEST_VALUE"}, clear=True)
+def test_env_defaults_to_current_env_if_none(tmp_path):
+    hap = Hap(tmp_path, cmd="false")
+    assert hap.pid is None
+    assert hap.proc is None
+    assert hap.rc is None
+    assert not hap.active
+    assert hap.env == {"ENV_KEY": "TEST_VALUE"}
 
 
 @pytest.mark.parametrize("env_mapping", [{}, {"ENV_KEY": "TEST_VALUE"}])

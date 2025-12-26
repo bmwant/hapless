@@ -215,10 +215,29 @@ def test_run_command_accepts_redirect_stderr_parameter(hapless: Hapless):
         hapless.run_command("echo redirect", redirect_stderr=True)
         create_hap_mock.assert_called_once_with(
             cmd="echo redirect",
+            env=None,
             workdir=None,
             hid=None,
             name=None,
             redirect_stderr=True,
+        )
+        run_hap_mock.assert_called_once_with(hap_mock, check=False, blocking=False)
+
+
+def test_run_command_accepts_env_parameter(hapless: Hapless):
+    custom_env = {"KEY": "VALUE"}
+    hap_mock = Mock()
+    with patch.object(hapless, "run_hap") as run_hap_mock, patch.object(
+        hapless, "create_hap", return_value=hap_mock
+    ) as create_hap_mock:
+        hapless.run_command("echo env", env=custom_env)
+        create_hap_mock.assert_called_once_with(
+            cmd="echo env",
+            env=custom_env,
+            workdir=None,
+            hid=None,
+            name=None,
+            redirect_stderr=None,
         )
         run_hap_mock.assert_called_once_with(hap_mock, check=False, blocking=False)
 
