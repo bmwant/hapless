@@ -248,10 +248,14 @@ class Hap(object):
 
     @property
     @allow_missing
-    def env(self) -> Dict[str, str]:
+    def env(self) -> Optional[Dict[str, str]]:
         proc = self.proc
+        environ = {}
         if proc is not None:
-            return proc.environ()
+            environ = proc.environ()
+
+        if environ:
+            return environ
 
         with open(self._env_file) as f:
             return json.loads(f.read())
