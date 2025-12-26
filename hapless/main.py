@@ -399,6 +399,7 @@ class Hapless:
         name = f"{name}{config.RESTART_DELIM}{restarts + 1}"
         self.run_command(
             cmd=cmd,
+            env=env,
             workdir=workdir,
             hid=hid,
             name=name,
