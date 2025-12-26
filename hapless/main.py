@@ -364,10 +364,11 @@ class Hapless:
             self.ui.error("Cannot send signal to the inactive hap")
 
     def restart(self, hap: Hap) -> None:
-        hid, name, cmd, workdir, restarts, redirect_stderr = (
+        hid, name, cmd, env, workdir, restarts, redirect_stderr = (
             hap.hid,
             hap.name,
             hap.cmd,
+            hap.env,
             hap.workdir,
             hap.restarts,
             hap.redirect_stderr,

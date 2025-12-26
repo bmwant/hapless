@@ -132,7 +132,7 @@ def test_serialize(hap: Hap):
     assert "workdir" in result
 
 
-def test_represent_unbound_hap(hapless: Hapless):  # , capsys):
+def test_represent_unbound_hap(hapless: Hapless):
     hap = hapless.create_hap("echo print", name="hap-print")
     assert f"{hap}" == "#1 (hap-print)"
     # default is <hapless.hap.Hap object at 0x103960440>

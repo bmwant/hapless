@@ -35,6 +35,7 @@ class Hap(object):
         *,
         name: Optional[str] = None,
         cmd: Optional[str] = None,
+        env: Optional[Dict[str, str]] = None,
         workdir: Optional[Union[str, Path]] = None,
         redirect_stderr: bool = False,
     ) -> None:
