@@ -150,6 +150,7 @@ class Hapless:
             proc = subprocess.Popen(
                 hap.cmd,
                 cwd=hap.workdir,
+                env=hap.env,
                 shell=True,
                 executable=shell_exec,
                 stdout=stdout_pipe,
