@@ -50,3 +50,11 @@ def structlog_log_output():
         wrapper_class=structlog.make_filtering_bound_logger(logging.DEBUG),
     )
     return log_capture
+
+
+# @pytest.fixture
+# def clean_env(monkeypatch):
+#     # """Wipes the environment and sets base test defaults."""
+#     monkeypatch.setattr(os, "environ", {})
+#     monkeypatch.setenv("TESTING", "true")
+#     yield

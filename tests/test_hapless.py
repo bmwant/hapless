@@ -315,6 +315,7 @@ def test_redirect_state_is_not_affected_after_creation(hapless: Hapless):
 def test_restart_preserves_redirect_state(hapless: Hapless, redirect_stderr: bool):
     hap = hapless.create_hap(
         cmd="doesnotexist",
+        env={},
         name="hap-redirect-state",
         redirect_stderr=redirect_stderr,
     )
@@ -334,6 +335,7 @@ def test_restart_preserves_redirect_state(hapless: Hapless, redirect_stderr: boo
         wait_created_mock.assert_called_once_with(ANY, timeout=1)
         run_command_mock.assert_called_once_with(
             cmd="doesnotexist",
+            env={},
             workdir=hapless.dir,
             hid=hid,
             name="hap-redirect-state@1",
@@ -372,7 +374,9 @@ def test_spawn_is_used_instead_of_fork(hapless: Hapless):
 
 
 def test_wrap_subprocess(hapless: Hapless):
-    hap = hapless.create_hap(cmd="echo subprocess", name="hap-subprocess")
+    with patch.dict("os.environ", {"TESTING": "true"}, clear=True):
+        hap = hapless.create_hap(cmd="echo subprocess", name="hap-subprocess")
+
     with patch("subprocess.Popen") as popen_mock, patch.object(
         hap, "bind"
     ) as bind_mock, patch.object(hap, "set_return_code") as set_return_code_mock:
@@ -384,6 +388,7 @@ def test_wrap_subprocess(hapless: Hapless):
         popen_mock.assert_called_once_with(
             "echo subprocess",
             cwd=hap.workdir,
+            env={"TESTING": "true"},
             shell=True,
             executable=ANY,
             stdout=ANY,
