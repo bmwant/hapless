@@ -19,7 +19,6 @@ def test_restart_uses_same_working_dir(hapless: Hapless, monkeypatch):
             name="hap-same-name",
         )
     hid = hap.hid
-    # breakpoint()
     assert hap.workdir == EXAMPLES_DIR
 
     hapless.run_hap(hap, blocking=True)
