@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 from pathlib import Path
 from typing import Dict
 from unittest.mock import Mock, PropertyMock, patch
@@ -7,8 +8,7 @@ from unittest.mock import Mock, PropertyMock, patch
 import pytest
 
 from hapless.hap import Hap
-
-# from hapless.main import Hapless
+from hapless.main import Hapless
 
 
 @pytest.fixture
@@ -80,24 +80,36 @@ def test_proc_env_is_used_as_primaty_source(hap: Hap, write_env_factory):
 # assert hap.stdout_path.read_text().strip() == "hapless_env_value"
 
 
-# def test_env_preserved_on_restart(hapless: Hapless):
-#     hap = hapless.create_hap(
-#         cmd="python -c 'import os; print(os.getenv(\"HAPLESS_TEST_ENV_VAR\"))'",
-#         name="hap-env-restart-test",
-#         env={"HAPLESS_TEST_ENV_VAR": "hapless_env_value_restart"},
-#     )
+def test_env_preserved_on_restart(hapless: Hapless):
+    env = {"TESTING": "true"}
+    # NOTE: providing absolute path as environment got erased for this test
+    python_exec = shutil.which("python")
+    hap = hapless.create_hap(
+        cmd=f"{python_exec} -c 'import os; print(os.getenv(\"TESTING\"))'",
+        env=env,
+        name="hap-env-restart",
+    )
 
-#     hapless.run_hap(hap, blocking=True)
-#     assert hap.rc == 0
-#     assert hap.stdout_path.exists()
-#     assert hap.stdout_path.read_text().strip() == "hapless_env_value_restart"
+    hapless.run_hap(hap, blocking=True)
+    assert hap.rc == 0
+    assert hap.stdout_path.exists()
+    assert hap.stdout_path.read_text().strip() == "true"
+    original_run = hapless.run_command
 
-#     hapless.restart(hap)
-#     assert hap.rc == 0
-#     assert hap.stdout_path.exists()
-#     # The output will be appended on restart
-#     outputs = hap.stdout_path.read_text().strip().splitlines()
-#     assert outputs[-1] == "hapless_env_value_restart"
+    def blocking_run(*args, **kwargs):
+        kwargs["blocking"] = True
+        return original_run(*args, **kwargs)
+
+    with patch.object(
+        hapless, "run_command", side_effect=blocking_run
+    ) as run_mock, patch.dict(os.environ, {"TESTING": "false"}, clear=True):
+        hapless.restart(hap)
+        run_mock.assert_called_once()
+
+    assert hap.rc == 0
+    assert hap.stdout_path.exists()
+    # NOTE: original env value is still used
+    assert hap.stdout_path.read_text().strip() == "true"
 
 
 # def test_env_is_populated_on_empty_env(hapless: Hapless):
@@ -114,42 +126,35 @@ def test_proc_env_is_used_as_primaty_source(hap: Hap, write_env_factory):
 #     assert hap.stdout_path.read_text().strip() == "None"
 
 
-# def test_restart_uses_same_working_dir(hapless: Hapless, monkeypatch):
-#     monkeypatch.chdir(EXAMPLES_DIR)
-#     hap = hapless.create_hap(
-#         cmd="python ./samename.py",
-#         name="hap-same-name",
-#     )
-#     hid = hap.hid
-#     assert hap.workdir == EXAMPLES_DIR
+def test_restart_uses_same_env(hapless: Hapless, monkeypatch):
+    env = {"TESTING": "true"}
+    hap = hapless.create_hap(
+        cmd="true",
+        env=env,
+        name="hap-same-env",
+    )
+    hid = hap.hid
 
-#     hapless.run_hap(hap, blocking=True)
-#     assert hap.rc == 0
-#     assert hap.stdout_path.exists()
-#     assert "Correct file is being run" in hap.stdout_path.read_text()
+    hapless.run_hap(hap, blocking=True)
+    assert hap.rc == 0
 
-#     # Contains script with the same filename
-#     monkeypatch.chdir(EXAMPLES_DIR / "nested")
+    original_run = hapless.run_command
 
-#     original_run = hapless.run_command
+    def blocking_run(*args, **kwargs):
+        kwargs["blocking"] = True
+        return original_run(*args, **kwargs)
 
-#     def blocking_run(*args, **kwargs):
-#         kwargs["blocking"] = True
-#         return original_run(*args, **kwargs)
+    with patch.object(hapless, "run_command", side_effect=blocking_run) as run_mock:
+        hapless.restart(hap)
+        run_mock.assert_called_once_with(
+            cmd="true",
+            env=env,
+            workdir=hap.workdir,
+            hid=hid,
+            name="hap-same-env@1",
+            redirect_stderr=False,
+        )
 
-#     with patch.object(hapless, "run_command", side_effect=blocking_run) as run_mock:
-#         hapless.restart(hap)
-#         run_mock.assert_called_once_with(
-#             cmd="python ./samename.py",
-#             workdir=EXAMPLES_DIR,
-#             hid=hid,
-#             name="hap-same-name@1",
-#             redirect_stderr=False,
-#         )
-
-#     restarted_hap = hapless.get_hap("hap-same-name")
-#     assert restarted_hap is not None
-#     assert restarted_hap.rc == 0
-#     assert restarted_hap.stdout_path.exists()
-#     assert "Correct file is being run" in restarted_hap.stdout_path.read_text()
-#     assert "Malicious code execution" not in restarted_hap.stdout_path.read_text()
+    restarted_hap = hapless.get_hap("hap-same-env")
+    assert restarted_hap is not None
+    assert restarted_hap.rc == 0
