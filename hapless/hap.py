@@ -269,11 +269,22 @@ class Hap(object):
         """
         Base name without restarts counter.
         """
-        return self.raw_name.split(config.RESTART_DELIM)[0]
+        raw_name = self.raw_name
+        if raw_name is None:
+            raise ValueError("Hap state is corrupted")
+
+        return raw_name.split(config.RESTART_DELIM)[0]
 
     @cached_property
     def restarts(self) -> int:
-        _, *rest = self.raw_name.rsplit("@", maxsplit=1)
+        """
+        Obtain number of restarts from the raw name.
+        """
+        raw_name = self.raw_name
+        if raw_name is None:
+            raise ValueError("Hap state is corrupted")
+
+        _, *rest = raw_name.rsplit("@", maxsplit=1)
         return int(rest[0]) if rest else 0
 
     @property

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hapless"
-version = "0.14.0"
+version = "0.15.0"
 description = "Run and track processes in background"
 authors = ["Misha Behersky <bmwant@gmail.com>"]
 license = "MIT"
