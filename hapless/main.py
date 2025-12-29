@@ -1,11 +1,11 @@
 import getpass
 import os
 import shutil
-import signal
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from signal import Signals, strsignal
 from typing import Dict, List, Optional, Union, cast
 
 import psutil
@@ -360,11 +360,9 @@ class Hapless:
             self.ui.error("No active haps to kill")
         return killed_counter
 
-    def signal(self, hap: Hap, sig: signal.Signals):
+    def signal(self, hap: Hap, sig: Signals):
         if hap.active:
-            sig_text = (
-                f"[bold]{sig.name}[/] ([{config.COLOR_MAIN}]{signal.strsignal(sig)}[/])"
-            )
+            sig_text = f"[bold]{sig.name}[/] ([{config.COLOR_MAIN}]{strsignal(sig)}[/])"
             self.ui.print(f"{config.ICON_INFO} Sending {sig_text} to hap {hap}")
             hap.proc.send_signal(sig)
         else:
