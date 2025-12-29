@@ -6,7 +6,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, cast
 
 import psutil
 
@@ -148,7 +148,7 @@ class Hapless:
             if shell_exec is not None:
                 logger.debug(f"Using {shell_exec} to run hap")
             proc = subprocess.Popen(
-                hap.cmd,
+                cast(str, hap.cmd),
                 cwd=hap.workdir,
                 env=hap.env,
                 shell=True,
@@ -383,10 +383,10 @@ class Hapless:
         if hap.active:
             self.kill([hap], verbose=False)
 
-        hap_killed = self.get_hap(hid)
+        hap_killed = cast(Hap, self.get_hap(hid))
         while hap_killed.active:
             # NOTE: re-read is required as `proc` is a cached property
-            hap_killed = self.get_hap(hid)
+            hap_killed = cast(Hap, self.get_hap(hid))
 
         rc_exists = wait_created(hap_killed._rc_file, timeout=1)
         if not rc_exists:
@@ -399,7 +399,7 @@ class Hapless:
 
         name = f"{name}{config.RESTART_DELIM}{restarts + 1}"
         self.run_command(
-            cmd=cmd,
+            cmd=cast(str, cmd),
             env=env,
             workdir=workdir,
             hid=hid,
