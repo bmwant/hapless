@@ -1,8 +1,10 @@
+import os
 from pathlib import Path
 from unittest.mock import ANY, Mock, patch
 
 import pytest
 
+from hapless.hap import Hap
 from hapless.main import Hapless
 
 
@@ -22,19 +24,37 @@ def test_get_hap_dirs_with_hap(hapless: Hapless, hap):
 
 
 def test_create_hap(hapless: Hapless):
-    result = hapless.create_hap("echo hello")
-    assert result.cmd == "echo hello"
-    assert result.hid == "1"
-    assert result.name is not None
-    assert isinstance(result.name, str)
-    assert result.name.startswith("hap-")
+    hap = hapless.create_hap("echo create")
+    assert hap.cmd == "echo create"
+    assert hap.hid == "1"
+    assert hap.name is not None
+    assert isinstance(hap.name, str)
+    assert hap.name.startswith("hap-")
 
 
 def test_create_hap_custom_hid(hapless: Hapless):
-    result = hapless.create_hap(cmd="echo hello", hid="42", name="hap-name")
-    assert result.cmd == "echo hello"
-    assert result.hid == "42"
-    assert result.name == "hap-name"
+    hap = hapless.create_hap(cmd="echo hid", hid="42", name="hap-name")
+    assert hap.cmd == "echo hid"
+    assert hap.hid == "42"
+    assert hap.name == "hap-name"
+
+
+@patch.dict(os.environ, {"ENV_KEY": "TEST_VALUE"}, clear=True)
+def test_create_hap_defaults_to_current_env(hapless: Hapless):
+    env = {"ENV_KEY": "TEST_VALUE"}
+
+    with patch(
+        "hapless.main.Hap._set_env",
+        autospec=True,
+        side_effect=Hap._set_env,
+    ) as set_env_mock:
+        hap = hapless.create_hap(cmd="echo env", name="hap-env")
+
+        # NOTE: it's a method, so we need to pass `self` as the first argument
+        set_env_mock.assert_called_once_with(hap, env)
+        assert hap.cmd == "echo env"
+        assert hap.name == "hap-env"
+        assert hap.env == env
 
 
 def test_get_hap_works_with_restarts(hapless: Hapless):
