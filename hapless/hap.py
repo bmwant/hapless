@@ -68,7 +68,7 @@ class Hap(object):
         with open(self._rc_file, "w") as f:
             f.write(f"{rc}")
 
-    def _set_raw_name(self, raw_name: Optional[str]):
+    def _set_raw_name(self, raw_name: Optional[str]) -> None:
         """
         Set name for the first time on hap creation.
         """
@@ -110,7 +110,7 @@ class Hap(object):
         if not psutil.pid_exists(pid):
             raise RuntimeError(f"Process with pid {pid} is gone")
 
-    def _set_logfiles(self, redirect_stderr: bool):
+    def _set_logfiles(self, redirect_stderr: bool) -> None:
         if redirect_stderr:
             logger.debug("Process stderr will be redirected to stdout file")
         if not self._stdout_path.exists() and not redirect_stderr:
@@ -127,12 +127,16 @@ class Hap(object):
                 logger.error(f"Cannot get environment: {e}")
         return environ
 
-    def _set_env(self, env: Optional[Dict[str, str]] = None):
-        if env is None:
-            env = dict(os.environ)
+    def _set_env(self, env: Optional[Dict[str, str]] = None) -> None:
+        """
+        Set environment variables for the first time on hap creation.
+        """
+        if self.env is None:
+            if env is None:
+                env = dict(os.environ)
 
-        with open(self._env_file, "w") as env_file:
-            env_file.write(json.dumps(env))
+            with open(self._env_file, "w") as env_file:
+                env_file.write(json.dumps(env))
 
     def bind(self, pid: int):
         """
@@ -247,10 +251,7 @@ class Hap(object):
     @property
     @allow_missing
     def env(self) -> Optional[Dict[str, str]]:
-        proc = self.proc
-        environ = {}
-        if proc is not None:
-            environ = proc.environ()
+        environ = self._get_proc_env()
 
         if environ:
             return environ

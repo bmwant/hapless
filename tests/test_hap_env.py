@@ -29,6 +29,25 @@ def test_empty_env_provided_on_creation(tmp_path):
     assert hap.env == {}
 
 
+def test_correct_env_is_picked_up_on_instance_creation(tmp_path):
+    with patch.dict(os.environ, {"TESTING": "true"}, clear=True):
+        hap = Hap(tmp_path, cmd="true")
+        assert hap.pid is None
+        assert hap.proc is None
+        assert hap.rc is None
+        assert not hap.active
+        assert hap.env == {"TESTING": "true"}
+
+    # Check reread picks up previously saved state
+    with patch.dict(os.environ, {"TESTING": "false"}, clear=True):
+        hap = Hap(tmp_path)
+        assert hap.pid is None
+        assert hap.proc is None
+        assert hap.rc is None
+        assert not hap.active
+        assert hap.env == {"TESTING": "true"}
+
+
 @patch.dict(os.environ, {"ENV_KEY": "TEST_VALUE"}, clear=True)
 def test_env_defaults_to_current_env_if_none(tmp_path):
     hap = Hap(tmp_path, cmd="false")
@@ -64,20 +83,6 @@ def test_proc_env_is_used_as_primaty_source(hap: Hap, write_env_factory):
     with patch.object(type(hap), "proc", prop_mock):
         assert hap.proc is proc_mock
         assert hap.env == {"ENV_KEY": "ENV_VALUE_FROM_PROC"}
-
-
-# def test_correct_env_is_picked_up():
-#     hapless = Hapless()
-# hap = hapless.create_hap(
-#     cmd="python -c 'import os; print(os.getenv(\"HAPLESS_TEST_ENV_VAR\"))'",
-#     name="hap-env-test",
-#     env={"HAPLESS_TEST_ENV_VAR": "hapless_env_value"},
-# )
-
-# hapless.run_hap(hap, blocking=True)
-# assert hap.rc == 0
-# assert hap.stdout_path.exists()
-# assert hap.stdout_path.read_text().strip() == "hapless_env_value"
 
 
 def test_env_preserved_on_restart(hapless: Hapless):
