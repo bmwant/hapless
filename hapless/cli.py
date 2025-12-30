@@ -215,6 +215,7 @@ def _wrap_hap(hap_alias: str) -> None:
             f.write(message)
         logger.error(message)
         return sys.exit(1)
+
     hapless._wrap_subprocess(hap)
 
 

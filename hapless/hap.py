@@ -35,6 +35,7 @@ class Hap(object):
         *,
         name: Optional[str] = None,
         cmd: Optional[str] = None,
+        env: Optional[Dict[str, str]] = None,
         workdir: Optional[Union[str, Path]] = None,
         redirect_stderr: bool = False,
     ) -> None:
@@ -57,6 +58,7 @@ class Hap(object):
         self._set_logfiles(redirect_stderr)
         self._set_raw_name(name)
         self._set_command_context(cmd, workdir)
+        self._set_env(env)
 
     def set_name(self, name: str):
         with open(self._name_file, "w") as f:
@@ -66,7 +68,7 @@ class Hap(object):
         with open(self._rc_file, "w") as f:
             f.write(f"{rc}")
 
-    def _set_raw_name(self, raw_name: Optional[str]):
+    def _set_raw_name(self, raw_name: Optional[str]) -> None:
         """
         Set name for the first time on hap creation.
         """
@@ -108,32 +110,33 @@ class Hap(object):
         if not psutil.pid_exists(pid):
             raise RuntimeError(f"Process with pid {pid} is gone")
 
-    def _set_logfiles(self, redirect_stderr: bool):
+    def _set_logfiles(self, redirect_stderr: bool) -> None:
         if redirect_stderr:
             logger.debug("Process stderr will be redirected to stdout file")
         if not self._stdout_path.exists() and not redirect_stderr:
             self._stderr_path.touch(exist_ok=True, mode=0o644)
         self._stdout_path.touch(exist_ok=True, mode=0o644)
 
-    def _set_env(self):
+    def _get_proc_env(self) -> Dict[str, str]:
         proc = self.proc
-
         environ = {}
         if proc is not None:
             try:
                 environ = proc.environ()
             except (ProcessLookupError, psutil.NoSuchProcess) as e:
                 logger.error(f"Cannot get environment: {e}")
+        return environ
 
-        if not environ:
-            logger.warning(
-                "Cannot get environment from the process. "
-                "Fallback to current environment"
-            )
-            environ = dict(os.environ)
+    def _set_env(self, env: Optional[Dict[str, str]] = None) -> None:
+        """
+        Set environment variables for the first time on hap creation.
+        """
+        if self.env is None:
+            if env is None:
+                env = dict(os.environ)
 
-        with open(self._env_file, "w") as env_file:
-            env_file.write(json.dumps(environ))
+            with open(self._env_file, "w") as env_file:
+                env_file.write(json.dumps(env))
 
     def bind(self, pid: int):
         """
@@ -141,7 +144,6 @@ class Hap(object):
         """
         try:
             self._set_pid(pid)
-            self._set_env()
         except (RuntimeError, psutil.AccessDenied) as e:
             logger.error(f"Cannot bind due to {e}")
 
@@ -248,10 +250,11 @@ class Hap(object):
 
     @property
     @allow_missing
-    def env(self) -> Dict[str, str]:
-        proc = self.proc
-        if proc is not None:
-            return proc.environ()
+    def env(self) -> Optional[Dict[str, str]]:
+        environ = self._get_proc_env()
+
+        if environ:
+            return environ
 
         with open(self._env_file) as f:
             return json.loads(f.read())
@@ -267,11 +270,22 @@ class Hap(object):
         """
         Base name without restarts counter.
         """
-        return self.raw_name.split(config.RESTART_DELIM)[0]
+        raw_name = self.raw_name
+        if raw_name is None:
+            raise ValueError("Hap state is corrupted")
+
+        return raw_name.split(config.RESTART_DELIM)[0]
 
     @cached_property
     def restarts(self) -> int:
-        _, *rest = self.raw_name.rsplit("@", maxsplit=1)
+        """
+        Obtain number of restarts from the raw name.
+        """
+        raw_name = self.raw_name
+        if raw_name is None:
+            raise ValueError("Hap state is corrupted")
+
+        _, *rest = raw_name.rsplit("@", maxsplit=1)
         return int(rest[0]) if rest else 0
 
     @property

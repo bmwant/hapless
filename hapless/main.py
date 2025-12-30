@@ -1,12 +1,12 @@
 import getpass
 import os
 import shutil
-import signal
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from signal import Signals, strsignal
+from typing import Dict, List, Optional, Union, cast
 
 import psutil
 
@@ -113,6 +113,7 @@ class Hapless:
     def create_hap(
         self,
         cmd: str,
+        env: Optional[Dict[str, str]] = None,
         workdir: Optional[Union[str, Path]] = None,
         hid: Optional[str] = None,
         name: Optional[str] = None,
@@ -126,10 +127,13 @@ class Hapless:
             redirect_stderr = config.REDIRECT_STDERR
         if workdir is None or not Path(workdir).exists():
             workdir = os.getcwd()
+        if env is None:
+            env = dict(os.environ)
         return Hap(
             hap_dir,
             name=name,
             cmd=cmd,
+            env=env,
             workdir=workdir,
             redirect_stderr=redirect_stderr,
         )
@@ -144,8 +148,9 @@ class Hapless:
             if shell_exec is not None:
                 logger.debug(f"Using {shell_exec} to run hap")
             proc = subprocess.Popen(
-                hap.cmd,
+                cast(str, hap.cmd),
                 cwd=hap.workdir,
+                env=hap.env,
                 shell=True,
                 executable=shell_exec,
                 stdout=stdout_pipe,
@@ -247,6 +252,7 @@ class Hapless:
     def run_command(
         self,
         cmd: str,
+        env: Optional[Dict[str, str]] = None,
         workdir: Optional[Union[str, Path]] = None,
         hid: Optional[str] = None,
         name: Optional[str] = None,
@@ -261,6 +267,7 @@ class Hapless:
         """
         hap = self.create_hap(
             cmd=cmd,
+            env=env,
             workdir=workdir,
             hid=hid,
             name=name,
@@ -353,21 +360,20 @@ class Hapless:
             self.ui.error("No active haps to kill")
         return killed_counter
 
-    def signal(self, hap: Hap, sig: signal.Signals):
+    def signal(self, hap: Hap, sig: Signals):
         if hap.active:
-            sig_text = (
-                f"[bold]{sig.name}[/] ([{config.COLOR_MAIN}]{signal.strsignal(sig)}[/])"
-            )
+            sig_text = f"[bold]{sig.name}[/] ([{config.COLOR_MAIN}]{strsignal(sig)}[/])"
             self.ui.print(f"{config.ICON_INFO} Sending {sig_text} to hap {hap}")
             hap.proc.send_signal(sig)
         else:
             self.ui.error("Cannot send signal to the inactive hap")
 
     def restart(self, hap: Hap) -> None:
-        hid, name, cmd, workdir, restarts, redirect_stderr = (
+        hid, name, cmd, env, workdir, restarts, redirect_stderr = (
             hap.hid,
             hap.name,
             hap.cmd,
+            hap.env,
             hap.workdir,
             hap.restarts,
             hap.redirect_stderr,
@@ -375,10 +381,10 @@ class Hapless:
         if hap.active:
             self.kill([hap], verbose=False)
 
-        hap_killed = self.get_hap(hid)
+        hap_killed = cast(Hap, self.get_hap(hid))
         while hap_killed.active:
             # NOTE: re-read is required as `proc` is a cached property
-            hap_killed = self.get_hap(hid)
+            hap_killed = cast(Hap, self.get_hap(hid))
 
         rc_exists = wait_created(hap_killed._rc_file, timeout=1)
         if not rc_exists:
@@ -391,7 +397,8 @@ class Hapless:
 
         name = f"{name}{config.RESTART_DELIM}{restarts + 1}"
         self.run_command(
-            cmd=cmd,
+            cmd=cast(str, cmd),
+            env=env,
             workdir=workdir,
             hid=hid,
             name=name,

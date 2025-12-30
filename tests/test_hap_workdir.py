@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 from unittest.mock import patch
 
@@ -11,10 +12,12 @@ EXAMPLES_DIR = TESTS_DIR.parent / "examples"
 
 def test_restart_uses_same_working_dir(hapless: Hapless, monkeypatch):
     monkeypatch.chdir(EXAMPLES_DIR)
-    hap = hapless.create_hap(
-        cmd="python ./samename.py",
-        name="hap-same-name",
-    )
+    python_exec = shutil.which("python")
+    with patch.dict("os.environ", {"TESTING": "true"}, clear=True):
+        hap = hapless.create_hap(
+            cmd=f"{python_exec} ./samename.py",
+            name="hap-same-name",
+        )
     hid = hap.hid
     assert hap.workdir == EXAMPLES_DIR
 
@@ -35,7 +38,8 @@ def test_restart_uses_same_working_dir(hapless: Hapless, monkeypatch):
     with patch.object(hapless, "run_command", side_effect=blocking_run) as run_mock:
         hapless.restart(hap)
         run_mock.assert_called_once_with(
-            cmd="python ./samename.py",
+            cmd=f"{python_exec} ./samename.py",
+            env={"TESTING": "true"},
             workdir=EXAMPLES_DIR,
             hid=hid,
             name="hap-same-name@1",

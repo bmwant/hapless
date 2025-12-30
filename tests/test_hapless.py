@@ -1,8 +1,10 @@
+import os
 from pathlib import Path
 from unittest.mock import ANY, Mock, patch
 
 import pytest
 
+from hapless.hap import Hap
 from hapless.main import Hapless
 
 
@@ -22,19 +24,37 @@ def test_get_hap_dirs_with_hap(hapless: Hapless, hap):
 
 
 def test_create_hap(hapless: Hapless):
-    result = hapless.create_hap("echo hello")
-    assert result.cmd == "echo hello"
-    assert result.hid == "1"
-    assert result.name is not None
-    assert isinstance(result.name, str)
-    assert result.name.startswith("hap-")
+    hap = hapless.create_hap("echo create")
+    assert hap.cmd == "echo create"
+    assert hap.hid == "1"
+    assert hap.name is not None
+    assert isinstance(hap.name, str)
+    assert hap.name.startswith("hap-")
 
 
 def test_create_hap_custom_hid(hapless: Hapless):
-    result = hapless.create_hap(cmd="echo hello", hid="42", name="hap-name")
-    assert result.cmd == "echo hello"
-    assert result.hid == "42"
-    assert result.name == "hap-name"
+    hap = hapless.create_hap(cmd="echo hid", hid="42", name="hap-name")
+    assert hap.cmd == "echo hid"
+    assert hap.hid == "42"
+    assert hap.name == "hap-name"
+
+
+@patch.dict(os.environ, {"ENV_KEY": "TEST_VALUE"}, clear=True)
+def test_create_hap_defaults_to_current_env(hapless: Hapless):
+    env = {"ENV_KEY": "TEST_VALUE"}
+
+    with patch(
+        "hapless.main.Hap._set_env",
+        autospec=True,
+        side_effect=Hap._set_env,
+    ) as set_env_mock:
+        hap = hapless.create_hap(cmd="echo env", name="hap-env")
+
+        # NOTE: it's a method, so we need to pass `self` as the first argument
+        set_env_mock.assert_called_once_with(hap, env)
+        assert hap.cmd == "echo env"
+        assert hap.name == "hap-env"
+        assert hap.env == env
 
 
 def test_get_hap_works_with_restarts(hapless: Hapless):
@@ -215,10 +235,29 @@ def test_run_command_accepts_redirect_stderr_parameter(hapless: Hapless):
         hapless.run_command("echo redirect", redirect_stderr=True)
         create_hap_mock.assert_called_once_with(
             cmd="echo redirect",
+            env=None,
             workdir=None,
             hid=None,
             name=None,
             redirect_stderr=True,
+        )
+        run_hap_mock.assert_called_once_with(hap_mock, check=False, blocking=False)
+
+
+def test_run_command_accepts_env_parameter(hapless: Hapless):
+    custom_env = {"KEY": "VALUE"}
+    hap_mock = Mock()
+    with patch.object(hapless, "run_hap") as run_hap_mock, patch.object(
+        hapless, "create_hap", return_value=hap_mock
+    ) as create_hap_mock:
+        hapless.run_command("echo env", env=custom_env)
+        create_hap_mock.assert_called_once_with(
+            cmd="echo env",
+            env=custom_env,
+            workdir=None,
+            hid=None,
+            name=None,
+            redirect_stderr=None,
         )
         run_hap_mock.assert_called_once_with(hap_mock, check=False, blocking=False)
 
@@ -296,6 +335,7 @@ def test_redirect_state_is_not_affected_after_creation(hapless: Hapless):
 def test_restart_preserves_redirect_state(hapless: Hapless, redirect_stderr: bool):
     hap = hapless.create_hap(
         cmd="doesnotexist",
+        env={},
         name="hap-redirect-state",
         redirect_stderr=redirect_stderr,
     )
@@ -315,6 +355,7 @@ def test_restart_preserves_redirect_state(hapless: Hapless, redirect_stderr: boo
         wait_created_mock.assert_called_once_with(ANY, timeout=1)
         run_command_mock.assert_called_once_with(
             cmd="doesnotexist",
+            env={},
             workdir=hapless.dir,
             hid=hid,
             name="hap-redirect-state@1",
@@ -353,7 +394,9 @@ def test_spawn_is_used_instead_of_fork(hapless: Hapless):
 
 
 def test_wrap_subprocess(hapless: Hapless):
-    hap = hapless.create_hap(cmd="echo subprocess", name="hap-subprocess")
+    with patch.dict("os.environ", {"TESTING": "true"}, clear=True):
+        hap = hapless.create_hap(cmd="echo subprocess", name="hap-subprocess")
+
     with patch("subprocess.Popen") as popen_mock, patch.object(
         hap, "bind"
     ) as bind_mock, patch.object(hap, "set_return_code") as set_return_code_mock:
@@ -365,6 +408,7 @@ def test_wrap_subprocess(hapless: Hapless):
         popen_mock.assert_called_once_with(
             "echo subprocess",
             cwd=hap.workdir,
+            env={"TESTING": "true"},
             shell=True,
             executable=ANY,
             stdout=ANY,
