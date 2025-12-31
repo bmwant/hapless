@@ -16,9 +16,9 @@ import structlog
 from rich.spinner import Spinner
 from rich.text import Text
 
-try:
+if sys.version_info >= (3, 10):
     from typing import ParamSpec
-except ImportError:
+else:
     from typing_extensions import ParamSpec
 
 from hapless import config
