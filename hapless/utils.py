@@ -15,7 +15,11 @@ import psutil
 import structlog
 from rich.spinner import Spinner
 from rich.text import Text
-from typing_extensions import ParamSpec
+
+try:
+    from typing import ParamSpec
+except ImportError:
+    from typing_extensions import ParamSpec
 
 from hapless import config
 
