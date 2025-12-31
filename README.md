@@ -18,18 +18,35 @@ Simplest way of running and tracking processes in the background.
 
 ### Installation
 
+* Install using [uv](https://docs.astral.sh/uv/)
+
+```bash
+uv tool install hapless
+```
+
+* Install using [pipx](https://pipx.pypa.io/latest/)
+
+```bash
+pipx install hapless
+```
+
+* Install using [pip](https://pip.pypa.io/en/stable/)
+
 ```bash
 pip install hapless
 
-# or to make sure proper pip is used for the given python executable
+# To make sure proper pip is used for the given python executable
 python -m pip install hapless
-```
 
-Install into user-specific directory in case of any permissions-related issues.
-
-```bash
+# Install into user-specific directory in case of any permissions-related issues
 pip install --user hapless
 python -m pip install --user hapless
+```
+
+* Install using [brew](https://brew.sh/)
+
+```bash
+brew install hapless
 ```
 
 ### Usage
@@ -58,6 +75,7 @@ Changes made in each release can be found on the [Releases](https://github.com/b
 Python versions compatibility:
 
 * `0.11.1` is the last version to support Python `3.7`
+* `0.15.1` is the last version to support Python `3.8`
 
 ### See also
 
