@@ -621,4 +621,4 @@ dev = ["nox", "pytest", "pytest-cov", "pytest-env", "ruff", "ty"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "c4b4339bccdacf7a0e3628ea2d3a2d4a74f7bff40027dbb49321e68524858943"
+content-hash = "1a5eb93300ce07a220dae508dfee82e8c14782f0b701852d1b59253798ccbc2b"
